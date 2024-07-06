@@ -1,3 +1,5 @@
+![llm_master_logo_full](https://github.com/Habatakurikei/llm_master/assets/131997581/35bc6932-def9-4595-a2b3-2c122fb4e61e)
+
 # LLM Master
 
 LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) from different providers. It supports concurrent execution of multiple LLMs and easy management of API keys and model configurations.
@@ -62,6 +64,10 @@ pip install anthropic google-generativeai groq openai
 ## Customization
 
 You can easily add new LLM providers or models by updating the `REGISTERED_LLM` dictionary and creating a new thread class for the provider.
+
+## Update Plan
+
+Currently one common prompt can be used for multiple LLM generation. In work to enable separate prompts for individual LLMs.
 
 ## Contributing
 
