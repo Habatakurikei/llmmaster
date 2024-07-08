@@ -17,7 +17,9 @@ LLM Master is a Python library that provides a unified interface for interacting
 - Concurrent execution of multiple LLMs
 - Easy configuration of API keys through environment variables
 - Support for various models from each provider
-- Customizable generation parameters (max tokens, temperature)
+- Customizable generation parameters
+  - Mandatory parameters: `provider` and `prompt`
+  - Optional parameters: `model`, `max_tokens` and `temperature`
 - Thread-based execution for improved performance
 
 ## Installation
@@ -40,39 +42,78 @@ pip install anthropic google-generativeai groq openai
    export PERPLEXITY_API_KEY="your_perplexity_key"
    ```
 
-2. Import and use the LLMMaster class:
+2. Use cases
 
-   ```python
-   from llm_master import LLMMaster
+  * Using single LLM
 
-   # Create an instance
-   llm_master = LLMMaster()
+```python
+from llm_master import LLMMaster
 
-   # Summon specific LLMs or use summon_all() for all supported LLMs
-   llm_master.summon({'openai': 'gpt-4o', 'anthropic': 'claude-3-5-sonnet-20240620'})
-   # or
-   # llm_master.summon_all()
+# Create an instance of LLMMaster
+llm_master = LLMMaster()
 
-   # Run the LLMs with a prompt
-   llm_master.run(prompt="Tell me a joke about programming", max_tokens=100, temperature=0.7)
+# Configure LLM instance
+llm_master.summon({
+    "openai_instance": llm_master.pack_parameters(
+        provider="openai",
+        model="gpt-4o",
+        prompt="Hello, what's the weather like today?",
+        max_tokens=100,
+        temperature=0.7
+    )
+})
 
-   # Access the results
-   for provider, response in llm_master.results.items():
-       print(f"{provider} response: {response}")
-   ```
+# Run LLM
+llm_master.run()
+
+# Get results
+results = llm_master.results
+print(results["openai_instance"])
+
+# Clear instances
+llm_master.dismiss()
+```
+
+  * Using multiple LLMs simultaneously
+
+```python
+llm_master.summon({
+    "openai_instance": llm_master.pack_parameters(
+        provider="openai",
+        prompt="Summarize the main ideas of quantum computing."
+    ),
+    "anthropic_instance": llm_master.pack_parameters(
+        provider="anthropic",
+        prompt="Explain the concept of artificial general intelligence."
+    )
+})
+
+llm_master.run()
+
+results = llm_master.results
+print(results["openai_instance"])
+print(results["anthropic_instance"])
+```
+
+## Notes
+
+- Please comply with the terms of service for each provider's API.
+- Securely manage your API keys and be careful not to commit them to public repositories.
+- There is a limit (32) to the number of LLM instances that can be created at once.
 
 ## Customization
 
-You can easily add new LLM providers or models by updating the `REGISTERED_LLM` dictionary and creating a new thread class for the provider.
-
-## Update Plan
-
-Currently one common prompt can be used for multiple LLM generation. In work to enable separate prompts for individual LLMs.
+- You can easily adjust default models by updating the `REGISTERED_LLM` dictionary and creating a new thread class for the provider.
+- You can also run an individual provider LLM without using LLMMaster but each defined class.
 
 ## Contributing
 
-Contributions to LLM Master are welcome! Please feel free to submit a Pull Request.
+Contributions to LLM Master are welcome! Please feel free to submit a Pull Request and bug reports and feature requests through GitHub Issues.
 
 ## License
 
 This project is licensed under the MIT License.
+
+---
+
+This project is under development. New features and support for additional providers may be added. Please check the repository for the latest information.
