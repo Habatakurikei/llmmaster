@@ -1,4 +1,5 @@
 import os
+import time
 from threading import Thread
 
 import google.generativeai as genai
@@ -21,10 +22,16 @@ REGISTERED_LLM = {'anthropic': 'claude-3-5-sonnet-20240620',
                   'openai': 'gpt-4o',
                   'perplexity': 'llama-3-sonar-large-32k-online'}
 
+MAX_TOKENS = 4096
+TEMPERATURE = 0.7
+
+SUMMON_LIMIT = 32
+WAIT_FOR_SUMMONING = 1
+
 
 class LLMMaster():
     '''
-    Note: configure your API key in advance for your OS environment,
+    Note: configure your API key in advance in your OS environment,
           using set (Win) or export (Mac/Linux) command for:
             - ANTHROPIC_API_KEY
             - GEMINI_API_KEY
@@ -32,79 +39,83 @@ class LLMMaster():
             - OPENAI_API_KEY
             - PERPLEXITY_API_KEY
     Usage:
-      1. create a new instance
-      2. call summon or summon_all to initialize the instance
-      3. call run to start generation through LLM
-      4. access self.result to get generated texts
+      1. create this class instance.
+      2. call summon to set a new LLM instance with prompot.
+         Use pack_parameters() to make argument.
+      3. call run to start text generation for each LLM instance.
+      4. access self.results to get generated texts for each LLM instance.
+      5. call dismiss to clear LLM instances and results, or finish work.
     '''
     def __init__(self):
-        self.to_summon = {}
+        self.instances = {}
         self.results = {}
 
-    def summon(self, llms={}):
+    def summon(self, entries={}):
         '''
-        Set a single LLM indicated in argument to run.
-        Provide argument llms in dictionary format like {'vendor': 'model'},
-        e.g. {'openai': 'gpt-4o'}, see REGISTERED_LLM for acceptable cases.
-        Acceptable for either single model or multiple models setup.
-        
+        Set LLM instance. Provide argument in dictionary format as:
+        {
+            "label": {
+                "provider": "openai",
+                "model": "gpt-4o",
+                "prompt": "text",
+                "max_tokens": 4096,
+                "temperature": 0.7
+            }
+        }
+        See LLMInstanceCreator for input rules for each parameter.
+        Acceptable for both cases of single entry and multiple entries.
         '''
-        self.to_summon.update(llms)
+        num_to_summon = len(entries.keys())
 
-    def summon_all(self):
-        '''
-        Set all the registerd typical LLMs to run.
-        '''
-        self.to_summon.update(REGISTERED_LLM)
+        if num_to_summon < 1 or SUMMON_LIMIT < num_to_summon:
+            msg = f'LLM entries must be between 1 and 32 but {num_to_summon}.'
+            raise ValueError(msg)
 
-    def run(self, prompt='', max_tokens=4096, temperature=0.7):
+        generator = LLMInstanceCreator()
+
+        for key, value in entries.items():
+
+            if SUMMON_LIMIT < len(self.instances.keys()):
+                msg = 'Number of LLM entries to summon reached to limit '
+                msg = f'{SUMMON_LIMIT}.'
+                raise Exception(msg)
+
+            if key in self.instances.keys():
+                msg = f'Duplicate label: {key}'
+                raise Exception(msg)
+
+            try:
+                generator.verify(key, value)
+                self.instances.update(generator.create())
+
+            except Exception as e:
+                msg = 'Error occurred while verifying or creating instance.'
+                raise Exception(msg) from e
+
+    def run(self):
 
         self.results = {}
-        threads = []
 
-        for key, value in self.to_summon.items():
-
-            if key == 'anthropic':
-                instance = AnthropicLLM(model=value,
-                                        prompt=prompt,
-                                        max_tokens=max_tokens,
-                                        temperature=temperature)
-
-            elif key == 'google':
-                instance = GoogleLLM(model=value,
-                                     prompt=prompt,
-                                     max_tokens=max_tokens,
-                                     temperature=temperature)
-
-            elif key == 'groq':
-                instance = GroqLLM(model=value,
-                                   prompt=prompt,
-                                   max_tokens=max_tokens,
-                                   temperature=temperature)
-
-            elif key == 'openai':
-                instance = OpenAILLM(model=value,
-                                     prompt=prompt,
-                                     max_tokens=max_tokens,
-                                     temperature=temperature)
-
-            elif key == 'perplexity':
-                instance = PerplexityLLM(model=value,
-                                         prompt=prompt,
-                                         max_tokens=max_tokens,
-                                         temperature=temperature)
-
-            else:
-                raise Exception(f'Vendor {key} is not supported.')
-
-            threads.append(instance)
+        for instance in self.instances.values():
+            time.sleep(WAIT_FOR_SUMMONING)
             instance.start()
 
-        for instance in threads:
+        for instance in self.instances.values():
             instance.join()
 
-        for instance in threads:
-            self.results.update(instance.response)
+        for label, instance in self.instances.items():
+            buff = {label: instance.response}
+            self.results.update(buff)
+
+    def dismiss(self):
+        self.instances = {}
+        self.results = {}
+
+    def pack_parameters(self, **kwargs):
+        '''
+        Use this function to make entry in dictionary format.
+        '''
+        return kwargs
 
 
 class AnthropicLLM(Thread):
@@ -117,18 +128,20 @@ class AnthropicLLM(Thread):
     def __init__(self,
                  model=REGISTERED_LLM['anthropic'],
                  prompt='',
-                 max_tokens=4096,
-                 temperature=0.7):
+                 max_tokens=MAX_TOKENS,
+                 temperature=TEMPERATURE):
         super().__init__()
         self.model = model
         self.prompt = prompt
         self.max_tokens = max_tokens
         self.temperature = temperature
-        self.response = {}
+        self.response = ''
 
     def run(self):
 
-        print(f'Call Anthropic {self.model}...')
+        msg = 'Summon Anthropic with '
+        msg += f'{self.model}, {self.max_tokens}, {self.temperature}...'
+        print(msg)
 
         message = 'No response.'
 
@@ -143,14 +156,15 @@ class AnthropicLLM(Thread):
                           'content': [{'type': 'text', 'text': self.prompt}]}])
 
         except Exception as e:
-            raise Exception from e
+            msg = 'Error occurred while creating Anthropic LLM instance.'
+            raise Exception(msg) from e
 
         if hasattr(response, 'content'):
             message = response.content[0].text.strip()
 
         print(f'Anthropic responded =\n{message}\n')
 
-        self.response.update(anthropic=message)
+        self.response = message
 
 
 class GroqLLM(Thread):
@@ -165,8 +179,8 @@ class GroqLLM(Thread):
     def __init__(self,
                  model=REGISTERED_LLM['groq'],
                  prompt='',
-                 max_tokens=4096,
-                 temperature=0.7):
+                 max_tokens=MAX_TOKENS,
+                 temperature=TEMPERATURE):
         super().__init__()
         self.model = model
         self.prompt = prompt
@@ -176,7 +190,9 @@ class GroqLLM(Thread):
 
     def run(self):
 
-        print(f'Call Groq {self.model}')
+        msg = 'Summon Groq with '
+        msg += f'{self.model}, {self.max_tokens}, {self.temperature}...'
+        print(msg)
 
         message = 'No response.'
 
@@ -190,14 +206,15 @@ class GroqLLM(Thread):
                 messages=[{'role': 'user', 'content': self.prompt}])
 
         except Exception as e:
-            raise Exception from e
+            msg = 'Error occurred while creating Groq LLM instance.'
+            raise Exception(msg) from e
 
         if hasattr(response, 'choices'):
             message = response.choices[0].message.content.strip()
 
         print(f'Groq responded =\n{message}\n')
 
-        self.response.update(groq=message)
+        self.response = message
 
 
 class GoogleLLM(Thread):
@@ -210,8 +227,8 @@ class GoogleLLM(Thread):
     def __init__(self,
                  model=REGISTERED_LLM['google'],
                  prompt='',
-                 max_tokens=65536,
-                 temperature=0.7):
+                 max_tokens=MAX_TOKENS,
+                 temperature=TEMPERATURE):
         super().__init__()
         self.model = model
         self.prompt = prompt
@@ -221,7 +238,9 @@ class GoogleLLM(Thread):
 
     def run(self):
 
-        print(f'Call Google {self.model}')
+        msg = 'Summon Google with '
+        msg += f'{self.model}, {self.max_tokens}, {self.temperature}...'
+        print(msg)
 
         message = 'No response.'
 
@@ -235,14 +254,15 @@ class GoogleLLM(Thread):
             response = model.generate_content(self.prompt)
 
         except Exception as e:
-            raise Exception from e
+            msg = 'Error occurred while creating Google LLM instance.'
+            raise Exception(msg) from e
 
         if hasattr(response, 'text'):
             message = response.text.strip()
 
         print(f'Google responded =\n{message}\n')
 
-        self.response.update(google=message)
+        self.response = message
 
 
 class OpenAILLM(Thread):
@@ -258,8 +278,8 @@ class OpenAILLM(Thread):
     def __init__(self,
                  model=REGISTERED_LLM['openai'],
                  prompt='',
-                 max_tokens=4096,
-                 temperature=0.7):
+                 max_tokens=MAX_TOKENS,
+                 temperature=TEMPERATURE):
         super().__init__()
         self.model = model
         self.prompt = prompt
@@ -269,7 +289,9 @@ class OpenAILLM(Thread):
 
     def run(self):
 
-        print(f'Call OpenAI {self.model}')
+        msg = 'Summon OpenAI with '
+        msg += f'{self.model}, {self.max_tokens}, {self.temperature}...'
+        print(msg)
 
         message = 'No response.'
 
@@ -283,14 +305,15 @@ class OpenAILLM(Thread):
                 messages=[{'role': 'user', 'content': self.prompt}])
 
         except Exception as e:
-            raise Exception from e
+            msg = 'Error occurred while creating OpenAI LLM instance.'
+            raise Exception(msg) from e
 
         if hasattr(response, 'choices'):
             message = response.choices[0].message.content.strip()
 
         print(f'OpenAI responded =\n{message}\n')
 
-        self.response.update(openai=message)
+        self.response = message
 
 
 class PerplexityLLM(Thread):
@@ -308,8 +331,8 @@ class PerplexityLLM(Thread):
     def __init__(self,
                  model=REGISTERED_LLM['perplexity'],
                  prompt='',
-                 max_tokens=4096,
-                 temperature=0.7):
+                 max_tokens=MAX_TOKENS,
+                 temperature=TEMPERATURE):
         super().__init__()
         self.model = model
         self.prompt = prompt
@@ -319,7 +342,9 @@ class PerplexityLLM(Thread):
 
     def run(self):
 
-        print(f'Call Perplexity {self.model}')
+        msg = 'Summon Perplexity with '
+        msg += f'{self.model}, {self.max_tokens}, {self.temperature}...'
+        print(msg)
 
         message = 'No response.'
 
@@ -334,25 +359,142 @@ class PerplexityLLM(Thread):
                 messages=[{'role': 'user', 'content': self.prompt}])
 
         except Exception as e:
-            raise Exception from e
+            msg = 'Error occurred while creating Perplexity LLM instance.'
+            raise Exception(msg) from e
 
         if hasattr(response, 'choices'):
             message = response.choices[0].message.content.strip()
 
         print(f'Perplexity responded =\n{message}\n')
 
-        self.response.update(perplexity=message)
+        self.response = message
 
 
-def split_llm_information(llm=''):
+class LLMInstanceCreator():
     '''
-    Arrange dictionary format from text with slash for LLMMaster input.
-    e.g. 'openai/gpt-4o' will return {'openai': 'gpt-4o'}
+    Verify entry parameters and generate LLM instance in dictionary format.
     '''
-    items = llm.split('/')
+    def __init__(self):
+        self.label = ''
+        self.provider = ''
+        self.model = ''
+        self.prompt = ''
+        self.max_tokens = MAX_TOKENS
+        self.temperature = TEMPERATURE
+        self.verified_OK = False
 
-    if len(items) != 2:
-        msg = f'Length of entries must be 2 but {len(items)}: {llm}'
-        raise Exception(msg)
+    def verify(self, label='', parameters={}):
+        '''
+        Check validity of each parameter for given single entry.
 
-    return {items[0]: items[1]}
+        Arguments:
+        - label: unique identifier in string for instance (mandatory)
+            - empty str not acceptable
+        - entry parameters in dictionary:
+            - provider: string (mandatory)
+            - model: string defined by provider
+            - prompt: string (mandatory), empty str not acceptable
+            - max_tokens: natural number between 1 and 4096 (in most providers)
+            - temperature: positive float between 0 and 1
+        '''
+        self.verified_OK = False
+
+        # 1. verify label
+        if not any(label):
+            raise Exception('No label given in input.')
+
+        self.label = label
+
+        # 2. verify provider
+        if ('provider' not in parameters or
+           parameters['provider'] not in REGISTERED_LLM.keys()):
+            msg = 'Provider name not given or non-supported provider given.'
+            raise ValueError(msg)
+
+        self.provider = parameters['provider']
+
+        # 3. verify model
+        if 'model' not in parameters or not any(parameters['model']):
+            self.model = REGISTERED_LLM[self.provider]
+        else:
+            self.model = parameters['model']
+
+        # 4. verify prompt
+        if 'prompt' not in parameters or not any(parameters['prompt']):
+            raise ValueError('Prompt not given.')
+
+        self.prompt = parameters['prompt']
+
+        # 5. verify max_tokens
+        if 'max_tokens' not in parameters:
+            self.max_tokens = MAX_TOKENS
+
+        else:
+            buff = parameters['max_tokens']
+            if isinstance(buff, int) and 0 < buff and buff <= MAX_TOKENS:
+                self.max_tokens = buff
+            else:
+                self.max_tokens = MAX_TOKENS
+
+        # 6. verify temperature
+        if 'temperature' not in parameters:
+            self.temperature = TEMPERATURE
+
+        else:
+            buff = parameters['temperature']
+            if isinstance(buff, float) and 0.0 <= buff and buff <= 1.0:
+                self.temperature = buff
+            else:
+                self.temperature = TEMPERATURE
+
+        self.verified_OK = True
+
+    def create(self):
+        '''
+        Call only after verification confirmed passed.
+
+        Returns: in dictionary format of
+        - label: same as given in input
+        - instance of LLM ready to run
+        '''
+        if not self.verified_OK:
+            msg = 'Unable to generate because not verified or no input.'
+            raise Exception(msg)
+
+        if self.provider == 'anthropic':
+            instance = AnthropicLLM(model=self.model,
+                                    prompt=self.prompt,
+                                    max_tokens=self.max_tokens,
+                                    temperature=self.temperature)
+
+        elif self.provider == 'google':
+            instance = GoogleLLM(model=self.model,
+                                 prompt=self.prompt,
+                                 max_tokens=self.max_tokens,
+                                 temperature=self.temperature)
+
+        elif self.provider == 'groq':
+            instance = GroqLLM(model=self.model,
+                               prompt=self.prompt,
+                               max_tokens=self.max_tokens,
+                               temperature=self.temperature)
+
+        elif self.provider == 'openai':
+            instance = OpenAILLM(model=self.model,
+                                 prompt=self.prompt,
+                                 max_tokens=self.max_tokens,
+                                 temperature=self.temperature)
+
+        elif self.provider == 'perplexity':
+            instance = PerplexityLLM(model=self.model,
+                                     prompt=self.prompt,
+                                     max_tokens=self.max_tokens,
+                                     temperature=self.temperature)
+
+        else:
+            msg = f'Unknown provider name given {self.provider}'
+            raise Exception(msg)
+
+        self.verified_OK = False
+
+        return {self.label: instance}
