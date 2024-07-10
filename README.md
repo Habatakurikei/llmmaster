@@ -6,11 +6,18 @@ LLM Master is a Python library that provides a unified interface for interacting
 
 ## Supported LLM Providers
 
+### Text-to-Text Models
 - Anthropic (Claude)
 - Google (Gemini)
 - Groq
 - OpenAI (GPT)
 - Perplexity
+
+### Text-to-Image Models
+- OpenAI (Dall-E)
+- Stable Diffusion (comming soon)
+
+Text-to-Speech models and more models will be covered!
 
 ## Features
 
@@ -19,7 +26,7 @@ LLM Master is a Python library that provides a unified interface for interacting
 - Support for various models from each provider
 - Customizable generation parameters
   - Mandatory parameters: `provider` and `prompt`
-  - Optional parameters: `model`, `max_tokens` and `temperature`
+  - Optional parameters: `model` and particular parameters for different model
 - Thread-based execution for improved performance
 
 ## Installation
@@ -103,7 +110,7 @@ print(results["anthropic_instance"])
 
 ## Customization
 
-- You can easily adjust default models by updating the `REGISTERED_LLM` dictionary and creating a new thread class for the provider.
+- You can easily adjust default models by updating the default models in dictionary and creating a new thread class for the provider.
 - You can also run an individual provider LLM without using LLMMaster but each defined class.
 
 ## Contributing
