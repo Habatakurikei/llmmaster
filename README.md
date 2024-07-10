@@ -110,7 +110,7 @@ print(results["anthropic_instance"])
 
 ## Customization
 
-- You can easily adjust default models by updating the default models in dictionary and creating a new thread class for the provider.
+- You can easily adjust default models by updating the dictionary in `config.py` and creating a new thread class for the provider.
 - You can also run an individual provider LLM without using LLMMaster but each defined class.
 
 ## Contributing
