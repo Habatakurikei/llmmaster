@@ -31,11 +31,13 @@ Text-to-Speech models and more models will be covered!
 
 ## Installation
 
-To use LLM Master, you need to install the required dependencies. You can do this using pip:
+To use LLM Master, you need to install the library. You can do this using pip:
 
 ```
-pip install anthropic google-generativeai groq openai
+pip install llm-master
 ```
+
+Relevant packages will also be installed.
 
 ## Usage
 
