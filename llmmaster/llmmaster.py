@@ -1,14 +1,14 @@
 import time
 
-from config import FULL_DEFAULT_MODELS
-from config import SUMMON_LIMIT
-from config import WAIT_FOR_SUMMONING
-from text_to_text_models import AnthropicLLM
-from text_to_text_models import GoogleLLM
-from text_to_text_models import GroqLLM
-from text_to_text_models import OpenAILLM
-from text_to_text_models import PerplexityLLM
-from text_to_image_models import OpenAITextToImage
+from .config import FULL_DEFAULT_MODELS
+from .config import SUMMON_LIMIT
+from .config import WAIT_FOR_SUMMONING
+from .text_to_text_models import AnthropicLLM
+from .text_to_text_models import GoogleLLM
+from .text_to_text_models import GroqLLM
+from .text_to_text_models import OpenAILLM
+from .text_to_text_models import PerplexityLLM
+from .text_to_image_models import OpenAITextToImage
 
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
