@@ -2,14 +2,14 @@ import os
 
 from openai import OpenAI
 
-from base_model import BaseModel
+from .base_model import BaseModel
 
-from config import OPENAI_KEY_NAME
-from config import OPENAI_TTI_SIZE_LIST
-from config import OPENAI_TTI_QUALITY_LIST
-from config import OPENAI_TTI_DEFAULT_SIZE
-from config import OPENAI_TTI_DEFAULT_QUALITY
-from config import OPENAI_TTI_DEFAULT_N
+from .config import OPENAI_KEY_NAME
+from .config import OPENAI_TTI_SIZE_LIST
+from .config import OPENAI_TTI_QUALITY_LIST
+from .config import OPENAI_TTI_DEFAULT_SIZE
+from .config import OPENAI_TTI_DEFAULT_QUALITY
+from .config import OPENAI_TTI_DEFAULT_N
 
 
 class OpenAITextToImage(BaseModel):
