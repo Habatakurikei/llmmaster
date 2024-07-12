@@ -5,17 +5,17 @@ from anthropic import Anthropic
 from groq import Groq
 from openai import OpenAI
 
-from base_model import BaseModel
+from .base_model import BaseModel
 
-from config import ANTHROPIC_KEY_NAME
-from config import GEMINI_KEY_NAME
-from config import GROQ_KEY_NAME
-from config import OPENAI_KEY_NAME
-from config import PERPLEXITY_KEY_NAME
+from .config import ANTHROPIC_KEY_NAME
+from .config import GEMINI_KEY_NAME
+from .config import GROQ_KEY_NAME
+from .config import OPENAI_KEY_NAME
+from .config import PERPLEXITY_KEY_NAME
 
-from config import PERPLEXITY_EP
-from config import MAX_TOKENS
-from config import TEMPERATURE
+from .config import PERPLEXITY_EP
+from .config import MAX_TOKENS
+from .config import TEMPERATURE
 
 
 class AnthropicLLM(BaseModel):
