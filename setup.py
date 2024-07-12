@@ -4,15 +4,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="llm_master",
+    name="llmmaster",
     version="0.1.0",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A unified interface for interacting with multiple LLMs.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Habatakurikei/llm_master",
-    packages=setuptools.find_packages(),
+    url="https://github.com/Habatakurikei/llmmaster",
+    packages=setuptools.find_packages(include=['llmmaster', 'llmmaster.*']),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
