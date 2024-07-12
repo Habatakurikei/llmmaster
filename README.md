@@ -1,4 +1,4 @@
-![llm_master_logo_full](https://github.com/Habatakurikei/llm_master/assets/131997581/35bc6932-def9-4595-a2b3-2c122fb4e61e)
+![llmmaster_logo_full](https://github.com/Habatakurikei/llmmaster/assets/131997581/35bc6932-def9-4595-a2b3-2c122fb4e61e)
 
 # LLM Master
 
@@ -25,7 +25,7 @@ Text-to-Speech models and more models will be covered!
 - Easy configuration of API keys through environment variables
 - Support for various models from each provider
 - Customizable generation parameters
-  - Mandatory parameters: `provider` and `prompt`
+  - Required parameters: `provider` and `prompt`
   - Optional parameters: `model` and particular parameters for different model
 - Thread-based execution for improved performance
 
@@ -34,7 +34,7 @@ Text-to-Speech models and more models will be covered!
 To use LLM Master, you need to install the library. You can do this using pip:
 
 ```
-pip install llm-master
+pip install llmmaster
 ```
 
 Relevant packages will also be installed.
@@ -42,6 +42,8 @@ Relevant packages will also be installed.
 ## Usage
 
 1. Set up your API keys as environment variables:
+
+For Mac/Linux,
 
    ```
    export ANTHROPIC_API_KEY="your_anthropic_key"
@@ -51,19 +53,29 @@ Relevant packages will also be installed.
    export PERPLEXITY_API_KEY="your_perplexity_key"
    ```
 
+For Windows,
+
+   ```
+   SET ANTHROPIC_API_KEY=your_anthropic_key
+   SET GEMINI_API_KEY=your_gemini_key
+   SET GROQ_API_KEY=your_groq_key
+   SET OPENAI_API_KEY=your_openai_key
+   SET PERPLEXITY_API_KEY=your_perplexity_key
+   ```
+
 2. Use cases
 
   * Using single LLM
 
 ```python
-from llm_master import LLMMaster
+from llmmaster import LLMMaster
 
 # Create an instance of LLMMaster
-llm_master = LLMMaster()
+llmmaster = LLMMaster()
 
 # Configure LLM instance
-llm_master.summon({
-    "openai_instance": llm_master.pack_parameters(
+llmmaster.summon({
+    "openai_instance": llmmaster.pack_parameters(
         provider="openai",
         model="gpt-4o",
         prompt="Hello, what's the weather like today?",
@@ -73,33 +85,33 @@ llm_master.summon({
 })
 
 # Run LLM
-llm_master.run()
+llmmaster.run()
 
 # Get results
-results = llm_master.results
+results = llmmaster.results
 print(results["openai_instance"])
 
 # Clear instances
-llm_master.dismiss()
+llmmaster.dismiss()
 ```
 
   * Using multiple LLMs simultaneously
 
 ```python
-llm_master.summon({
-    "openai_instance": llm_master.pack_parameters(
+llmmaster.summon({
+    "openai_instance": llmmaster.pack_parameters(
         provider="openai",
         prompt="Summarize the main ideas of quantum computing."
     ),
-    "anthropic_instance": llm_master.pack_parameters(
+    "anthropic_instance": llmmaster.pack_parameters(
         provider="anthropic",
         prompt="Explain the concept of artificial general intelligence."
     )
 })
 
-llm_master.run()
+llmmaster.run()
 
-results = llm_master.results
+results = llmmaster.results
 print(results["openai_instance"])
 print(results["anthropic_instance"])
 ```
@@ -109,6 +121,7 @@ print(results["anthropic_instance"])
 - Please comply with the terms of service for each provider's API.
 - Securely manage your API keys and be careful not to commit them to public repositories.
 - There is a limit (32) to the number of LLM instances that can be created at once.
+- Input parameters are not strictly checked by the rules defined by each provider. You may face an error due to some wrong paramer or combination of parameters.
 
 ## Customization
 
