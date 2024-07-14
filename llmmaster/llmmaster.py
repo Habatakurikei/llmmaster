@@ -9,6 +9,7 @@ from .text_to_text_models import GroqLLM
 from .text_to_text_models import OpenAILLM
 from .text_to_text_models import PerplexityLLM
 from .text_to_image_models import OpenAITextToImage
+from .text_to_image_models import StableDiffusionTextToImage
 
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
@@ -16,7 +17,8 @@ INSTANCE_CLASSES = {
     'groq': GroqLLM,
     'openai': OpenAILLM,
     'perplexity': PerplexityLLM,
-    'openai_tti': OpenAITextToImage
+    'openai_tti': OpenAITextToImage,
+    'stable_diffusion_tti': StableDiffusionTextToImage
 }
 
 

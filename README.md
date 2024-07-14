@@ -4,30 +4,47 @@
 
 LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) from different providers. It supports concurrent execution of multiple LLMs and easy management of API keys and model configurations.
 
-## Supported LLM Providers
-
-### Text-to-Text Models
-- Anthropic (Claude)
-- Google (Gemini)
-- Groq
-- OpenAI (GPT)
-- Perplexity
-
-### Text-to-Image Models
-- OpenAI (Dall-E)
-- Stable Diffusion (comming soon)
-
-Text-to-Speech models and more models will be covered!
-
 ## Features
 
 - Concurrent execution of multiple LLMs
-- Easy configuration of API keys through environment variables
 - Support for various models from each provider
 - Customizable generation parameters
   - Required parameters: `provider` and `prompt`
   - Optional parameters: `model` and particular parameters for different model
 - Thread-based execution for improved performance
+
+## Supported LLM Providers and Models
+
+LLMMaster respects multi-modal approach. 
+
+The table below represents various conversion capabilities between different media types (text, image, audio, video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
+
+Use highlighted word for input to make LLMMaster instance.
+
+| From - To | Text | Image | Audio | Video |
+|-----------|------|-------|-------|-------|
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | google_tta (soon) | (pending) |
+| Image | google_itt (pending) | openai_iti (soon), stable_diffusion_iti (soon) | NA | NA |
+| Audio | openai_att (soon) | NA | NA | NA |
+| Video | google_vtt (pending) | NA | NA | NA |
+
+And the table below represents the models that are supported by each provider. Use highlighted word for input to make LLMMaster instance.
+
+### Text-to-Text Models
+- Anthropic (`claude-3-5-sonnet-20240620` and more released by Anthropic)
+- Google (`gemini-1.5-flash` and more released by Google)
+- Groq (`llama3-70b-8192` and more released by Groq)
+- OpenAI (`gpt-4o` and more released by OpenAI)
+- Perplexity (`llama-3-sonar-large-32k-online` and more released by Perplexity)
+
+### Text-to-Image Models
+- OpenAI (`dall-e-3`, `dall-e-2`)
+- Stable Diffusion (`core`, `ultra`)
+
+See each provider's documentation for full list.
+
+More models will be covered soon!
+
 
 ## Installation
 
@@ -45,23 +62,27 @@ Relevant packages will also be installed.
 
 For Mac/Linux,
 
-   ```
-   export ANTHROPIC_API_KEY="your_anthropic_key"
-   export GEMINI_API_KEY="your_gemini_key"
-   export GROQ_API_KEY="your_groq_key"
-   export OPENAI_API_KEY="your_openai_key"
-   export PERPLEXITY_API_KEY="your_perplexity_key"
-   ```
+```
+export ANTHROPIC_API_KEY="your_anthropic_key"
+export GEMINI_API_KEY="your_gemini_key"
+export GROQ_API_KEY="your_groq_key"
+export OPENAI_API_KEY="your_openai_key"
+export PERPLEXITY_API_KEY="your_perplexity_key"
+export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
+```
 
 For Windows,
 
-   ```
-   SET ANTHROPIC_API_KEY=your_anthropic_key
-   SET GEMINI_API_KEY=your_gemini_key
-   SET GROQ_API_KEY=your_groq_key
-   SET OPENAI_API_KEY=your_openai_key
-   SET PERPLEXITY_API_KEY=your_perplexity_key
-   ```
+```
+SET ANTHROPIC_API_KEY=your_anthropic_key
+SET GEMINI_API_KEY=your_gemini_key
+SET GROQ_API_KEY=your_groq_key
+SET OPENAI_API_KEY=your_openai_key
+SET PERPLEXITY_API_KEY=your_perplexity_key
+SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
+```
+
+Note that you do not have to set all of the API keys. You can set only the ones that you need.
 
 2. Use cases
 
@@ -114,6 +135,51 @@ llmmaster.run()
 results = llmmaster.results
 print(results["openai_instance"])
 print(results["anthropic_instance"])
+```
+
+  * Using image generation
+
+```python
+from llmmaster import LLMMaster
+
+# Create an instance of LLMMaster
+llmmaster = LLMMaster()
+
+# Configure image generation instance
+llmmaster.summon({
+    "openai_image": llmmaster.pack_parameters(
+        provider="openai_tti",
+        model="dall-e-3",
+        prompt="A futuristic cityscape with flying cars and holographic billboards",
+        size="1024x1024",
+        quality="hd"
+    ),
+    "stable_diffusion_image": llmmaster.pack_parameters(
+        provider="stable_diffusion_tti",
+        model="core",
+        prompt="A serene landscape with a mountain lake at sunset",
+        aspect_ratio="16:9",
+        style_preset="cinematic"
+    )
+})
+
+# Run image generation
+llmmaster.run()
+
+# Get results
+results = llmmaster.results
+
+# The result is given as a URL for OpenAI.
+print("OpenAI DALL-E 3 image URL:", results["openai_image"])
+
+# The result is given as a binary data for Stable Diffusion.
+if isinstance(results["stable_diffusion_image"], bytes):
+    with open("stable_diffusion_image.png", 'wb') as f:
+        f.write(results["stable_diffusion_image"])
+        print("stable_diffusion_image.png saved")
+
+# Clear instances
+llmmaster.dismiss()
 ```
 
 ## Notes

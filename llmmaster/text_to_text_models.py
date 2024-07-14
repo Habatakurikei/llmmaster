@@ -13,7 +13,7 @@ from .config import GROQ_KEY_NAME
 from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
 
-from .config import PERPLEXITY_EP
+from .config import PERPLEXITY_TTT_EP
 from .config import MAX_TOKENS
 from .config import TEMPERATURE
 
@@ -56,12 +56,11 @@ class AnthropicLLM(BaseModel):
                 temperature=self.parameters['temperature'],
                 messages=[{'role': 'user', 'content': [to_send]}])
 
-        except Exception as e:
-            msg = 'Error occurred while creating Anthropic LLM instance.'
-            raise Exception(msg) from e
+            if hasattr(response, 'content'):
+                message = response.content[0].text.strip()
 
-        if hasattr(response, 'content'):
-            message = response.content[0].text.strip()
+        except Exception as e:
+            message = str(e)
 
         # print(f'Anthropic responded =\n{message}\n')
 
@@ -109,12 +108,11 @@ class GroqLLM(BaseModel):
                 messages=[{'role': 'user',
                            'content': self.parameters['prompt']}])
 
-        except Exception as e:
-            msg = 'Error occurred while creating Groq LLM instance.'
-            raise Exception(msg) from e
+            if hasattr(response, 'choices'):
+                message = response.choices[0].message.content.strip()
 
-        if hasattr(response, 'choices'):
-            message = response.choices[0].message.content.strip()
+        except Exception as e:
+            message = str(e)
 
         # print(f'Groq responded =\n{message}\n')
 
@@ -159,12 +157,11 @@ class GoogleLLM(BaseModel):
                                           generation_config=generation_config)
             response = model.generate_content(self.parameters['prompt'])
 
-        except Exception as e:
-            msg = 'Error occurred while creating Google LLM instance.'
-            raise Exception(msg) from e
+            if hasattr(response, 'text'):
+                message = response.text.strip()
 
-        if hasattr(response, 'text'):
-            message = response.text.strip()
+        except Exception as e:
+            message = str(e)
 
         # print(f'Google responded =\n{message}\n')
 
@@ -213,12 +210,11 @@ class OpenAILLM(BaseModel):
                 messages=[{'role': 'user',
                            'content': self.parameters['prompt']}])
 
-        except Exception as e:
-            msg = 'Error occurred while creating OpenAI LLM instance.'
-            raise Exception(msg) from e
+            if hasattr(response, 'choices'):
+                message = response.choices[0].message.content.strip()
 
-        if hasattr(response, 'choices'):
-            message = response.choices[0].message.content.strip()
+        except Exception as e:
+            message = str(e)
 
         # print(f'OpenAI responded =\n{message}\n')
 
@@ -261,7 +257,7 @@ class PerplexityLLM(BaseModel):
 
         try:
             client = OpenAI(api_key=os.getenv(PERPLEXITY_KEY_NAME),
-                            base_url=PERPLEXITY_EP)
+                            base_url=PERPLEXITY_TTT_EP)
 
             response = client.chat.completions.create(
                 model=self.parameters['model'],
@@ -270,12 +266,11 @@ class PerplexityLLM(BaseModel):
                 messages=[{'role': 'user',
                            'content': self.parameters['prompt']}])
 
-        except Exception as e:
-            msg = 'Error occurred while creating Perplexity LLM instance.'
-            raise Exception(msg) from e
+            if hasattr(response, 'choices'):
+                message = response.choices[0].message.content.strip()
 
-        if hasattr(response, 'choices'):
-            message = response.choices[0].message.content.strip()
+        except Exception as e:
+            message = str(e)
 
         # print(f'Perplexity responded =\n{message}\n')
 
