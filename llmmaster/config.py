@@ -2,7 +2,7 @@
 ADOBE_FIREFLY_CLIENT_ID_NAME = 'ADOBE_FIREFLY_CLIENT_ID'
 ADOBE_FIREFLY_CLIENT_SECRET_NAME = 'ADOBE_FIREFLY_CLIENT_SECRET'
 ANTHROPIC_KEY_NAME = 'ANTHROPIC_API_KEY'
-GEMINI_KEY_NAME = 'GEMINI_API_KEY'
+GOOGLE_KEY_NAME = 'GOOGLE_API_KEY'
 GROQ_KEY_NAME = 'GROQ_API_KEY'
 OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
@@ -22,12 +22,15 @@ DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
 DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
                       'google_itt': 'gemini-1.5-flash'}
 
+DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
+
 
 def _full_default_list():
     full_list = {}
     full_list.update(DEFAULT_TTT_MODELS)
     full_list.update(DEFAULT_TTI_MODELS)
     full_list.update(DEFAULT_ITT_MODELS)
+    full_list.update(DEFAULT_VTT_MODELS)
     return full_list
 
 
@@ -49,11 +52,11 @@ REQUEST_OK = 200
 SUMMON_LIMIT = 32
 WAIT_FOR_SUMMONING = 1
 
-# TTI setting
+# Text-To-Text settings
 MAX_TOKENS = 4096
 TEMPERATURE = 0.7
 
-# TTT settings
+# Text-To-Image settings
 MAX_SEED = 4294967294
 
 ADOBE_FIREFLY_CONTENT_CLASS = ['art', 'photo']
@@ -86,3 +89,7 @@ STABLE_DIFFUSION_TTI_STYLE_PRESET_LIST = ['anime', '3d-model', 'analog-film',
                                           'modeling-compound', 'neon-punk',
                                           'origami', 'photographic',
                                           'pixel-art', 'tile-texture']
+
+# Video-To-Text settings
+WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
+WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600

@@ -8,7 +8,7 @@ from openai import OpenAI
 from .base_model import BaseModel
 
 from .config import ANTHROPIC_KEY_NAME
-from .config import GEMINI_KEY_NAME
+from .config import GOOGLE_KEY_NAME
 from .config import GROQ_KEY_NAME
 from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
@@ -149,7 +149,7 @@ class GoogleLLM(BaseModel):
         message = 'No response.'
 
         try:
-            genai.configure(api_key=os.getenv(GEMINI_KEY_NAME))
+            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
             generation_config = genai.GenerationConfig(
                 temperature=self.parameters['temperature'])
 

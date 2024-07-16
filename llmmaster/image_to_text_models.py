@@ -10,7 +10,7 @@ from openai import OpenAI
 
 from .base_model import BaseModel
 
-from .config import GEMINI_KEY_NAME
+from .config import GOOGLE_KEY_NAME
 from .config import OPENAI_KEY_NAME
 from .config import MAX_TOKENS
 
@@ -121,7 +121,7 @@ class GoogleImageToText(BaseModel):
         message = 'Image description not generated.'
 
         try:
-            genai.configure(api_key=os.getenv(GEMINI_KEY_NAME))
+            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
 
             model = genai.GenerativeModel(model_name=self.parameters['model'])
 

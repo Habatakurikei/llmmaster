@@ -2,7 +2,7 @@
 
 # LLM Master
 
-LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) from different providers. It supports concurrent execution of multiple LLMs and easy management of API keys and model configurations.
+LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) from different providers. It supports concurrent execution of multiple LLMs and easy model configurations.
 
 ## Features
 
@@ -26,11 +26,11 @@ Use highlighted word for `provider` to make LLMMaster instance.
 | Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | google_tta (soon) | (pending) |
 | Image | `openai_itt`, `google_itt` | openai_iti (soon), stable_diffusion_iti (soon) | NA | NA |
 | Audio | openai_att (soon) | NA | NA | NA |
-| Video | google_vtt (pending) | NA | NA | NA |
+| Video | `google_vtt` | NA | NA | NA |
 
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
 
-Use highlighted word for `model` to make LLMMaster instance. The `model` parameter is optional. If you do not specify the model, the default model will be used.
+Use highlighted word for `model` to make LLMMaster instance. The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
 
 ### Text-to-Text Models (typical)
 - Anthropic (`claude-3-5-sonnet-20240620`)
@@ -42,9 +42,13 @@ Use highlighted word for `model` to make LLMMaster instance. The `model` paramet
 ### Text-to-Image Models
 - OpenAI (`dall-e-3`, `dall-e-2`)
 - Stable Diffusion (`core`, `ultra`)
+- Adobe Firely (pending deployment)
 
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
+- Google (`gemini-1.5-flash`)
+
+### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
 
 More models will be covered soon!
@@ -61,13 +65,17 @@ Relevant packages will also be installed.
 
 ## Usage
 
-1. Set up your API keys as environment variables. Note that you do not have to set all of the API keys. You can set only the ones that you need.
+### Set API keys for your environment in advance
+
+Set up your API keys as environment variables. Note that you do not have to set all of the API keys. You can set only the ones that you need.
+
+**Important**: changed `GEMINI_API_KEY` to `GOOGLE_API_KEY` since ver. 0.1.4.
 
 For Mac/Linux,
 
 ```
 export ANTHROPIC_API_KEY="your_anthropic_key"
-export GEMINI_API_KEY="your_gemini_key"
+export GOOGLE_API_KEY="your_google_key"
 export GROQ_API_KEY="your_groq_key"
 export OPENAI_API_KEY="your_openai_key"
 export PERPLEXITY_API_KEY="your_perplexity_key"
@@ -78,16 +86,18 @@ For Windows,
 
 ```
 SET ANTHROPIC_API_KEY=your_anthropic_key
-SET GEMINI_API_KEY=your_gemini_key
+SET GOOGLE_API_KEY=your_google_key
 SET GROQ_API_KEY=your_groq_key
 SET OPENAI_API_KEY=your_openai_key
 SET PERPLEXITY_API_KEY=your_perplexity_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 ```
 
-2. Use cases
+### Use cases
 
-  * Using single Text-to-Text LLM
+  1. Using **single Text-to-Text** LLM
+
+This is the most basic usage of LLM Master. `openai_instance` is actually a unique label to manage multiple instances in case. You may set any string for it.
 
 ```python
 from llmmaster import LLMMaster
@@ -117,7 +127,7 @@ print(results["openai_instance"])
 llmmaster.dismiss()
 ```
 
-  * Using multiple Text-to-Text LLMs simultaneously
+  2 Using **multiple Text-to-Text** LLMs simultaneously
 
 ```python
 llmmaster.summon({
@@ -138,7 +148,7 @@ print(results["openai_instance"])
 print(results["anthropic_instance"])
 ```
 
-  * Using Text-to-Image Models
+  3. Using **Text-to-Image** Models
 
 ```python
 from llmmaster import LLMMaster
@@ -183,7 +193,7 @@ if isinstance(results["stable_diffusion_image"], bytes):
 llmmaster.dismiss()
 ```
 
-  * Using Image-to-Text Models
+  4. Using **Image-to-Text** Models
 
 ```python
 from llmmaster import LLMMaster
@@ -222,6 +232,24 @@ master.run()
 print(f'Results: {master.results}')
 ```
 
+  5. Using **Video-to-Text** Model
+
+```python
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+params = master.pack_parameters(
+    provider='google_vtt',
+    prompt='Describe attached video.',
+    video_file='/home/user/sample-video.mp4')
+
+master.summon({'video_to_text': params})
+master.run()
+
+print(f'Answer = {master.results["video_to_text"]}')
+```
+
 ## Notes
 
 - Please comply with the terms of service for each provider's API.
@@ -232,7 +260,7 @@ print(f'Results: {master.results}')
 ## Customization
 
 - You can easily adjust default models by updating the dictionary in `config.py` and creating a new thread class for the provider.
-- You can also run an individual provider LLM without using LLMMaster but each defined class.
+- You can also run an individual provider Model directly without using LLMMaster. See each class definition for details.
 
 ## Contributing
 

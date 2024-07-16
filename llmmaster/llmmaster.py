@@ -12,6 +12,7 @@ from .text_to_image_models import OpenAITextToImage
 from .text_to_image_models import StableDiffusionTextToImage
 from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
+from .video_to_text_models import GoogleVideoToText
 
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
@@ -22,7 +23,8 @@ INSTANCE_CLASSES = {
     'openai_tti': OpenAITextToImage,
     'stable_diffusion_tti': StableDiffusionTextToImage,
     'openai_itt': OpenAIImageToText,
-    'google_itt': GoogleImageToText
+    'google_itt': GoogleImageToText,
+    'google_vtt': GoogleVideoToText
 }
 
 
@@ -31,7 +33,7 @@ class LLMMaster():
     Note: configure your API key in advance in your OS environment,
           using set (Win) or export (Mac/Linux) command for:
             - ANTHROPIC_API_KEY
-            - GEMINI_API_KEY
+            - GOOGLE_API_KEY
             - GROQ_API_KEY
             - OPENAI_API_KEY
             - PERPLEXITY_API_KEY
