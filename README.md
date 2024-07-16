@@ -19,38 +19,41 @@ LLMMaster respects multi-modal approach.
 
 The table below represents various conversion capabilities between different media types (text, image, audio, video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
-Use highlighted word for input to make LLMMaster instance.
+Use highlighted word for `provider` to make LLMMaster instance.
 
-| From - To | Text | Image | Audio | Video |
+| From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
 | Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | google_tta (soon) | (pending) |
-| Image | google_itt (pending) | openai_iti (soon), stable_diffusion_iti (soon) | NA | NA |
+| Image | `openai_itt`, `google_itt` | openai_iti (soon), stable_diffusion_iti (soon) | NA | NA |
 | Audio | openai_att (soon) | NA | NA | NA |
 | Video | google_vtt (pending) | NA | NA | NA |
 
-And the table below represents the models that are supported by each provider. Use highlighted word for input to make LLMMaster instance.
+And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
 
-### Text-to-Text Models
-- Anthropic (`claude-3-5-sonnet-20240620` and more released by Anthropic)
-- Google (`gemini-1.5-flash` and more released by Google)
-- Groq (`llama3-70b-8192` and more released by Groq)
-- OpenAI (`gpt-4o` and more released by OpenAI)
-- Perplexity (`llama-3-sonar-large-32k-online` and more released by Perplexity)
+Use highlighted word for `model` to make LLMMaster instance. The `model` parameter is optional. If you do not specify the model, the default model will be used.
+
+### Text-to-Text Models (typical)
+- Anthropic (`claude-3-5-sonnet-20240620`)
+- Google (`gemini-1.5-flash`)
+- Groq (`llama3-70b-8192`)
+- OpenAI (`gpt-4o`)
+- Perplexity (`llama-3-sonar-large-32k-online`)
 
 ### Text-to-Image Models
 - OpenAI (`dall-e-3`, `dall-e-2`)
 - Stable Diffusion (`core`, `ultra`)
 
-See each provider's documentation for full list.
+### Image-to-Text Models (typical)
+- OpenAI (`gpt-4o`)
+- Google (`gemini-1.5-flash`)
 
 More models will be covered soon!
-
 
 ## Installation
 
 To use LLM Master, you need to install the library. You can do this using pip:
 
-```
+```bash
 pip install llmmaster
 ```
 
@@ -58,7 +61,7 @@ Relevant packages will also be installed.
 
 ## Usage
 
-1. Set up your API keys as environment variables:
+1. Set up your API keys as environment variables. Note that you do not have to set all of the API keys. You can set only the ones that you need.
 
 For Mac/Linux,
 
@@ -82,11 +85,9 @@ SET PERPLEXITY_API_KEY=your_perplexity_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 ```
 
-Note that you do not have to set all of the API keys. You can set only the ones that you need.
-
 2. Use cases
 
-  * Using single LLM
+  * Using single Text-to-Text LLM
 
 ```python
 from llmmaster import LLMMaster
@@ -116,7 +117,7 @@ print(results["openai_instance"])
 llmmaster.dismiss()
 ```
 
-  * Using multiple LLMs simultaneously
+  * Using multiple Text-to-Text LLMs simultaneously
 
 ```python
 llmmaster.summon({
@@ -137,7 +138,7 @@ print(results["openai_instance"])
 print(results["anthropic_instance"])
 ```
 
-  * Using image generation
+  * Using Text-to-Image Models
 
 ```python
 from llmmaster import LLMMaster
@@ -180,6 +181,45 @@ if isinstance(results["stable_diffusion_image"], bytes):
 
 # Clear instances
 llmmaster.dismiss()
+```
+
+  * Using Image-to-Text Models
+
+```python
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+# Online image URLs and local image paths are supported for Google.
+# Online images are preferred for OpenAI.
+inputs = [
+    {
+        'name': 'openai_itt_example',
+        'params': {
+            'provider': 'openai_itt',
+            'model': 'gpt-4o',
+            'prompt': 'Describe this image.',
+            'image_url': ['https://example.com/image.jpg']
+        }
+    },
+    {
+        'name': 'google_itt_example',
+        'params': {
+            'provider': 'google_itt',
+            'model': 'gemini-1.5-flash',
+            'prompt': 'What might be differences between these pictures?',
+            'image_url': ['https://example.com/image.png',
+                          '/home/user/my_image.png']
+        }
+    }
+]
+
+for case in inputs:
+    master.summon({case['name']: master.pack_parameters(**case['params'])})
+
+master.run()
+
+print(f'Results: {master.results}')
 ```
 
 ## Notes

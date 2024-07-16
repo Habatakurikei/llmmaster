@@ -19,11 +19,15 @@ DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-5-sonnet-20240620',
 DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
 
+DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
+                      'google_itt': 'gemini-1.5-flash'}
+
 
 def _full_default_list():
     full_list = {}
     full_list.update(DEFAULT_TTT_MODELS)
     full_list.update(DEFAULT_TTI_MODELS)
+    full_list.update(DEFAULT_ITT_MODELS)
     return full_list
 
 

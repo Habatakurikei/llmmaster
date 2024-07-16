@@ -114,9 +114,9 @@ class StableDiffusionTextToImage(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure.
         '''
-        msg = 'Summon Stable Diffusion Text to Image, '
-        msg += f'sending request to {self.parameters["url"]}.'
-        print(msg)
+        # msg = 'Summon Stable Diffusion Text to Image, '
+        # msg += f'sending request to {self.parameters["url"]}.'
+        # print(msg)
 
         answer = 'No response.'
 
