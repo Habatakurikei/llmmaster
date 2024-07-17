@@ -87,8 +87,8 @@ def test_google_image_to_text_instances(run_api):
             'params': {
                 'provider': 'google_itt',
                 'model': 'gemini-1.5-flash',
-                'prompt': 'How many books are in the photo?',
-                'image_url': ['https://habatakurikei.com/wp-content/uploads/2018/05/cover-english-learning-opt.jpg']
+                'prompt': 'Describe this image.',
+                'image_url': ['test-inputs/test_image.png']
             }
         },
         {

@@ -24,6 +24,10 @@ DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
 
 DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
 
+DEFAULT_ATT_MODELS = {'openai_att': 'whisper-1'}
+
+MODELS_NEED_DUMMY_PROMPT = ['openai_att']
+
 
 def _full_default_list():
     full_list = {}
@@ -31,6 +35,7 @@ def _full_default_list():
     full_list.update(DEFAULT_TTI_MODELS)
     full_list.update(DEFAULT_ITT_MODELS)
     full_list.update(DEFAULT_VTT_MODELS)
+    full_list.update(DEFAULT_ATT_MODELS)
     return full_list
 
 
@@ -93,3 +98,9 @@ STABLE_DIFFUSION_TTI_STYLE_PRESET_LIST = ['anime', '3d-model', 'analog-film',
 # Video-To-Text settings
 WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
 WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600
+
+# Audio-To-Text settings
+OPENAI_ATT_MODE_LIST = ['transcriptions', 'translations']
+OPENAI_ATT_RESPONSE_FORMAT_LIST = ['json', 'text', 'srt',
+                                   'verbose_json', 'vtt']
+OPENAI_ATT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']

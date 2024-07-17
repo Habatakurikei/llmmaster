@@ -11,6 +11,7 @@ LLM Master is a Python library that provides a unified interface for interacting
 - Customizable generation parameters
   - Required parameters: `provider` and `prompt`
   - Optional parameters: `model` and particular parameters for different model
+  - Exception: `prompt` is not required for Audio-to-Text Models.
 - Thread-based execution for improved performance
 
 ## Supported LLM Providers and Models
@@ -23,9 +24,9 @@ Use highlighted word for `provider` to make LLMMaster instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | google_tta (soon) | (pending) |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | openai_tta, google_tta (soon) | (pending) |
 | Image | `openai_itt`, `google_itt` | openai_iti (soon), stable_diffusion_iti (soon) | NA | NA |
-| Audio | openai_att (soon) | NA | NA | NA |
+| Audio | `openai_att` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
 
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
@@ -50,6 +51,9 @@ Use highlighted word for `model` to make LLMMaster instance. The `model` paramet
 
 ### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
+
+### Audio-to-Text Models
+- OpenAI (`whisper-1`)
 
 More models will be covered soon!
 
@@ -248,6 +252,55 @@ master.summon({'video_to_text': params})
 master.run()
 
 print(f'Answer = {master.results["video_to_text"]}')
+```
+
+  6. Using **Audio-to-Text** Models
+
+```python
+master = LLMMaster()
+
+inputs = [
+    {
+        'name': 'openai_att_case_1',
+        'params': {
+            'provider': 'openai_att',
+            'mode': 'translations',
+            'file': '/home/user/test_speech.mp3',
+            'response_format': 'json',
+            'temperature': 0.0
+        }
+    },
+    {
+        'name': 'openai_att_case_2',
+        'params': {
+            'provider': 'openai_att',
+            'mode': 'transcriptions',
+            'file': '/home/user/test_speech.mp3',
+            'response_format': 'text'
+        }
+    },
+    {
+        'name': 'openai_att_case_3',
+        'params': {
+            'provider': 'openai_att',
+            'mode': 'transcriptions',
+            'file': '/home/user/test_speech.mp3',
+            'response_format': 'verbose_json'
+        }
+    }
+]
+
+for case in inputs:
+    master.summon({case['name']: master.pack_parameters(**case['params'])})
+
+master.run()
+
+# different type of response given by different `response_format`
+# also different by `transcriptions` or `translations
+# handle with care
+print('Results')
+for name, response in master.results.items():
+    print(f'{name}: {response}')
 ```
 
 ## Notes

@@ -1,6 +1,7 @@
 import time
 
 from .config import FULL_DEFAULT_MODELS
+from .config import MODELS_NEED_DUMMY_PROMPT
 from .config import SUMMON_LIMIT
 from .config import WAIT_FOR_SUMMONING
 from .text_to_text_models import AnthropicLLM
@@ -13,6 +14,7 @@ from .text_to_image_models import StableDiffusionTextToImage
 from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
 from .video_to_text_models import GoogleVideoToText
+from .audio_to_text_models import OpenAIAudioToText
 
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
@@ -24,7 +26,8 @@ INSTANCE_CLASSES = {
     'stable_diffusion_tti': StableDiffusionTextToImage,
     'openai_itt': OpenAIImageToText,
     'google_itt': GoogleImageToText,
-    'google_vtt': GoogleVideoToText
+    'google_vtt': GoogleVideoToText,
+    'openai_att': OpenAIAudioToText
 }
 
 
@@ -113,8 +116,15 @@ class LLMMaster():
 
     def pack_parameters(self, **kwargs):
         '''
-        Use this function to make entry parameters in dictionary format.
+        Use this function to arrange entry parameters in dictionary format.
+        Add a dummy prompt for specific models like audio-to-text
+        models, which is required to avoid instance creation error.
+        Note that this function is not a verifier but a supporter.
         '''
+        if ('provider' in kwargs and
+           kwargs['provider'] in MODELS_NEED_DUMMY_PROMPT and
+           'prompt' not in kwargs):
+            kwargs.update(prompt='dummy prompt to avoid error')
         return kwargs
 
 
