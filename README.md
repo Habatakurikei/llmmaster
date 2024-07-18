@@ -24,8 +24,8 @@ Use highlighted word for `provider` to make LLMMaster instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | openai_tta, google_tta (soon) | (pending) |
-| Image | `openai_itt`, `google_itt` | openai_iti (soon), stable_diffusion_iti (soon) | NA | NA |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tta`, google_tta (pending) | (pending) |
+| Image | `openai_itt`, `google_itt` | openai_iti (soon), stable_diffusion_iti (soon) | NA | (pending) |
 | Audio | `openai_att` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
 
@@ -44,6 +44,9 @@ Use highlighted word for `model` to make LLMMaster instance. The `model` paramet
 - OpenAI (`dall-e-3`, `dall-e-2`)
 - Stable Diffusion (`core`, `ultra`)
 - Adobe Firely (pending deployment)
+
+### Text-to-Audio (Speech) Models
+- OpenAI (`tts-1`, `tts-1-hd`)
 
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
@@ -150,6 +153,8 @@ llmmaster.run()
 results = llmmaster.results
 print(results["openai_instance"])
 print(results["anthropic_instance"])
+
+llmmaster.dismiss()
 ```
 
   3. Using **Text-to-Image** Models
@@ -197,7 +202,39 @@ if isinstance(results["stable_diffusion_image"], bytes):
 llmmaster.dismiss()
 ```
 
-  4. Using **Image-to-Text** Models
+  4. Using **Text-to-Audio** Models
+
+```python
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+to_say = "Do not concentrate on the finger, or you will miss all that heavenly glory."
+
+# try to generate all the voice patterns for a same saying
+# capable for various audio formats: mp3, opus, aac, flac, wav and pcm
+entries = []
+for voice_pattern in OPENAI_TTS_VOICE_OPTIONS:
+    case = {'provider': 'openai_tts', 'prompt': to_say, 'voice': voice_pattern, 'response_format': 'mp3'}
+    entries.append({'name': f'openai_case_{voice_pattern}', 'params': case})
+
+for entry in entries:
+    master.summon({entry['name']: master.pack_parameters(**entry['params'])})
+
+master.run()
+
+print('Responses')
+for name, response in master.results.items():
+    save_as = f"{name}.mp3"
+    with open(save_as, 'wb') as f:
+        for chunk in response.iter_bytes():
+            f.write(chunk)
+    print(f'Saved as {save_as} for {name}')
+
+master.dismiss()
+```
+
+  5. Using **Image-to-Text** Models
 
 ```python
 from llmmaster import LLMMaster
@@ -236,7 +273,7 @@ master.run()
 print(f'Results: {master.results}')
 ```
 
-  5. Using **Video-to-Text** Model
+  6. Using **Video-to-Text** Model
 
 ```python
 from llmmaster import LLMMaster
@@ -254,7 +291,7 @@ master.run()
 print(f'Answer = {master.results["video_to_text"]}')
 ```
 
-  6. Using **Audio-to-Text** Models
+  7. Using **Audio-to-Text** Models
 
 ```python
 master = LLMMaster()
@@ -302,6 +339,9 @@ print('Results')
 for name, response in master.results.items():
     print(f'{name}: {response}')
 ```
+
+## Applications
+- Multi-AI brainstorming web app monju [https://monju.ai](https://monju.ai). This app generates ideas from 3 different LLMs simultaneously, and then shows the result in a mindmap.
 
 ## Notes
 

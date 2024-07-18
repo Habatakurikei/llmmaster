@@ -66,7 +66,7 @@ class OpenAIAudioToText(BaseModel):
                     timestamp_granularities=tg)
 
             else:
-                #print('OpenAI Audio-to-Text: general transcriptions')
+                # print('OpenAI Audio-to-Text: general transcriptions')
                 response = client.audio.transcriptions.create(
                     model=self.parameters['model'],
                     file=self.parameters['file'],

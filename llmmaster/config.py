@@ -19,6 +19,8 @@ DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-5-sonnet-20240620',
 DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
 
+DEFAULT_TTA_MODELS = {'openai_tts': 'tts-1'}
+
 DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
                       'google_itt': 'gemini-1.5-flash'}
 
@@ -33,9 +35,10 @@ def _full_default_list():
     full_list = {}
     full_list.update(DEFAULT_TTT_MODELS)
     full_list.update(DEFAULT_TTI_MODELS)
+    full_list.update(DEFAULT_TTA_MODELS)
     full_list.update(DEFAULT_ITT_MODELS)
-    full_list.update(DEFAULT_VTT_MODELS)
     full_list.update(DEFAULT_ATT_MODELS)
+    full_list.update(DEFAULT_VTT_MODELS)
     return full_list
 
 
@@ -95,12 +98,23 @@ STABLE_DIFFUSION_TTI_STYLE_PRESET_LIST = ['anime', '3d-model', 'analog-film',
                                           'origami', 'photographic',
                                           'pixel-art', 'tile-texture']
 
-# Video-To-Text settings
-WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
-WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600
+# Text-To-Audio settings
+OPENAI_TTS_MODELS = ['tts-1', 'tts-1-hd']
+OPENAI_TTS_VOICE_OPTIONS = ['alloy', 'echo', 'fable',
+                            'onyx', 'nova', 'shimmer']
+OPENAI_TTS_RESPONSE_FORMAT_LIST = ['mp3', 'opus', 'aac',
+                                   'flac', 'wav', 'pcm']
+
+OPENAI_TTS_MAX_SPEED = 4.0
+OPENAI_TTS_MIN_SPEED = 0.25
+OPENAI_TTS_DEFAULT_SPEED = 1.0
 
 # Audio-To-Text settings
 OPENAI_ATT_MODE_LIST = ['transcriptions', 'translations']
 OPENAI_ATT_RESPONSE_FORMAT_LIST = ['json', 'text', 'srt',
                                    'verbose_json', 'vtt']
 OPENAI_ATT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
+
+# Video-To-Text settings
+WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
+WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600

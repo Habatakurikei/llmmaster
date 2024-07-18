@@ -11,10 +11,11 @@ from .text_to_text_models import OpenAILLM
 from .text_to_text_models import PerplexityLLM
 from .text_to_image_models import OpenAITextToImage
 from .text_to_image_models import StableDiffusionTextToImage
+from .text_to_audio_models import OpenAITextToSpeech
 from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
-from .video_to_text_models import GoogleVideoToText
 from .audio_to_text_models import OpenAIAudioToText
+from .video_to_text_models import GoogleVideoToText
 
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
@@ -24,10 +25,11 @@ INSTANCE_CLASSES = {
     'perplexity': PerplexityLLM,
     'openai_tti': OpenAITextToImage,
     'stable_diffusion_tti': StableDiffusionTextToImage,
+    'openai_tts': OpenAITextToSpeech,
     'openai_itt': OpenAIImageToText,
     'google_itt': GoogleImageToText,
-    'google_vtt': GoogleVideoToText,
-    'openai_att': OpenAIAudioToText
+    'openai_att': OpenAIAudioToText,
+    'google_vtt': GoogleVideoToText
 }
 
 
