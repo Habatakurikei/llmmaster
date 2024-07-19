@@ -1,5 +1,7 @@
 # LLMMaster test files
 test-inputs
+test-outputs
+usecases
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

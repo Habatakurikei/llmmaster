@@ -134,6 +134,8 @@ def test_ttt_instances(run_api):
             if not response:
                 judgment = False
 
+        print(f'Elapsed Time (sec) = {master.elapsed_time}')
+
     master.dismiss()
 
     assert judgment is True

@@ -22,14 +22,7 @@ class OpenAITextToSpeech(BaseModel):
       - tts-1-hd
     '''
     def __init__(self, **kwargs):
-        '''
-        Note:
-        OpenAI Text-To-Speech returns class.
-        Save the generated audio using `response.stream_to_file()`.
-        When failed to generate audio file, return value is given in str.
-        Handle return value `answer` with care for different type in case of
-        success and failure.
-        '''
+
         try:
             super().__init__(**kwargs)
 
@@ -39,7 +32,14 @@ class OpenAITextToSpeech(BaseModel):
             raise Exception(msg) from e
 
     def run(self):
-
+        '''
+        Note:
+        OpenAI Text-To-Speech returns class.
+        Save the generated audio using `response.stream_to_file()`.
+        When failed to generate audio file, return value is given in str.
+        Handle return value `answer` with care for different type in case of
+        success and failure.
+        '''
         # msg = f'Summon OpenAI Text-To-Speech with {self.parameters["model"]}'
         # print(msg)
 

@@ -11,7 +11,7 @@ LLM Master is a Python library that provides a unified interface for interacting
 - Customizable generation parameters
   - Required parameters: `provider` and `prompt`
   - Optional parameters: `model` and particular parameters for different model
-  - Exception: `prompt` is not required for Audio-to-Text Models.
+  - Exception: `prompt` is not required for Audio-to-Text Models and some modes of Image-to-Image Models.
 - Thread-based execution for improved performance
 
 ## Supported LLM Providers and Models
@@ -25,7 +25,7 @@ Use highlighted word for `provider` to make LLMMaster instance.
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
 | Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tta`, google_tta (pending) | (pending) |
-| Image | `openai_itt`, `google_itt` | openai_iti (soon), stable_diffusion_iti (soon) | NA | (pending) |
+| Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | stable_diffusion_itv (pending) |
 | Audio | `openai_att` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
 
@@ -51,6 +51,10 @@ Use highlighted word for `model` to make LLMMaster instance. The `model` paramet
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
 - Google (`gemini-1.5-flash`)
+
+### Image-to-Image Models
+- OpenAI (`dall-e-2`)
+- Stable Diffusion (`v2beta`)
 
 ### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
@@ -116,19 +120,23 @@ llmmaster = LLMMaster()
 llmmaster.summon({
     "openai_instance": llmmaster.pack_parameters(
         provider="openai",
-        model="gpt-4o",
-        prompt="Hello, what's the weather like today?",
+        model="gpt-4o-mini",
+        prompt="Hello, how are you?",
         max_tokens=100,
         temperature=0.7
     )
 })
 
 # Run LLM
+print('Start running LLMMaster...')
 llmmaster.run()
 
 # Get results
 results = llmmaster.results
-print(results["openai_instance"])
+print(f'OpenAI responded: {results["openai_instance"]}')
+
+# Check elapsed time
+# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 # Clear instances
 llmmaster.dismiss()
@@ -137,6 +145,12 @@ llmmaster.dismiss()
   2 Using **multiple Text-to-Text** LLMs simultaneously
 
 ```python
+from llmmaster import LLMMaster
+
+# Create an instance of LLMMaster
+llmmaster = LLMMaster()
+
+# Configure LLM instance
 llmmaster.summon({
     "openai_instance": llmmaster.pack_parameters(
         provider="openai",
@@ -148,30 +162,42 @@ llmmaster.summon({
     )
 })
 
+# You can check what parameters are set before run
+print('Parameters set before run.')
+for label, instance in llmmaster.instances.items():
+    print(f'{label} = {instance.parameters}')
+
+# Run LLM
+print('Start running LLMMaster...')
 llmmaster.run()
 
-results = llmmaster.results
-print(results["openai_instance"])
-print(results["anthropic_instance"])
+# Get results
+for instance, response in llmmaster.results.items():
+    print(f'{instance} responded: {response}')
 
+# Check elapsed time
+# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
+
+# Clear instances
 llmmaster.dismiss()
 ```
 
   3. Using **Text-to-Image** Models
 
 ```python
+import requests
 from llmmaster import LLMMaster
 
 # Create an instance of LLMMaster
 llmmaster = LLMMaster()
 
-# Configure image generation instance
+# Configure LLM instance
 llmmaster.summon({
     "openai_image": llmmaster.pack_parameters(
         provider="openai_tti",
         model="dall-e-3",
         prompt="A futuristic cityscape with flying cars and holographic billboards",
-        size="1024x1024",
+        size="1792x1024",
         quality="hd"
     ),
     "stable_diffusion_image": llmmaster.pack_parameters(
@@ -183,20 +209,32 @@ llmmaster.summon({
     )
 })
 
-# Run image generation
+# You can check what parameters are set before run
+print('Parameters set before run.')
+for label, instance in llmmaster.instances.items():
+    print(f'{label} = {instance.parameters}')
+
+# Run LLM
+print('Start running LLMMaster...')
 llmmaster.run()
 
 # Get results
-results = llmmaster.results
+response = llmmaster.results["openai_image"]
+if hasattr(response, 'data'):
+    image_response = requests.get(response.data[0].url)
+    if image_response.status_code == 200:
+        with open("openai_image.png", 'wb') as f:
+            f.write(image_response.content)
+        print("openai_image.png saved")
 
-# The result is given as a URL for OpenAI.
-print("OpenAI DALL-E 3 image URL:", results["openai_image"])
-
-# The result is given as a binary data for Stable Diffusion.
-if isinstance(results["stable_diffusion_image"], bytes):
+response = llmmaster.results["stable_diffusion_image"]
+if isinstance(response, bytes):
     with open("stable_diffusion_image.png", 'wb') as f:
-        f.write(results["stable_diffusion_image"])
-        print("stable_diffusion_image.png saved")
+        f.write(response)
+    print("stable_diffusion_image.png saved")
+
+# Check elapsed time
+# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 # Clear instances
 llmmaster.dismiss()
@@ -206,6 +244,7 @@ llmmaster.dismiss()
 
 ```python
 from llmmaster import LLMMaster
+from llmmaster.config import OPENAI_TTS_VOICE_OPTIONS
 
 master = LLMMaster()
 
@@ -221,8 +260,16 @@ for voice_pattern in OPENAI_TTS_VOICE_OPTIONS:
 for entry in entries:
     master.summon({entry['name']: master.pack_parameters(**entry['params'])})
 
+# You can check what parameters are set before run
+print('Parameters set before run.')
+for label, instance in llmmaster.instances.items():
+    print(f'{label} = {instance.parameters}')
+
+# Run LLM
+print('Start running LLMMaster...')
 master.run()
 
+# Get results
 print('Responses')
 for name, response in master.results.items():
     save_as = f"{name}.mp3"
@@ -230,6 +277,9 @@ for name, response in master.results.items():
         for chunk in response.iter_bytes():
             f.write(chunk)
     print(f'Saved as {save_as} for {name}')
+
+# Check elapsed time
+# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 master.dismiss()
 ```
@@ -268,32 +318,62 @@ inputs = [
 for case in inputs:
     master.summon({case['name']: master.pack_parameters(**case['params'])})
 
+print('Start running LLMMaster...')
 master.run()
 
 print(f'Results: {master.results}')
+
+# print(f'Elapsed time: {master.elapsed_time} seconds')
+
+master.dismiss()
 ```
 
-  6. Using **Video-to-Text** Model
+  6. Using **Image-to-Image** Models
 
 ```python
 from llmmaster import LLMMaster
 
 master = LLMMaster()
 
-params = master.pack_parameters(
-    provider='google_vtt',
-    prompt='Describe attached video.',
-    video_file='/home/user/sample-video.mp4')
+inputs = [
+    {
+        'name': 'openai',
+        'params': {
+            'provider': 'openai_iti',
+            'mode': 'variations',
+            'image': '/home/user/test_image.png',
+            'n': 2
+        }
+    },
+    {
+        'name': 'stable_diffusion',
+        'params': {
+            'provider': 'stable_diffusion_iti',
+            'mode': 'remove_background',
+            'file': '/home/user/test_image.png',
+        }
+    }]
 
-master.summon({'video_to_text': params})
+for case in inputs:
+    master.summon({case['name']: master.pack_parameters(**case['params'])})
+
+print('Start running LLMMaster...')
 master.run()
 
-print(f'Answer = {master.results["video_to_text"]}')
+print('Results')
+for name, response in master.results.items():
+    print(f'{name}: {response}')
+
+# print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
 ```
 
   7. Using **Audio-to-Text** Models
 
 ```python
+from llmmaster import LLMMaster
+
 master = LLMMaster()
 
 inputs = [
@@ -338,6 +418,31 @@ master.run()
 print('Results')
 for name, response in master.results.items():
     print(f'{name}: {response}')
+
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
+  8. Using **Video-to-Text** Model
+
+```python
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+params = master.pack_parameters(
+    provider='google_vtt',
+    prompt='Describe attached video.',
+    video_file='/home/user/sample-video.mp4')
+
+master.summon({'video_to_text': params})
+master.run()
+
+print(f'Answer = {master.results["video_to_text"]}')
+# print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
 ```
 
 ## Applications

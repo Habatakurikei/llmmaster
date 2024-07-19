@@ -2,6 +2,7 @@ import os
 import requests
 
 from openai import OpenAI
+from openai.types.images_response import ImagesResponse
 
 from .base_model import BaseModel
 
@@ -10,12 +11,14 @@ from .config import OPENAI_KEY_NAME
 from .config import OPENAI_TTI_DEFAULT_N
 from .config import OPENAI_TTI_QUALITY_LIST
 from .config import OPENAI_TTI_SIZE_LIST
+from .config import STABLE_DIFFUSION_BASE_EP
 from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import STABLE_DIFFUSION_TTI_ASPECT_RATIO_LIST
 from .config import STABLE_DIFFUSION_TTI_EP
 from .config import STABLE_DIFFUSION_TTI_MODELS
 from .config import STABLE_DIFFUSION_TTI_OUTPUT_FORMATS
 from .config import STABLE_DIFFUSION_TTI_STYLE_PRESET_LIST
+from .config import STABLE_DIFFUSION_VERSION
 from .config import REQUEST_OK
 
 
@@ -40,7 +43,7 @@ class OpenAITextToImage(BaseModel):
         # msg = f'Summon OpenAI Text to Image with {self.parameters["model"]}'
         # print(msg)
 
-        message = 'Generated image URL not found.'
+        answer = 'Valid image not generated.'
 
         try:
             client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
@@ -52,15 +55,14 @@ class OpenAITextToImage(BaseModel):
                 quality=self.parameters['quality'],
                 n=self.parameters['n'])
 
-            if hasattr(response, 'data'):
-                message = response.data[0].url
+            if isinstance(response, ImagesResponse):
+                # ImagesResponse class including generated image url
+                answer = response
 
         except Exception as e:
-            message = str(e)
+            answer = str(e)
 
-        # print(f'OpenAI responded =\n{message}')
-
-        self.response = message
+        self.response = answer
 
     def _verify_arguments(self, **kwargs):
         '''
@@ -118,7 +120,7 @@ class StableDiffusionTextToImage(BaseModel):
         # msg += f'sending request to {self.parameters["url"]}.'
         # print(msg)
 
-        answer = 'No response.'
+        answer = 'Valid image not generated.'
 
         try:
             response = requests.post(self.parameters['url'],
@@ -128,11 +130,10 @@ class StableDiffusionTextToImage(BaseModel):
 
             if response.status_code != REQUEST_OK:
                 answer = str(response.json())
+
             elif hasattr(response, 'content'):
                 # binary data of generated image
                 answer = response.content
-            else:
-                answer = 'Valid image not generated.'
 
         except Exception as e:
             answer = str(e)
@@ -148,13 +149,19 @@ class StableDiffusionTextToImage(BaseModel):
         '''
         parameters = {}
 
+        # endpoint
+        endpoint = (STABLE_DIFFUSION_BASE_EP + '/' +
+                    STABLE_DIFFUSION_VERSION +
+                    STABLE_DIFFUSION_TTI_EP)
+
         if kwargs['model'] in STABLE_DIFFUSION_TTI_MODELS:
-            endpoint = STABLE_DIFFUSION_TTI_EP + kwargs['model']
+            endpoint = endpoint + '/' + kwargs['model']
         else:
-            endpoint = STABLE_DIFFUSION_TTI_EP + STABLE_DIFFUSION_TTI_MODELS[0]
+            endpoint = endpoint + '/' + STABLE_DIFFUSION_TTI_MODELS[0]
 
         parameters.update(url=endpoint)
 
+        # headers
         headers = {'authorization':
                    f'Bearer {os.getenv(STABLE_DIFFUSION_KEY_NAME)}'}
         headers.update(accept='image/*')
@@ -163,6 +170,7 @@ class StableDiffusionTextToImage(BaseModel):
 
         parameters.update(files={"none": ''})
 
+        # body data
         data = {'prompt': kwargs['prompt']}
 
         if ('output_format' in kwargs and

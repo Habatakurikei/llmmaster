@@ -1,7 +1,9 @@
 import time
 
 from .config import FULL_DEFAULT_MODELS
-from .config import MODELS_NEED_DUMMY_PROMPT
+from .config import PROVIDERS_NEED_DUMMY_PROMPT
+from .config import OPENAI_ITI_MODE_NEED_DUMMY_PROMPT
+from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import SUMMON_LIMIT
 from .config import WAIT_FOR_SUMMONING
 from .text_to_text_models import AnthropicLLM
@@ -14,6 +16,8 @@ from .text_to_image_models import StableDiffusionTextToImage
 from .text_to_audio_models import OpenAITextToSpeech
 from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
+from .image_to_image_models import OpenAIImageToImage
+from .image_to_image_models import StableDiffusionImageToImage
 from .audio_to_text_models import OpenAIAudioToText
 from .video_to_text_models import GoogleVideoToText
 
@@ -28,6 +32,8 @@ INSTANCE_CLASSES = {
     'openai_tts': OpenAITextToSpeech,
     'openai_itt': OpenAIImageToText,
     'google_itt': GoogleImageToText,
+    'openai_iti': OpenAIImageToImage,
+    'stable_diffusion_iti': StableDiffusionImageToImage,
     'openai_att': OpenAIAudioToText,
     'google_vtt': GoogleVideoToText
 }
@@ -53,6 +59,7 @@ class LLMMaster():
     def __init__(self):
         self.instances = {}
         self.results = {}
+        self.elapsed_time = 0
 
     def summon(self, entries={}):
         '''
@@ -76,7 +83,7 @@ class LLMMaster():
             msg = f'LLM entries must be between 1 and 32 but {num_to_summon}.'
             raise ValueError(msg)
 
-        generator = LLMInstanceCreator()
+        creator = LLMInstanceCreator()
 
         for key, value in entries.items():
 
@@ -90,8 +97,8 @@ class LLMMaster():
                 raise Exception(msg)
 
             try:
-                generator.verify(key, **value)
-                self.instances.update(generator.create())
+                creator.verify(key, **value)
+                self.instances.update(creator.create())
 
             except Exception as e:
                 msg = 'Error occurred while verifying or creating instance.'
@@ -100,6 +107,7 @@ class LLMMaster():
     def run(self):
 
         self.results = {}
+        start_time = time.time()
 
         for instance in self.instances.values():
             time.sleep(WAIT_FOR_SUMMONING)
@@ -107,6 +115,9 @@ class LLMMaster():
 
         for instance in self.instances.values():
             instance.join()
+
+        end_time = time.time()
+        self.elapsed_time = round(end_time - start_time, 3)
 
         for label, instance in self.instances.items():
             buff = {label: instance.response}
@@ -119,14 +130,7 @@ class LLMMaster():
     def pack_parameters(self, **kwargs):
         '''
         Use this function to arrange entry parameters in dictionary format.
-        Add a dummy prompt for specific models like audio-to-text
-        models, which is required to avoid instance creation error.
-        Note that this function is not a verifier but a supporter.
         '''
-        if ('provider' in kwargs and
-           kwargs['provider'] in MODELS_NEED_DUMMY_PROMPT and
-           'prompt' not in kwargs):
-            kwargs.update(prompt='dummy prompt to avoid error')
         return kwargs
 
 
@@ -163,6 +167,7 @@ class LLMInstanceCreator():
         # 2. verify provider
         if 'provider' not in kwargs:
             raise Exception('No provider given in input.')
+
         elif kwargs['provider'] not in FULL_DEFAULT_MODELS.keys():
             msg = 'Provider name not given or non-supported provider given: '
             msg += f'{kwargs["provider"]}.'
@@ -173,6 +178,9 @@ class LLMInstanceCreator():
             self.parameters['model'] = FULL_DEFAULT_MODELS[kwargs['provider']]
 
         # 4. verify prompt
+        if self._is_dummy_prompt_required(**kwargs) and 'prompt' not in kwargs:
+            kwargs.update(prompt='dummy prompt to avoid error')
+
         if 'prompt' not in kwargs or not kwargs['prompt']:
             raise ValueError('Prompt not given.')
 
@@ -200,3 +208,39 @@ class LLMInstanceCreator():
         self.verified_OK = False
 
         return {self.label: instance}
+
+    def _is_dummy_prompt_required(self, **kwargs):
+        '''
+        Check if a dummy prompt is required for the model.
+        Return True or False.
+        Need a dummpy prompt for the following cases:
+        - OpenAIAudioToText
+          - provider = openai_att
+        - OpenAITextToImage
+          - mode = variations
+        - StableDiffusionImageToImage
+          - provider = stable_diffusion_iti
+          - mode = SD_ITI_TYPE_NEED_DUMMY_PROMPT
+        '''
+        answer = False
+
+        if kwargs['provider'] not in PROVIDERS_NEED_DUMMY_PROMPT:
+            pass
+
+        else:
+            if kwargs['provider'] == 'openai_att':
+                answer = True
+
+            elif kwargs['provider'] == 'openai_iti':
+                if not hasattr(kwargs, 'mode'):
+                    answer = True
+                elif kwargs['mode'] in OPENAI_ITI_MODE_NEED_DUMMY_PROMPT:
+                    answer = True
+
+            elif kwargs['provider'] == 'stable_diffusion_iti':
+                if not hasattr(kwargs, 'mode'):
+                    answer = True
+                elif kwargs['mode'] in SD_ITI_MODE_NEED_DUMMY_PROMPT:
+                    answer = True
+
+        return answer
