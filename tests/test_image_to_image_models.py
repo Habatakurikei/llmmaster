@@ -13,11 +13,6 @@ from llmmaster.image_to_image_models import StableDiffusionImageToImage
 from llmmaster import LLMMaster
 
 
-INSTANCE_CLASSES = {
-    'openai_iti': OpenAIImageToImage,
-    'stable_diffusion_iti': StableDiffusionImageToImage
-}
-
 TEST_IMAGE = 'test-inputs/test_image.png'
 TEST_MASK = 'test-inputs/test_mask.png'
 TEST_OUTPUT_PATH = 'test-outputs'

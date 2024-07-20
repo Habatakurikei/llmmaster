@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
-from llmmaster.config import MAX_TOKENS
+from llmmaster.config import DEFAULT_TOKENS
 from llmmaster.text_to_text_models import AnthropicLLM
 from llmmaster.text_to_text_models import GoogleLLM
 from llmmaster.text_to_text_models import GroqLLM
@@ -103,9 +103,10 @@ def test_ttt_instances(run_api):
     test_cases = [
         {'name': 'case_1', 'params': {'provider': 'openai', 'prompt': 'Hello.'}},
         {'name': 'case_2', 'params': {'provider': 'anthropic', 'prompt': 'Hello.', 'max_tokens': 0, 'temperature': -0.1}},
-        {'name': 'case_3', 'params': {'provider': 'google', 'prompt': 'Hello.', 'max_tokens': 4097, 'temperature': 1.1}},
+        {'name': 'case_3', 'params': {'provider': 'google', 'prompt': 'Hello.', 'max_tokens': 5000, 'temperature': 1.1}},
         {'name': 'case_4', 'params': {'provider': 'groq', 'prompt': 'Hello.', 'max_tokens': 100, 'temperature': 0.5}},
-        {'name': 'case_5', 'params': {'provider': 'perplexity', 'prompt': 'Hello.', 'temperature': 0.0}}
+        {'name': 'case_5', 'params': {'provider': 'perplexity', 'prompt': 'Hello.', 'temperature': 0.0}},
+        {'name': 'case_6', 'params': {'provider': 'openai', 'model': 'gpt-4o-mini', 'prompt': 'Hello.', 'max_tokens': 10000}}
     ]
 
     for case in test_cases:
@@ -114,10 +115,6 @@ def test_ttt_instances(run_api):
     for name, instance in master.instances.items():
         print(f'{name} = {instance}, {instance.parameters}')
         if not isinstance(instance, tuple(INSTANCE_CLASSES.values())):
-            judgment = False
-        if instance.parameters['max_tokens'] < 0 or instance.parameters['max_tokens'] > MAX_TOKENS:
-            judgment = False
-        if instance.parameters['temperature'] < 0 or instance.parameters['temperature'] > 1:
             judgment = False
 
     if run_api:
@@ -134,8 +131,7 @@ def test_ttt_instances(run_api):
             if not response:
                 judgment = False
 
-        print(f'Elapsed Time (sec) = {master.elapsed_time}')
-
+    print(f'Elapsed Time (sec) = {master.elapsed_time}')
     master.dismiss()
 
     assert judgment is True

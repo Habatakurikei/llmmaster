@@ -1,7 +1,23 @@
 # LLMMaster Changelog
 
 ## [Unreleased]
-- (pending) Adobe Firefly for Text-To-Image
+- Text-To-Image models pending to be added
+  - Adobe Firefly API
+  - Midjourney API through ImaginePro
+  - StableDiffusion API through ModelsLab
+- Speech-To-Text models
+  - Google Speech-To-Text API
+- Text-To-Video models
+
+## [0.1.7] - 2024-07-21
+### Added
+- Image-To-Video model class
+  - `StableDiffusionImageToVideo`
+### Changed
+- Renamed `OpenAIAudioToText` to `OpenAISpeechToText`
+- Renamed `INSTANCE_CLASSES` to `ACTIVE_MODELS` in `llmmaster.py`
+- Changed `MAX_TOKENS` to `DEFAULT_TOKENS` in `config.py`
+- LLMMaster no longer checks `max_tokens` and sets default if not given properly
 
 ## [0.1.6] - 2024-07-19
 ### Added

@@ -1,4 +1,5 @@
 import os
+import requests
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -6,15 +7,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
+from llmmaster.config import REQUEST_OK
 from llmmaster.text_to_image_models import OpenAITextToImage
 from llmmaster.text_to_image_models import StableDiffusionTextToImage
 from llmmaster import LLMMaster
 
 
-INSTANCE_CLASSES = {
-    'openai_tti': OpenAITextToImage,
-    'stable_diffusion_tti': StableDiffusionTextToImage
-}
+TEST_OUTPUT_PATH = 'test-outputs'
 
 
 @pytest.fixture
@@ -53,6 +52,9 @@ def test_openai_text_to_image_instances(run_api):
             master.run()
         except Exception as e:
             pytest.fail(f"An error occurred during API calls: {str(e)}")
+
+        if not os.path.isdir(TEST_OUTPUT_PATH):
+            os.makedirs(TEST_OUTPUT_PATH)
 
         print('Responses')
         for name, response in master.results.items():
@@ -107,6 +109,9 @@ def test_stable_diffusion_text_to_image_instances(run_api):
         except Exception as e:
             pytest.fail(f"An error occurred during API calls: {str(e)}")
 
+        if not os.path.isdir(TEST_OUTPUT_PATH):
+            os.makedirs(TEST_OUTPUT_PATH)
+
         print('Responses')
         for name, response in master.results.items():
             if isinstance(response, str):
@@ -117,10 +122,11 @@ def test_stable_diffusion_text_to_image_instances(run_api):
                 else:
                     save_as = f'{name}.png'
 
-                with open(save_as, 'wb') as f:
+                filepath = os.path.join(TEST_OUTPUT_PATH, save_as)
+                with open(filepath, 'wb') as f:
                     if isinstance(response, bytes):
                         f.write(response)
-                        print(f'{name} = {save_as} saved')
+                        print(f'{name} = {filepath} saved')
                     else:
                         print(f"Unexpected response type for {name}: {type(response)}")
 

@@ -46,6 +46,7 @@ def test_google_vtt(run_api):
             if not value:
                 judgment = False
 
+    print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()
 
     assert judgment is True

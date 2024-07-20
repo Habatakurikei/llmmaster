@@ -48,7 +48,10 @@ class OpenAIImageToImage(BaseModel):
     '''
     List of available models as of 2024-07-12:
       - dall-e-2
-    Note: OpenAI image edit and variation accept only PNG format.
+    Covered edit modes for this class:
+      - variations
+      - edits
+    Acceptable image format: png only
     '''
     def __init__(self, **kwargs):
 
@@ -154,7 +157,8 @@ class OpenAIImageToImage(BaseModel):
 
     def _get_byte_image(self, to_convert):
         '''
-        Convert image to bytes in PNG format.
+        Convert PNG file into bytes.
+        Also convert color format to RGBA if not acceptable.
         OpenAI accepts RBGA, LA and L of color formats.
         '''
         byte_arr = BytesIO()
@@ -166,7 +170,22 @@ class OpenAIImageToImage(BaseModel):
 
 
 class StableDiffusionImageToImage(BaseModel):
-
+    '''
+    Model: v2beta fixed
+    Covered edit modes for this class:
+      - upscale_conservative
+      - upscale_creative
+      - erase
+      - inpaint
+      - outpaint
+      - search_and_replace
+      - remove_background
+    Modes that prompt is not required:
+      - erase
+      - outpaint
+      - remove_background
+    Acceptable image format: png, jpeg, webp
+    '''
     def __init__(self, **kwargs):
 
         try:
@@ -214,7 +233,7 @@ class StableDiffusionImageToImage(BaseModel):
         """
         Expected inputs:
           - model (required): str, model name, fixed v2beta
-          - image (required): str, path to image file (PNG only)
+          - image (required): str, path to image file
           - for rest of arguments, see each function by mode
         """
         parameters = {}

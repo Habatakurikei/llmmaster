@@ -2,36 +2,34 @@
 
 # LLM Master
 
-LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) from different providers. It supports concurrent execution of multiple LLMs and easy model configurations.
+LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) and multimedia generative AI models from different providers.
 
 ## Features
 
-- Concurrent execution of multiple LLMs
 - Support for various models from each provider
+- Concurrent execution of multiple LLMs and multimedia generative AI models
+- Thread-based execution for improved performance
 - Customizable generation parameters
   - Required parameters: `provider` and `prompt`
   - Optional parameters: `model` and particular parameters for different model
-  - Exception: `prompt` is not required for Audio-to-Text Models and some modes of Image-to-Image Models.
-- Thread-based execution for improved performance
+  - **Exception:** `prompt` is not required for Audio-to-Text, Image-to-Image and Image-To-Video models, which is dependent on mode you select.
 
 ## Supported LLM Providers and Models
 
 LLMMaster respects multi-modal approach. 
 
-The table below represents various conversion capabilities between different media types (text, image, audio, video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
+The table below represents various conversion capabilities between different media types (text, image, audio/speech, video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
 Use highlighted word for `provider` to make LLMMaster instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
 | Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tta`, google_tta (pending) | (pending) |
-| Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | stable_diffusion_itv (pending) |
-| Audio | `openai_att` | NA | NA | NA |
+| Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
+| Audio | `openai_stt`, google_stt (soon) | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
 
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
-
-Use highlighted word for `model` to make LLMMaster instance. The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
 
 ### Text-to-Text Models (typical)
 - Anthropic (`claude-3-5-sonnet-20240620`)
@@ -56,13 +54,20 @@ Use highlighted word for `model` to make LLMMaster instance. The `model` paramet
 - OpenAI (`dall-e-2`)
 - Stable Diffusion (`v2beta`)
 
+### Image-to-Video Models
+- Stable Diffusion (`v2beta`)
+
+### Audio(Speech)-to-Text Models
+- OpenAI (`whisper-1`)
+
 ### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
 
-### Audio-to-Text Models
-- OpenAI (`whisper-1`)
+Use highlighted word for `model` to make LLMMaster instance.
 
-More models will be covered soon!
+The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
+
+More models will be supported soon!
 
 ## Installation
 
@@ -78,7 +83,7 @@ Relevant packages will also be installed.
 
 ### Set API keys for your environment in advance
 
-Set up your API keys as environment variables. Note that you do not have to set all of the API keys. You can set only the ones that you need.
+Set up your API keys as environment variables. Note that you do not have to set all of the API keys as shown below. You can set only the ones that you need.
 
 **Important**: changed `GEMINI_API_KEY` to `GOOGLE_API_KEY` since ver. 0.1.4.
 
@@ -106,9 +111,13 @@ SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 
 ### Use cases
 
+You can download these use cases in python in folder "usecases".
+
   1. Using **single Text-to-Text** LLM
 
-This is the most basic usage of LLM Master. `openai_instance` is actually a unique label to manage multiple instances in case. You may set any string for it.
+This is the most basic usage of LLM Master.
+
+`openai_instance` is actually a unique label to manage multiple instances. You may set any string for it. The next case will be a multi-LLM example.
 
 ```python
 from llmmaster import LLMMaster
@@ -136,7 +145,7 @@ results = llmmaster.results
 print(f'OpenAI responded: {results["openai_instance"]}')
 
 # Check elapsed time
-# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
+print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 # Clear instances
 llmmaster.dismiss()
@@ -176,7 +185,7 @@ for instance, response in llmmaster.results.items():
     print(f'{instance} responded: {response}')
 
 # Check elapsed time
-# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
+print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 # Clear instances
 llmmaster.dismiss()
@@ -234,13 +243,13 @@ if isinstance(response, bytes):
     print("stable_diffusion_image.png saved")
 
 # Check elapsed time
-# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
+print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 # Clear instances
 llmmaster.dismiss()
 ```
 
-  4. Using **Text-to-Audio** Models
+  4. Using **Text-to-Audio** (Text-to-Speech) Models
 
 ```python
 from llmmaster import LLMMaster
@@ -251,18 +260,20 @@ master = LLMMaster()
 to_say = "Do not concentrate on the finger, or you will miss all that heavenly glory."
 
 # try to generate all the voice patterns for a same saying
-# capable for various audio formats: mp3, opus, aac, flac, wav and pcm
 entries = []
 for voice_pattern in OPENAI_TTS_VOICE_OPTIONS:
-    case = {'provider': 'openai_tts', 'prompt': to_say, 'voice': voice_pattern, 'response_format': 'mp3'}
-    entries.append({'name': f'openai_case_{voice_pattern}', 'params': case})
+    case = {'provider': 'openai_tts',
+            'prompt': to_say,
+            'voice': voice_pattern,
+            'response_format': 'mp3'}
+    entries.append({'name': f'openai_tts_{voice_pattern}', 'params': case})
 
 for entry in entries:
     master.summon({entry['name']: master.pack_parameters(**entry['params'])})
 
 # You can check what parameters are set before run
 print('Parameters set before run.')
-for label, instance in llmmaster.instances.items():
+for label, instance in master.instances.items():
     print(f'{label} = {instance.parameters}')
 
 # Run LLM
@@ -276,10 +287,10 @@ for name, response in master.results.items():
     with open(save_as, 'wb') as f:
         for chunk in response.iter_bytes():
             f.write(chunk)
-    print(f'Saved as {save_as} for {name}')
+    print(f'Saved as {save_as} for case {name}')
 
 # Check elapsed time
-# print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
+print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
@@ -291,20 +302,22 @@ from llmmaster import LLMMaster
 
 master = LLMMaster()
 
-# Online image URLs and local image paths are supported for Google.
 # Online images are preferred for OpenAI.
-inputs = [
+# Online images and local image paths are both supported for Google.
+# Change "image_url" for your case
+entries = [
     {
-        'name': 'openai_itt_example',
+        'name': 'openai_itt_case',
         'params': {
             'provider': 'openai_itt',
             'model': 'gpt-4o',
-            'prompt': 'Describe this image.',
-            'image_url': ['https://example.com/image.jpg']
+            'prompt': 'Describe each image.',
+            'image_url': ['https://example.com/image-1.jpg',
+                          'https://example.com/image-2.jpg']
         }
     },
     {
-        'name': 'google_itt_example',
+        'name': 'google_itt_case',
         'params': {
             'provider': 'google_itt',
             'model': 'gemini-1.5-flash',
@@ -315,15 +328,16 @@ inputs = [
     }
 ]
 
-for case in inputs:
-    master.summon({case['name']: master.pack_parameters(**case['params'])})
+for entry in entries:
+    master.summon({entry['name']: master.pack_parameters(**entry['params'])})
 
 print('Start running LLMMaster...')
 master.run()
 
-print(f'Results: {master.results}')
+for entry, result in master.results.items():
+    print(f'{entry} responded: {result}')
 
-# print(f'Elapsed time: {master.elapsed_time} seconds')
+print(f'Elapsed time: {master.elapsed_time} seconds')
 
 master.dismiss()
 ```
@@ -331,17 +345,20 @@ master.dismiss()
   6. Using **Image-to-Image** Models
 
 ```python
+import requests
 from llmmaster import LLMMaster
 
 master = LLMMaster()
 
-inputs = [
+test_image = '/home/user/test_image.png'
+
+entries = [
     {
         'name': 'openai',
         'params': {
             'provider': 'openai_iti',
             'mode': 'variations',
-            'image': '/home/user/test_image.png',
+            'image': test_image,
             'n': 2
         }
     },
@@ -350,71 +367,121 @@ inputs = [
         'params': {
             'provider': 'stable_diffusion_iti',
             'mode': 'remove_background',
-            'file': '/home/user/test_image.png',
+            'image': test_image,
         }
     }]
 
-for case in inputs:
-    master.summon({case['name']: master.pack_parameters(**case['params'])})
+for entry in entries:
+    master.summon({entry['name']: master.pack_parameters(**entry['params'])})
 
 print('Start running LLMMaster...')
 master.run()
 
 print('Results')
-for name, response in master.results.items():
-    print(f'{name}: {response}')
 
-# print(f"Elapsed time: {master.elapsed_time} seconds")
+# Get results
+response = master.results["openai"]
+if hasattr(response, 'data'):
+    for i in range(len(response.data)):
+        image_response = requests.get(response.data[i].url)
+        if image_response.status_code == 200:
+            filename = f"openai_{i+1:02}.png"
+            with open(filename, 'wb') as f:
+                f.write(image_response.content)
+            print(f'Image No. {i+1:2} saved as {filename}')
+        else:
+            print(f'Image No. {i+1:2} failed to download')
+
+response = master.results["stable_diffusion"]
+if isinstance(response, bytes):
+    with open("stable_diffusion_result.png", 'wb') as f:
+        f.write(response)
+    print("stable_diffusion_result.png saved")
+
+print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
 
-  7. Using **Audio-to-Text** Models
+  7. Using **Image-to-Video** Model
 
 ```python
 from llmmaster import LLMMaster
 
 master = LLMMaster()
 
-inputs = [
+# Set a path of local image file
+# Change "image" for your case
+entry = master.pack_parameters(
+    provider='stable_diffusion_itv',
+    image='/home/user/test-image.png')
+
+master.summon({'sd_itv': entry})
+
+print('Start running LLMMaster...')
+master.run()
+
+print('Results')
+response = master.results["sd_itv"]
+if isinstance(response, bytes):
+    with open("sd_itv.mp4", 'wb') as f:
+        f.write(response)
+    print("sd_itv.mp4 saved")
+
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
+  8. Using **Audio-to-Text** (Speech-to-Text) Models
+
+```python
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+speech_file = '/home/user/sample-speech.mp3'
+
+entries = [
     {
-        'name': 'openai_att_case_1',
+        'name': 'openai_att_1',
         'params': {
             'provider': 'openai_att',
             'mode': 'translations',
-            'file': '/home/user/test_speech.mp3',
+            'file': speech_file,
             'response_format': 'json',
             'temperature': 0.0
         }
     },
     {
-        'name': 'openai_att_case_2',
+        'name': 'openai_att_2',
         'params': {
             'provider': 'openai_att',
             'mode': 'transcriptions',
-            'file': '/home/user/test_speech.mp3',
+            'file': speech_file,
             'response_format': 'text'
         }
     },
     {
-        'name': 'openai_att_case_3',
+        'name': 'openai_att_3',
         'params': {
             'provider': 'openai_att',
             'mode': 'transcriptions',
-            'file': '/home/user/test_speech.mp3',
+            'file': speech_file,
             'response_format': 'verbose_json'
         }
     }
 ]
 
-for case in inputs:
-    master.summon({case['name']: master.pack_parameters(**case['params'])})
+for entry in entries:
+    master.summon({entry['name']: master.pack_parameters(**entry['params'])})
 
+print(f'Start running LLMMaster...')
 master.run()
 
-# different type of response given by different `response_format`
-# also different by `transcriptions` or `translations
-# handle with care
+# Different type of response given by different
+# `response_format`, `transcriptions` or `translations` mode
+# Handle with care for output
 print('Results')
 for name, response in master.results.items():
     print(f'{name}: {response}')
@@ -424,23 +491,27 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  8. Using **Video-to-Text** Model
+  9. Using **Video-to-Text** Model
 
 ```python
 from llmmaster import LLMMaster
 
 master = LLMMaster()
 
+# Set a path of local video file
+# Change "video_file" for your case
 params = master.pack_parameters(
     provider='google_vtt',
     prompt='Describe attached video.',
     video_file='/home/user/sample-video.mp4')
 
 master.summon({'video_to_text': params})
+
+print('Start running LLMMaster...')
 master.run()
 
 print(f'Answer = {master.results["video_to_text"]}')
-# print(f"Elapsed time: {master.elapsed_time} seconds")
+print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
@@ -453,6 +524,7 @@ master.dismiss()
 - Please comply with the terms of service for each provider's API.
 - Securely manage your API keys and be careful not to commit them to public repositories.
 - There is a limit (32) to the number of LLM instances that can be created at once.
+- If you apply a single model for multiple entrys, running simultaneously, each entry will start in every 1 second of interval. This is a strict limitation of providers for security reason.
 - Input parameters are not strictly checked by the rules defined by each provider. You may face an error due to some wrong paramer or combination of parameters.
 
 ## Customization

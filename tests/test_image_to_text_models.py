@@ -72,6 +72,7 @@ def test_openai_image_to_text_instances(run_api):
             if not response:
                 judgment = False
 
+    print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()
 
     assert judgment is True
@@ -126,6 +127,7 @@ def test_google_image_to_text_instances(run_api):
             if not response:
                 judgment = False
 
+    print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()
 
     assert judgment is True

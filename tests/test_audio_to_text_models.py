@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
-from llmmaster.audio_to_text_models import OpenAIAudioToText
+from llmmaster.audio_to_text_models import OpenAISpeechToText
 from llmmaster import LLMMaster
 
 
@@ -15,15 +15,15 @@ def run_api(request):
     return request.config.getoption("--run-api")
 
 
-def test_openai_audio_to_text_instances(run_api):
+def test_openai_speech_to_text_instances(run_api):
     judgment = True
     master = LLMMaster()
 
     test_cases = [
         {
-            'name': 'openai_att_case_1',
+            'name': 'openai_stt_case_1',
             'params': {
-                'provider': 'openai_att',
+                'provider': 'openai_stt',
                 'mode': 'translations',
                 'file': 'test-inputs/test_speech.mp3',
                 'response_format': 'json',
@@ -31,18 +31,18 @@ def test_openai_audio_to_text_instances(run_api):
             }
         },
         {
-            'name': 'openai_att_case_2',
+            'name': 'openai_stt_case_2',
             'params': {
-                'provider': 'openai_att',
+                'provider': 'openai_stt',
                 'mode': 'transcriptions',
                 'file': 'test-inputs/test_speech.mp3',
                 'response_format': 'text'
             }
         },
         {
-            'name': 'openai_att_case_3',
+            'name': 'openai_stt_case_3',
             'params': {
-                'provider': 'openai_att',
+                'provider': 'openai_stt',
                 'mode': 'transcriptions',
                 'file': 'test-inputs/test_speech.mp3',
                 'response_format': 'verbose_json'
@@ -55,7 +55,7 @@ def test_openai_audio_to_text_instances(run_api):
 
     for name, instance in master.instances.items():
         print(f'{name} = {instance}, {instance.parameters}')
-        if not isinstance(instance, OpenAIAudioToText):
+        if not isinstance(instance, OpenAISpeechToText):
             judgment = False
         if 'file' not in instance.parameters or not instance.parameters['file']:
             judgment = False
@@ -74,6 +74,7 @@ def test_openai_audio_to_text_instances(run_api):
             if not response:
                 judgment = False
 
+    print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()
 
     assert judgment is True

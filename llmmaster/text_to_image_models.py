@@ -27,6 +27,9 @@ class OpenAITextToImage(BaseModel):
     List of available models as of 2024-07-12:
       - dall-e-2
       - dall-e-3
+    Acceptable sizes for dall-e-3: 1024x1024, 1024x1792 or 1792x1024
+    Acceptable quality: standard, hd
+    Output formats: png
     '''
     def __init__(self, **kwargs):
 
@@ -96,7 +99,9 @@ class StableDiffusionTextToImage(BaseModel):
     List of available models as of 2024-07-12:
       - core
       - ultra
-    LLMMaster does not support Stable Diffusion 3.
+    LLMMaster no longer supports Stable Diffusion 3
+    Acceptable sizes: 16:9, 1:1, 21:9, 2:3, 3:2, 4:5, 5:4, 9:16, 9:21
+    Output formats: jpeg, png, webp
     '''
     def __init__(self, **kwargs):
 

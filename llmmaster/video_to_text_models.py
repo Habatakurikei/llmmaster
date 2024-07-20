@@ -16,6 +16,7 @@ class GoogleVideoToText(BaseModel):
       - gemini-1.5-flash
       - gemini-1.0-pro
     Note: Ensure the chosen model supports video processing.
+    Input formats: mp4, mpeg, mov, avi, x-flv, mpg, webm, wmv and 3gpp
     '''
     def __init__(self, **kwargs):
 

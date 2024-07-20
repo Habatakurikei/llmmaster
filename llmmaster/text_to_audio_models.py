@@ -20,6 +20,8 @@ class OpenAITextToSpeech(BaseModel):
     List of available models as of 2024-07-04:
       - tts-1
       - tts-1-hd
+    Output formats: mp3, opus, aac, flac and pcm
+    Voice variations: alloy, echo, fable, onyx, nova, and shimmer
     '''
     def __init__(self, **kwargs):
 
@@ -67,8 +69,8 @@ class OpenAITextToSpeech(BaseModel):
         '''
         Expected inputs (common):
           - input = prompt
-          - voice: alloy, echo, fable, onyx, nova, or shimmer
-          - response_format: mp3, opus, aac, flac, wav, or pcm
+          - voice: str
+          - response_format: str
           - speed: float between 0.25 and 4.0
         '''
         parameters = kwargs

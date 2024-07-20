@@ -12,7 +12,7 @@ from .base_model import BaseModel
 
 from .config import GOOGLE_KEY_NAME
 from .config import OPENAI_KEY_NAME
-from .config import MAX_TOKENS
+from .config import DEFAULT_TOKENS
 
 
 class OpenAIImageToText(BaseModel):
@@ -22,6 +22,8 @@ class OpenAIImageToText(BaseModel):
       - gpt-4-turbo
       - relevant models in famiry of GPT-4o or GPT4-Turbo
     Note that all models do not support vision capability.
+    Acceptable formats: png, jpg, webp and gif
+    Only online images are supported for the moment.
     '''
     def __init__(self, **kwargs):
 
@@ -84,14 +86,14 @@ class OpenAIImageToText(BaseModel):
         parameters.update(image_url=image_url)
 
         if 'max_tokens' not in kwargs:
-            parameters.update(max_tokens=MAX_TOKENS)
+            parameters.update(max_tokens=DEFAULT_TOKENS)
 
         else:
             buff = kwargs['max_tokens']
-            if isinstance(buff, int) and 0 < buff and buff <= MAX_TOKENS:
+            if isinstance(buff, int) and 0 < buff:
                 pass
             else:
-                parameters['max_tokens'] = MAX_TOKENS
+                parameters['max_tokens'] = DEFAULT_TOKENS
 
         return parameters
 
@@ -102,6 +104,8 @@ class GoogleImageToText(BaseModel):
       - gemini-1.5-pro
       - gemini-1.5-flash
       - gemini-1.0-pro
+    Acceptable formats: png, jpg, webp, heic and heif
+    Both online and offline (local) images are supported.
     '''
     def __init__(self, **kwargs):
 

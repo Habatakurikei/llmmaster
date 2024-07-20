@@ -1,20 +1,30 @@
+# this file may contain classes of:
+# - speech-to-text model (STT)
+# - music-to-text model (MTT)
 import os
 
 from openai import OpenAI
 
 from .base_model import BaseModel
 
-from .config import OPENAI_ATT_DEFAULT_TIMESTAMP_GRANULARITIES
-from .config import OPENAI_ATT_MODE_LIST
-from .config import OPENAI_ATT_RESPONSE_FORMAT_LIST
+from .config import OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES
+from .config import OPENAI_STT_MODE_LIST
+from .config import OPENAI_STT_RESPONSE_FORMAT_LIST
 from .config import OPENAI_KEY_NAME
 from .config import TEMPERATURE
 
 
-class OpenAIAudioToText(BaseModel):
+class OpenAISpeechToText(BaseModel):
     '''
     List of available models as of 2024-07-17:
       - whisper-1
+    Covered modes for this class:
+      - transcriptions
+      - translations
+    Acceptable audio formats: mp3, mp4, mpeg, mpga, m4a, wav, and webm
+    Output formats: json, text, srt, verbose_json, or vtt
+    Timestamp granularities for verbose_json: word, segment, or both in list
+    This class does not require prompt.
     Note that translation supports only into English for the moment.
     '''
     def __init__(self, **kwargs):
@@ -24,7 +34,7 @@ class OpenAIAudioToText(BaseModel):
 
         except Exception as e:
             msg = 'Error while verifying specific parameters for '
-            msg += 'OpenAIAudioToText'
+            msg += 'OpenAISpeechToText'
             raise Exception(msg) from e
 
     def run(self):
@@ -96,9 +106,9 @@ class OpenAIAudioToText(BaseModel):
         '''
         parameters = kwargs
 
-        if 'mode' not in kwargs or kwargs['mode'] not in OPENAI_ATT_MODE_LIST:
+        if 'mode' not in kwargs or kwargs['mode'] not in OPENAI_STT_MODE_LIST:
             msg = "'mode' parameter is not selected properly from "
-            msg += f"{OPENAI_ATT_MODE_LIST} but {kwargs['mode']} given."
+            msg += f"{OPENAI_STT_MODE_LIST} but {kwargs['mode']} given."
             raise ValueError(msg)
 
         if 'file' in kwargs and os.path.isfile(kwargs['file']):
@@ -108,7 +118,7 @@ class OpenAIAudioToText(BaseModel):
             raise ValueError(msg)
 
         if 'response_format' not in kwargs:
-            parameters['response_format'] = OPENAI_ATT_RESPONSE_FORMAT_LIST[0]
+            parameters['response_format'] = OPENAI_STT_RESPONSE_FORMAT_LIST[0]
 
         if 'temperature' not in kwargs:
             parameters['temperature'] = TEMPERATURE
@@ -126,6 +136,6 @@ class OpenAIAudioToText(BaseModel):
             ('timestamp_granularities' not in kwargs or
            not isinstance(kwargs['timestamp_granularities'], list))):
             parameters['timestamp_granularities'] = \
-                OPENAI_ATT_DEFAULT_TIMESTAMP_GRANULARITIES
+                OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES
 
         return parameters

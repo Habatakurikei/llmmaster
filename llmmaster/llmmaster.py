@@ -18,10 +18,12 @@ from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
 from .image_to_image_models import OpenAIImageToImage
 from .image_to_image_models import StableDiffusionImageToImage
-from .audio_to_text_models import OpenAIAudioToText
+from .image_to_video_models import StableDiffusionImageToVideo
+from .audio_to_text_models import OpenAISpeechToText
 from .video_to_text_models import GoogleVideoToText
 
-INSTANCE_CLASSES = {
+
+ACTIVE_MODELS = {
     'anthropic': AnthropicLLM,
     'google': GoogleLLM,
     'groq': GroqLLM,
@@ -34,7 +36,8 @@ INSTANCE_CLASSES = {
     'google_itt': GoogleImageToText,
     'openai_iti': OpenAIImageToImage,
     'stable_diffusion_iti': StableDiffusionImageToImage,
-    'openai_att': OpenAIAudioToText,
+    'stable_diffusion_itv': StableDiffusionImageToVideo,
+    'openai_stt': OpenAISpeechToText,
     'google_vtt': GoogleVideoToText
 }
 
@@ -42,19 +45,20 @@ INSTANCE_CLASSES = {
 class LLMMaster():
     '''
     Note: configure your API key in advance in your OS environment,
-          using set (Win) or export (Mac/Linux) command for:
+          using SET (Win) or export (Mac/Linux) command for:
             - ANTHROPIC_API_KEY
             - GOOGLE_API_KEY
             - GROQ_API_KEY
             - OPENAI_API_KEY
             - PERPLEXITY_API_KEY
+            - STABLE_DIFFUSION_API_KEY
     Usage:
       1. create this class instance.
-      2. call summon to set a new LLM instance with prompot.
-         Use pack_parameters() to make argument.
-      3. call run to start text generation for each LLM instance.
-      4. access self.results to get generated texts for each LLM instance.
-      5. call dismiss to clear LLM instances and results, or finish work.
+      2. call summon to set a new LLM instance with parameters.
+         Use pack_parameters() to make parameters into dictionary.
+      3. call run to start working for each instance.
+      4. access self.results to get results for each instance.
+      5. call dismiss to clear instances and results, then finish work.
     '''
     def __init__(self):
         self.instances = {}
@@ -74,7 +78,7 @@ class LLMMaster():
             }
         }
         See LLMInstanceCreator for input rules for each parameter.
-        Acceptable for both cases of single entry and multiple entries.
+        Acceptable for single entry or multiple entries at once.
         Use self.pack_parameters() for batch parameters input.
         '''
         num_to_summon = len(entries.keys())
@@ -126,6 +130,7 @@ class LLMMaster():
     def dismiss(self):
         self.instances = {}
         self.results = {}
+        self.elapsed_time = 0
 
     def pack_parameters(self, **kwargs):
         '''
@@ -148,12 +153,12 @@ class LLMInstanceCreator():
         Check validity of minimum parameters for single entry.
 
         Arguments:
-        - label: unique identifier in string for instance (mandatory)
+        - label (required): unique identifier in string for instance
             - empty str not acceptable
         - entry parameters in dictionary:
-            - provider: string (mandatory)
-            - model: string defined by provider
-            - prompt: string (mandatory), empty str not acceptable
+            - provider (required): string
+            - model: string defined by provider, default model is available
+            - prompt (basically required): string, empty str not acceptable
         '''
         self.verified_OK = False
         self.parameters = kwargs
@@ -191,15 +196,15 @@ class LLMInstanceCreator():
         Call only after verification confirmed passed.
 
         Returns: in dictionary format of
-        - label: same as given in input
-        - instance of LLM ready to run
+          - label: same as given in input
+          - instance of LLM ready to run
         '''
         if not self.verified_OK:
             msg = 'Unable to create because not verified or no input.'
             raise Exception(msg)
 
         try:
-            instance_class = INSTANCE_CLASSES.get(self.parameters['provider'])
+            instance_class = ACTIVE_MODELS.get(self.parameters['provider'])
             instance = instance_class(**self.parameters)
 
         except Exception as e:
@@ -214,13 +219,15 @@ class LLMInstanceCreator():
         Check if a dummy prompt is required for the model.
         Return True or False.
         Need a dummpy prompt for the following cases:
-        - OpenAIAudioToText
-          - provider = openai_att
+        - OpenAISpeechToText
+          - provider = openai_stt
         - OpenAITextToImage
           - mode = variations
         - StableDiffusionImageToImage
           - provider = stable_diffusion_iti
           - mode = SD_ITI_TYPE_NEED_DUMMY_PROMPT
+        - StableDiffusionImageToVideo
+          - provider = stable_diffusion_itv
         '''
         answer = False
 
@@ -228,7 +235,8 @@ class LLMInstanceCreator():
             pass
 
         else:
-            if kwargs['provider'] == 'openai_att':
+            if (kwargs['provider'] == 'openai_stt' or
+               kwargs['provider'] == 'stable_diffusion_itv'):
                 answer = True
 
             elif kwargs['provider'] == 'openai_iti':

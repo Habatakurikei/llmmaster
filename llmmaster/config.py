@@ -27,9 +27,11 @@ DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
 DEFAULT_ITI_MODELS = {'openai_iti': 'dall-e-2',
                       'stable_diffusion_iti': 'v2beta'}
 
-DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
+DEFAULT_ITV_MODELS = {'stable_diffusion_itv': 'v2beta'}
 
-DEFAULT_ATT_MODELS = {'openai_att': 'whisper-1'}
+DEFAULT_ATT_MODELS = {'openai_stt': 'whisper-1'}
+
+DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
 
 
 def _full_default_list():
@@ -39,6 +41,7 @@ def _full_default_list():
     full_list.update(DEFAULT_TTA_MODELS)
     full_list.update(DEFAULT_ITT_MODELS)
     full_list.update(DEFAULT_ITI_MODELS)
+    full_list.update(DEFAULT_ITV_MODELS)
     full_list.update(DEFAULT_ATT_MODELS)
     full_list.update(DEFAULT_VTT_MODELS)
     return full_list
@@ -80,6 +83,7 @@ STABLE_DIFFUSION_ITI_EDIT_SEARCH_AND_REPLACE_EP = \
 STABLE_DIFFUSION_ITI_EDIT_REMOVE_BACKGROUND_EP = \
     '/stable-image/edit/remove-background'
 
+STABLE_DIFFUSION_ITV_VERSION = 'v2beta'
 STABLE_DIFFUSION_ITV_START_EP = '/image-to-video'
 STABLE_DIFFUSION_ITV_RESULT_EP = '/image-to-video/result/{id}'
 
@@ -88,13 +92,13 @@ SUMMON_LIMIT = 32
 WAIT_FOR_SUMMONING = 1
 
 # Dummy prompt settings
-PROVIDERS_NEED_DUMMY_PROMPT = ['openai_att', 'openai_iti',
-                               'stable_diffusion_iti']
+PROVIDERS_NEED_DUMMY_PROMPT = ['openai_stt', 'openai_iti',
+                               'stable_diffusion_iti', 'stable_diffusion_itv']
 OPENAI_ITI_MODE_NEED_DUMMY_PROMPT = ['variations']
 SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
 
 # Text-To-Text settings
-MAX_TOKENS = 4096
+DEFAULT_TOKENS = 4096
 TEMPERATURE = 0.7
 
 # Text-To-Image settings
@@ -169,11 +173,20 @@ STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MIN = 0.0
 STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MAX = 1.0
 WAIT_FOR_UPSCALE_CREATIVE_RESULT = 5
 
+# Image-To-Video settings
+STABLE_DIFFUSION_ITV_CFG_SCALE_DEFAULT = 1.8
+STABLE_DIFFUSION_ITV_CFG_SCALE_MIN = 0.0
+STABLE_DIFFUSION_ITV_CFG_SCALE_MAX = 10.0
+STABLE_DIFFUSION_ITV_MOTION_BUCKET_DEFAULT = 127
+STABLE_DIFFUSION_ITV_MOTION_BUCKET_MIN = 1
+STABLE_DIFFUSION_ITV_MOTION_BUCKET_MAX = 255
+WAIT_FOR_ITV_RESULT = 5
+
 # Audio-To-Text settings
-OPENAI_ATT_MODE_LIST = ['transcriptions', 'translations']
-OPENAI_ATT_RESPONSE_FORMAT_LIST = ['json', 'text', 'srt',
+OPENAI_STT_MODE_LIST = ['transcriptions', 'translations']
+OPENAI_STT_RESPONSE_FORMAT_LIST = ['json', 'text', 'srt',
                                    'verbose_json', 'vtt']
-OPENAI_ATT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
+OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
 
 # Video-To-Text settings
 WAIT_FOR_GOOGLE_VTT_UPLOAD = 5

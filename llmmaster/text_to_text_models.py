@@ -14,7 +14,7 @@ from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
 
 from .config import PERPLEXITY_TTT_EP
-from .config import MAX_TOKENS
+from .config import DEFAULT_TOKENS
 from .config import TEMPERATURE
 
 
@@ -289,14 +289,14 @@ def _verify_ttt_args(**kwargs):
     parameters = kwargs
 
     if 'max_tokens' not in kwargs:
-        parameters.update(max_tokens=MAX_TOKENS)
+        parameters.update(max_tokens=DEFAULT_TOKENS)
 
     else:
         buff = kwargs['max_tokens']
-        if isinstance(buff, int) and 0 < buff and buff <= MAX_TOKENS:
+        if isinstance(buff, int) and 0 < buff:
             pass
         else:
-            parameters['max_tokens'] = MAX_TOKENS
+            parameters['max_tokens'] = DEFAULT_TOKENS
 
     if 'temperature' not in kwargs:
         parameters.update(temperature=TEMPERATURE)
