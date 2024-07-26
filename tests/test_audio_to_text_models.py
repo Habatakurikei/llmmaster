@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
+from llmmaster.audio_to_text_models import GoogleSpeechToText
 from llmmaster.audio_to_text_models import OpenAISpeechToText
 from llmmaster import LLMMaster
 
@@ -73,6 +74,39 @@ def test_openai_speech_to_text_instances(run_api):
             print(f'{name} = {response}')
             if not response:
                 judgment = False
+
+    print(f'Elapsed time: {master.elapsed_time} seconds')
+    master.dismiss()
+
+    assert judgment is True
+
+
+def test_google_speech_to_text_instances(run_api):
+    judgment = True
+    master = LLMMaster()
+
+    params = master.pack_parameters(provider='google_stt',
+                                    prompt='Make a transcript for attached audio file.',
+                                    audio_file='test-inputs/enter_the_dragon.mp3')
+
+    master.summon({'google_stt': params})
+
+    print(f'{master.instances["google_stt"]} = {master.instances["google_stt"].parameters}')
+    if not isinstance(master.instances["google_stt"], GoogleSpeechToText):
+        judgment = False
+
+    if run_api:
+        # add --run-api option for making actual API calls test, paying API credit
+        print('Run API')
+        try:
+            master.run()
+        except Exception as e:
+            pytest.fail(f"An error occurred during API calls: {str(e)}")
+
+        if not master.results["google_stt"]:
+            judgment = False
+        else:
+            print(f'Google stt responsed: {master.results["google_stt"]}')
 
     print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()

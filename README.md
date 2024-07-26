@@ -2,7 +2,9 @@
 
 # LLM Master
 
-LLM Master is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) and multimedia generative AI models from different providers.
+LLM Master is a powerful tool to boost your creativity by working with multiple generative AIs.
+
+This is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) and multimedia generative AI models from different providers.
 
 ## Features
 
@@ -16,17 +18,17 @@ LLM Master is a Python library that provides a unified interface for interacting
 
 ## Supported LLM Providers and Models
 
-LLMMaster respects multi-modal approach. 
+LLM Master respects multi-modal approach. 
 
-The table below represents various conversion capabilities between different media types (text, image, audio/speech, video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
+The table below represents various conversion capabilities between different media types (text, image, audio/speech and video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
 Use highlighted word for `provider` to make LLMMaster instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tta`, google_tta (pending) | (pending) |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, google_tta (pending) | (pending) |
 | Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
-| Audio | `openai_stt`, google_stt (soon) | NA | NA | NA |
+| Audio | `openai_stt`, `google_stt` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
 
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
@@ -57,8 +59,9 @@ And the list below represents the models that are supported by each provider. Se
 ### Image-to-Video Models
 - Stable Diffusion (`v2beta`)
 
-### Audio(Speech)-to-Text Models
+### Audio(Speech)-to-Text Models (typical)
 - OpenAI (`whisper-1`)
+- Google (`gemini-1.5-flash`)
 
 ### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
@@ -444,9 +447,9 @@ speech_file = '/home/user/sample-speech.mp3'
 
 entries = [
     {
-        'name': 'openai_att_1',
+        'name': 'openai_stt_1',
         'params': {
-            'provider': 'openai_att',
+            'provider': 'openai_stt',
             'mode': 'translations',
             'file': speech_file,
             'response_format': 'json',
@@ -454,21 +457,29 @@ entries = [
         }
     },
     {
-        'name': 'openai_att_2',
+        'name': 'openai_stt_2',
         'params': {
-            'provider': 'openai_att',
+            'provider': 'openai_stt',
             'mode': 'transcriptions',
             'file': speech_file,
             'response_format': 'text'
         }
     },
     {
-        'name': 'openai_att_3',
+        'name': 'openai_stt_3',
         'params': {
-            'provider': 'openai_att',
+            'provider': 'openai_stt',
             'mode': 'transcriptions',
             'file': speech_file,
             'response_format': 'verbose_json'
+        }
+    },
+    {
+        'name': 'google_stt',
+        'params': {
+            'provider': 'google_stt',
+            'prompt': 'What does the speaker imply?',
+            'audio_file': speech_file
         }
     }
 ]
@@ -517,7 +528,7 @@ master.dismiss()
 ```
 
 ## Applications
-- Multi-AI brainstorming web app monju [https://monju.ai](https://monju.ai). This app generates ideas from 3 different LLMs simultaneously, and then shows the result in a mindmap.
+- Multi-AI brainstorming web app monju [https://monju.ai](https://monju.ai). This app generates ideas from 3 different LLMs simultaneously, and then shows the result in mindmap.
 
 ## Notes
 

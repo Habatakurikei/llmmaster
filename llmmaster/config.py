@@ -29,7 +29,8 @@ DEFAULT_ITI_MODELS = {'openai_iti': 'dall-e-2',
 
 DEFAULT_ITV_MODELS = {'stable_diffusion_itv': 'v2beta'}
 
-DEFAULT_ATT_MODELS = {'openai_stt': 'whisper-1'}
+DEFAULT_ATT_MODELS = {'openai_stt': 'whisper-1',
+                      'google_stt': 'gemini-1.5-flash'}
 
 DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
 

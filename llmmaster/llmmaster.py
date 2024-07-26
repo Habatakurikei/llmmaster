@@ -19,6 +19,7 @@ from .image_to_text_models import GoogleImageToText
 from .image_to_image_models import OpenAIImageToImage
 from .image_to_image_models import StableDiffusionImageToImage
 from .image_to_video_models import StableDiffusionImageToVideo
+from .audio_to_text_models import GoogleSpeechToText
 from .audio_to_text_models import OpenAISpeechToText
 from .video_to_text_models import GoogleVideoToText
 
@@ -37,6 +38,7 @@ ACTIVE_MODELS = {
     'openai_iti': OpenAIImageToImage,
     'stable_diffusion_iti': StableDiffusionImageToImage,
     'stable_diffusion_itv': StableDiffusionImageToVideo,
+    'google_stt': GoogleSpeechToText,
     'openai_stt': OpenAISpeechToText,
     'google_vtt': GoogleVideoToText
 }

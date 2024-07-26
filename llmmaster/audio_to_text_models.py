@@ -3,10 +3,12 @@
 # - music-to-text model (MTT)
 import os
 
+import google.generativeai as genai
 from openai import OpenAI
 
 from .base_model import BaseModel
 
+from .config import GOOGLE_KEY_NAME
 from .config import OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES
 from .config import OPENAI_STT_MODE_LIST
 from .config import OPENAI_STT_RESPONSE_FORMAT_LIST
@@ -137,5 +139,70 @@ class OpenAISpeechToText(BaseModel):
            not isinstance(kwargs['timestamp_granularities'], list))):
             parameters['timestamp_granularities'] = \
                 OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES
+
+        return parameters
+
+
+class GoogleSpeechToText(BaseModel):
+    '''
+    List of typical available models as of 2024-07-24:
+      - gemini-1.5-pro
+      - gemini-1.5-flash
+      - gemini-1.0-pro
+    Acceptable formats: wav, mp3, aiff, aac, ogg and flac
+    This model supports transcription, description, summary and answering
+    question for uploaded sound file by setting prompt.
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'GoogleSpeechToText'
+            raise Exception(msg) from e
+
+    def run(self):
+
+        # msg = f'Summon Google Speech-to-Text with {self.parameters["model"]}'
+        # print(msg)
+
+        message = 'Speech analysis not generated.'
+
+        try:
+            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
+
+            model = genai.GenerativeModel(model_name=self.parameters['model'])
+
+            audio_file = genai.upload_file(path=self.parameters['audio_file'])
+
+            response = model.generate_content([self.parameters['prompt'],
+                                               audio_file])
+
+            if hasattr(response, 'text'):
+                message = response.text.strip()
+
+            genai.delete_file(audio_file.name)
+
+        except Exception as e:
+            message = str(e)
+
+        self.response = message
+
+    def _verify_arguments(self, **kwargs):
+        '''
+        Expected inputs:
+        audio_file: local path to file.
+        '''
+        parameters = kwargs
+
+        if 'audio_file' not in kwargs:
+            msg = "'audio_file' parameter is required with at least one path."
+            raise ValueError(msg)
+
+        elif not os.path.isfile(kwargs['audio_file']):
+            msg = "'audio_file' is not a valid file."
+            raise ValueError(msg)
 
         return parameters

@@ -2,12 +2,22 @@
 
 ## [Unreleased]
 - Text-To-Image models pending to be added
-  - Adobe Firefly API
   - Midjourney API through ImaginePro
   - StableDiffusion API through ModelsLab
-- Speech-To-Text models
-  - Google Speech-To-Text API
-- Text-To-Video models
+  - Adobe Firefly API not released for personal use
+  - Ideogram API not released for personal use
+- Text-To-3DImage models
+  - Meshy API
+- Text-To-Speech models pending to be added
+  - ElevenLabs API
+- Text-To-Video models pending to be added
+  - Runway API not released for public
+  - Pika.art API
+
+## [0.2.0] - 2024-07-27
+### Added
+- Speech-To-Text model class
+  - `GoogleSpeechToText`
 
 ## [0.1.7] - 2024-07-21
 ### Added
@@ -65,7 +75,7 @@
 - test functions using pytest in folder `tests` and tested
 - initial PyPI uploaded
 
-## [0.0.3] - 2024-07-09
+## [0.0.4] - 2024-07-09
 ### Added
 - Text-To_Image model
   - `OpenAITTI`
