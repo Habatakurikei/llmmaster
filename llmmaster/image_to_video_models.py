@@ -17,6 +17,7 @@ from .config import STABLE_DIFFUSION_ITV_MOTION_BUCKET_MIN
 from .config import STABLE_DIFFUSION_ITV_MOTION_BUCKET_MAX
 from .config import STABLE_DIFFUSION_ITV_RESULT_EP
 from .config import STABLE_DIFFUSION_ITV_START_EP
+from .config import REQUEST_OK
 from .config import WAIT_FOR_ITV_RESULT
 
 
@@ -42,11 +43,12 @@ class StableDiffusionImageToVideo(BaseModel):
         '''
         Note:
         Stable Diffusion returns binary data of generated video in mp4 format.
-        But when failed to generate video, return value is given in str.
-        Handle return value `answer` with care for different type in case of
-        success and failure.
+        LLMMaster returns requests.models.Response class directly.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
         '''
-        answer = 'Valid video not generated.'
+        answer = 'Valid video not generated. '
 
         try:
             response = requests.post(self.parameters['url'],
@@ -54,17 +56,15 @@ class StableDiffusionImageToVideo(BaseModel):
                                      files=self.parameters['files'],
                                      data=self.parameters['data'])
 
-            response = self._fetch_itv_result(response.json().get('id'))
+            response = self._fetch_result(response.json().get('id'))
 
-            if hasattr(response, 'content'):
-                # binary data of generated video
-                answer = response.content
-
+            if response.status_code == REQUEST_OK:
+                answer = response
             else:
                 answer += str(response.json())
 
         except Exception as e:
-            answer = str(e)
+            answer += str(e)
 
         self.response = answer
 
@@ -139,9 +139,10 @@ class StableDiffusionImageToVideo(BaseModel):
 
         return parameters
 
-    # fetch result function for image to video
-    def _fetch_itv_result(self, id):
-
+    def _fetch_result(self, id=''):
+        '''
+        Fetch result for image-to-video conversion
+        '''
         answer = 'Generated file not found.'
 
         ep = self.parameters['url_result'].replace('{id}', id)

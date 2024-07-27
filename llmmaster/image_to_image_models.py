@@ -41,6 +41,7 @@ from .config import STABLE_DIFFUSION_OUTPAINT_RIGHT_MAX
 from .config import STABLE_DIFFUSION_OUTPAINT_DOWN_MAX
 from .config import STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MIN
 from .config import STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MAX
+from .config import REQUEST_OK
 from .config import WAIT_FOR_UPSCALE_CREATIVE_RESULT
 
 
@@ -67,13 +68,13 @@ class OpenAIImageToImage(BaseModel):
         '''
         Note:
         OpenAI Image-To-Image returns class ImagesResponse.
-        Save the generated image by accesing data.url for both single and
-        multiple outputs.
-        When failed to generate image file, return value is given in str.
-        Handle return value `answer` with care for different type in case
-        of success and failure.
+        Save the generated image by accesing `data.url` for both
+        single output and multiple outputs case.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
         '''
-        answer = 'Editted image not found.'
+        answer = 'Editted image not found. '
 
         try:
             client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
@@ -105,11 +106,10 @@ class OpenAIImageToImage(BaseModel):
                 raise Exception("Unexpected type of process selected.")
 
             if isinstance(response, ImagesResponse):
-                # ImagesResponse class including generated image url
                 answer = response
 
         except Exception as e:
-            answer = str(e)
+            answer += str(e)
 
         self.response = answer
 
@@ -205,7 +205,7 @@ class StableDiffusionImageToImage(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure.
         '''
-        answer = 'Editted image not found.'
+        answer = 'Editted image not found. '
 
         try:
             response = self._execute_api_call(self.parameters['url'],
@@ -214,18 +214,15 @@ class StableDiffusionImageToImage(BaseModel):
                                               self.parameters['data'])
 
             if self.parameters['mode'] == 'upscale_creative':
-                response = self._fetch_upscale_creative_result(
-                    response.json().get('id'))
+                response = self._fetch_result(response.json().get('id'))
 
-            if hasattr(response, 'content'):
-                # binary data of generated image
-                answer = response.content
-
+            if response.status_code == REQUEST_OK:
+                answer = response
             else:
                 answer += str(response.json())
 
         except Exception as e:
-            answer = str(e)
+            answer += str(e)
 
         self.response = answer
 
@@ -294,7 +291,7 @@ class StableDiffusionImageToImage(BaseModel):
                              data=data)
 
     # fetch result function for upscale creative
-    def _fetch_upscale_creative_result(self, id):
+    def _fetch_result(self, id=''):
 
         answer = 'Editted file not found.'
         ep = self.parameters['url_result'].replace('{id}', id)

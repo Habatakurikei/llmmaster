@@ -2,7 +2,7 @@
 
 # LLM Master
 
-LLM Master is a powerful tool to boost your creativity by working with multiple generative AIs.
+LLM Master is a powerful engine to boost your creativity by working with multiple generative AIs.
 
 This is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) and multimedia generative AI models from different providers.
 

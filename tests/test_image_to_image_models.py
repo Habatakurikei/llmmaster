@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 import requests
+from requests.models import Response
 
 from llmmaster.config import REQUEST_OK
 from llmmaster.image_to_image_models import OpenAIImageToImage
@@ -117,9 +118,7 @@ def test_stable_diffusion_image_to_image_instances(run_api):
 
         print('Responses')
         for name, response in master.results.items():
-            if isinstance(response, str):
-                print(f'{name} = {response}')
-            else:
+            if isinstance(response, Response):
                 if 'output_format' in master.instances[name].parameters:
                     save_as = f'{name}.{master.instances[name].parameters["output_format"]}'
                 else:
@@ -128,12 +127,15 @@ def test_stable_diffusion_image_to_image_instances(run_api):
                 filepath = os.path.join(TEST_OUTPUT_PATH, save_as)
 
                 with open(filepath, 'wb') as f:
-                    if isinstance(response, bytes):
-                        f.write(response)
+                    if isinstance(response.content, bytes):
+                        f.write(response.content)
                         print(f'{name} = {filepath} saved')
                     else:
                         print(f"Unexpected response type for {name}: {type(response)}")
 
+            else:
+                print(f'{name} = {response}')
+                judgment = False
 
     print(f'Elapsed time (sec): {master.elapsed_time}')
     master.dismiss()

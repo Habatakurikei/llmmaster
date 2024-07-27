@@ -42,11 +42,14 @@ class OpenAITextToImage(BaseModel):
             raise Exception(msg) from e
 
     def run(self):
-
-        # msg = f'Summon OpenAI Text to Image with {self.parameters["model"]}'
-        # print(msg)
-
-        answer = 'Valid image not generated.'
+        '''
+        Note:
+        OpenAITextToImage returns ImagesResponse class including image url.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
+        '''
+        answer = 'Valid image not generated. '
 
         try:
             client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
@@ -59,11 +62,10 @@ class OpenAITextToImage(BaseModel):
                 n=self.parameters['n'])
 
             if isinstance(response, ImagesResponse):
-                # ImagesResponse class including generated image url
                 answer = response
 
         except Exception as e:
-            answer = str(e)
+            answer += str(e)
 
         self.response = answer
 
@@ -117,15 +119,13 @@ class StableDiffusionTextToImage(BaseModel):
         '''
         Note:
         Stable Diffusion returns binary data of generated image, but not URL.
-        But when failed to generate image, return value is given in str.
-        Handle return value `answer` with care for different type in case of
-        success and failure.
+        LLMMaster returns requests.models.Response class directly.
+        Seed value is included in response.headers['Seed'] for reuse.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
         '''
-        # msg = 'Summon Stable Diffusion Text to Image, '
-        # msg += f'sending request to {self.parameters["url"]}.'
-        # print(msg)
-
-        answer = 'Valid image not generated.'
+        answer = 'Valid image not generated. '
 
         try:
             response = requests.post(self.parameters['url'],
@@ -133,17 +133,13 @@ class StableDiffusionTextToImage(BaseModel):
                                      files=self.parameters['files'],
                                      data=self.parameters['data'])
 
-            if response.status_code != REQUEST_OK:
-                answer = str(response.json())
-
-            elif hasattr(response, 'content'):
-                # binary data of generated image
-                answer = response.content
+            if response.status_code == REQUEST_OK:
+                answer = response
+            else:
+                answer += str(response.json())
 
         except Exception as e:
-            answer = str(e)
-
-        # print(f'Stable Diffusion responded =\n{answer}')
+            answer += str(e)
 
         self.response = answer
 

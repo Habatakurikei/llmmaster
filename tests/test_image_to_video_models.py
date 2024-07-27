@@ -1,5 +1,6 @@
 import os
 import sys
+from requests.models import Response
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
@@ -46,15 +47,16 @@ def test_stable_diffusion_image_to_video_instances(run_api):
             os.makedirs(TEST_OUTPUT_PATH)
 
         print('Responses')
-        for name, output_bytes in master.results.items():
-            if not any(output_bytes):
+        for name, response in master.results.items():
+            if isinstance(response, Response):
+                filename = f'{name}.mp4'
+                filepath = os.path.join(TEST_OUTPUT_PATH, filename)
+                with open(filepath, 'wb') as f:
+                    f.write(response.content)
+                print(f'Saved as {filepath} for {name}')
+            else:
+                print(f'{name} = {response}')
                 judgment = False
-
-            filename = f'{name}.mp4'
-            filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-            with open(filepath, 'wb') as f:
-                f.write(output_bytes)
-            print(f'Saved as {filepath} for {name}')
 
     print(f"Elapsed time (sec): {master.elapsed_time}")
     master.dismiss()

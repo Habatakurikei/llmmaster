@@ -14,6 +14,15 @@
   - Runway API not released for public
   - Pika.art API
 
+## [0.2.1] - 2024-07-28
+### Changed
+- return value changed to `requests.models.Response` class from `response.content` for the following models:
+  - `StableDiffusionTextToImage`
+  - `StableDiffusionImageToVideo`
+  - `StableDiffusionImageToImage`
+### Added
+- `RESULTSTYPE.md` for brief description how to handle generated contents
+
 ## [0.2.0] - 2024-07-27
 ### Added
 - Speech-To-Text model class
