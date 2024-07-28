@@ -22,6 +22,11 @@ from .image_to_video_models import StableDiffusionImageToVideo
 from .audio_to_text_models import GoogleSpeechToText
 from .audio_to_text_models import OpenAISpeechToText
 from .video_to_text_models import GoogleVideoToText
+from .meshy_models import MeshyTextToTexture
+from .meshy_models import MeshyTextTo3D
+from .meshy_models import MeshyTextTo3DRefine
+from .meshy_models import MeshyTextToVoxel
+from .meshy_models import MeshyImageTo3D
 
 
 ACTIVE_MODELS = {
@@ -40,7 +45,12 @@ ACTIVE_MODELS = {
     'stable_diffusion_itv': StableDiffusionImageToVideo,
     'google_stt': GoogleSpeechToText,
     'openai_stt': OpenAISpeechToText,
-    'google_vtt': GoogleVideoToText
+    'google_vtt': GoogleVideoToText,
+    'meshy_tttx': MeshyTextToTexture,
+    'meshy_tt3d': MeshyTextTo3D,
+    'meshy_tt3d_refine': MeshyTextTo3DRefine,
+    'meshy_ttvx': MeshyTextToVoxel,
+    'meshy_it3d': MeshyImageTo3D
 }
 
 
@@ -54,6 +64,7 @@ class LLMMaster():
             - OPENAI_API_KEY
             - PERPLEXITY_API_KEY
             - STABLE_DIFFUSION_API_KEY
+            - MESHY_API_KEY
     Usage:
       1. create this class instance.
       2. call summon to set a new LLM instance with parameters.
@@ -230,27 +241,28 @@ class LLMInstanceCreator():
           - mode = SD_ITI_TYPE_NEED_DUMMY_PROMPT
         - StableDiffusionImageToVideo
           - provider = stable_diffusion_itv
+        - MeshyTextToTexture
+          - provider = meshy_tttx
+        - MeshyTextTo3DRefine
+          - provider = meshy_tt3d_refine
+        - MeshyImageTo3D
+          - provider = meshy_it3d
         '''
         answer = False
 
-        if kwargs['provider'] not in PROVIDERS_NEED_DUMMY_PROMPT:
-            pass
+        if kwargs['provider'] in PROVIDERS_NEED_DUMMY_PROMPT:
+            answer = True
 
-        else:
-            if (kwargs['provider'] == 'openai_stt' or
-               kwargs['provider'] == 'stable_diffusion_itv'):
+        elif kwargs['provider'] == 'openai_iti':
+            if not hasattr(kwargs, 'mode'):
+                answer = True
+            elif kwargs['mode'] in OPENAI_ITI_MODE_NEED_DUMMY_PROMPT:
                 answer = True
 
-            elif kwargs['provider'] == 'openai_iti':
-                if not hasattr(kwargs, 'mode'):
-                    answer = True
-                elif kwargs['mode'] in OPENAI_ITI_MODE_NEED_DUMMY_PROMPT:
-                    answer = True
-
-            elif kwargs['provider'] == 'stable_diffusion_iti':
-                if not hasattr(kwargs, 'mode'):
-                    answer = True
-                elif kwargs['mode'] in SD_ITI_MODE_NEED_DUMMY_PROMPT:
-                    answer = True
+        elif kwargs['provider'] == 'stable_diffusion_iti':
+            if not hasattr(kwargs, 'mode'):
+                answer = True
+            elif kwargs['mode'] in SD_ITI_MODE_NEED_DUMMY_PROMPT:
+                answer = True
 
         return answer

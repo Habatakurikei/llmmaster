@@ -18,7 +18,9 @@ This is a Python library that provides a unified interface for interacting with 
 
 ## Supported LLM Providers and Models
 
-LLM Master respects multi-modal approach. 
+LLM Master respects multi-modal approach. There are many generative AI models that can be used for different purposes. There are 2 categories: major data formats and 3D models.
+
+**1. Major Data Formats**
 
 The table below represents various conversion capabilities between different media types (text, image, audio/speech and video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
@@ -70,6 +72,16 @@ Use highlighted word for `model` to make LLMMaster instance.
 
 The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
 
+**2. 3D Models**
+
+From ver. 0.2.2, LLM Master supports 3D models thanks to Meshy API. Here are the list of supported models:
+
+  - MeshyTextToTexture: `meshy_tttx`
+  - MeshyTextTo3D: `meshy_tt3d`
+  - MeshyTextTo3DRefine: `meshy_tt3d_refine`
+  - MeshyTextToVoxel: `meshy_ttvx`
+  - MeshyImageTo3D: `meshy_it3d`
+
 More models will be supported soon!
 
 ## Installation
@@ -99,9 +111,10 @@ export GROQ_API_KEY="your_groq_key"
 export OPENAI_API_KEY="your_openai_key"
 export PERPLEXITY_API_KEY="your_perplexity_key"
 export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
+export MESHY_API_KEY="your_meshy_key"
 ```
 
-For Windows,
+For Windows (cmd),
 
 ```
 SET ANTHROPIC_API_KEY=your_anthropic_key
@@ -110,11 +123,12 @@ SET GROQ_API_KEY=your_groq_key
 SET OPENAI_API_KEY=your_openai_key
 SET PERPLEXITY_API_KEY=your_perplexity_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
+SET MESHY_API_KEY=your_meshy_key
 ```
 
 ### Use cases
 
-You can download these use cases in python in folder "usecases".
+You can download these use cases in python in folder "usecases". See `RESULTSTYPE.md` for brief description how to handle generated contents.
 
   1. Using **single Text-to-Text** LLM
 
@@ -525,6 +539,12 @@ print(f'Answer = {master.results["video_to_text"]}')
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
+```
+
+  10. Using **3D Models** (Meshy)
+
+```python
+# To be updated soon.
 ```
 
 ## Applications

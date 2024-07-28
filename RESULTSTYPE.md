@@ -43,3 +43,9 @@ In case of any error, the result will be stored as str. Print it to see problem 
 ## Video-To-Text
   - GoogleVideoToText: response.text.strip()
 
+## Meshy
+  - MeshyTextToTexture: requests.models.Response class
+  - MeshyTextTo3D: requests.models.Response class
+  - MeshyTextTo3DRefine: requests.models.Response class
+  - MeshyTextToVoxel: requests.models.Response class
+  - MeshyImageTo3D: requests.models.Response class

@@ -7,6 +7,7 @@ GROQ_KEY_NAME = 'GROQ_API_KEY'
 OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
 STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
+MESHY_KEY_NAME = 'MESHY_API_KEY'
 
 
 # Default models setting
@@ -34,6 +35,12 @@ DEFAULT_ATT_MODELS = {'openai_stt': 'whisper-1',
 
 DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
 
+DEFAULT_MESHY_MODELS = {'meshy_tttx': 'dummy',
+                        'meshy_tt3d': 'meshy-3',
+                        'meshy_tt3d_refine': 'dummy',
+                        'meshy_ttvx': 'dummy',
+                        'meshy_it3d': 'dummy'}
+
 
 def _full_default_list():
     full_list = {}
@@ -45,6 +52,7 @@ def _full_default_list():
     full_list.update(DEFAULT_ITV_MODELS)
     full_list.update(DEFAULT_ATT_MODELS)
     full_list.update(DEFAULT_VTT_MODELS)
+    full_list.update(DEFAULT_MESHY_MODELS)
     return full_list
 
 
@@ -88,13 +96,20 @@ STABLE_DIFFUSION_ITV_VERSION = 'v2beta'
 STABLE_DIFFUSION_ITV_START_EP = '/image-to-video'
 STABLE_DIFFUSION_ITV_RESULT_EP = '/image-to-video/result/{id}'
 
+MESHY_BASE_EP = 'https://api.meshy.ai'
+
+MESHY_TTTX_START_EP = '/v1/text-to-texture'
+MESHY_TT3D_START_EP = '/v2/text-to-3d'
+MESHY_TTVX_START_EP = '/v1/text-to-voxel'
+MESHY_IT3D_START_EP = '/v1/image-to-3d'
+
 # settings for summon
 SUMMON_LIMIT = 32
 WAIT_FOR_SUMMONING = 1
 
 # Dummy prompt settings
-PROVIDERS_NEED_DUMMY_PROMPT = ['openai_stt', 'openai_iti',
-                               'stable_diffusion_iti', 'stable_diffusion_itv']
+PROVIDERS_NEED_DUMMY_PROMPT = ['openai_stt', 'stable_diffusion_itv',
+                               'meshy_tttx', 'meshy_tt3d_refine', 'meshy_it3d']
 OPENAI_ITI_MODE_NEED_DUMMY_PROMPT = ['variations']
 SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
 
@@ -192,3 +207,23 @@ OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
 # Video-To-Text settings
 WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
 WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600
+
+# Meshy specific settings
+MESHY_TT3D_MODELS = ['meshy-3', 'meshy-3-turbo']
+MESHY_TT3D_STYLES_LIST = ['realistic', 'cartoon', 'low-poly',
+                          'sculpture', 'pbr']
+
+MESHY_TTTX_STYLES_LIST = ['realistic', 'fake-3d-cartoo', 'japanese-anime',
+                          'cartoon-line-art', 'realistic-hand-drawn',
+                          'fake-3d-hand-drawn', 'oriental-comic-ink']
+MESHY_TTTX_RESOLUTION_LIST = ['1024', '2048', '4096']
+
+MESHY_VOXEL_SHRINK_LIST = [8, 4, 2, 1]
+
+MESHY_TT3D_TEXTURE_RICHNESS_LIST = ['high', 'medium', 'low', 'none']
+
+MESHY_STATUS_IN_PROGRESS = 'IN_PROGRESS'
+MESHY_STATUS_SUCCEEDED = 'SUCCEEDED'
+MESHY_STATUS_FAILED = 'FAILED'
+
+WAIT_FOR_MESHY_RESULT = 5

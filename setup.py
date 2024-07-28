@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="llmmaster",
-    version="0.2.1",
+    version="0.2.2",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A unified interface for interacting with multiple LLMs.",
@@ -35,6 +35,7 @@ setuptools.setup(
         "groq>=0.5.0",
         "openai>=1.30.1",
         "pillow>=9.5.0",
+        "elevenlabs>=1.6.0",
     ],
     extras_require={
         "dev": [
