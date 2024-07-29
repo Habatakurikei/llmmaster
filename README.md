@@ -28,7 +28,7 @@ Use highlighted word for `provider` to make LLMMaster instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, google_tta (pending) | (pending) |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, google_tta (pending) | (pending) |
 | Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
 | Audio | `openai_stt`, `google_stt` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
@@ -49,6 +49,7 @@ And the list below represents the models that are supported by each provider. Se
 
 ### Text-to-Audio (Speech) Models
 - OpenAI (`tts-1`, `tts-1-hd`)
+- ElevenLabs (`eleven_multilingual_v2`)
 
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
@@ -112,6 +113,7 @@ export OPENAI_API_KEY="your_openai_key"
 export PERPLEXITY_API_KEY="your_perplexity_key"
 export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 export MESHY_API_KEY="your_meshy_key"
+export ELEVENLABS_API_KEY="your_elevenlabs_key"
 ```
 
 For Windows (cmd),
@@ -124,11 +126,27 @@ SET OPENAI_API_KEY=your_openai_key
 SET PERPLEXITY_API_KEY=your_perplexity_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 SET MESHY_API_KEY=your_meshy_key
+SET ELEVENLABS_API_KEY=your_elevenlabs_key
+```
+
+For Windows (PowerShell)
+
+```
+$env:ANTHROPIC_API_KEY="your_anthropic_key"
+$env:GOOGLE_API_KEY="your_google_key"
+$env:GROQ_API_KEY="your_groq_key"
+$env:OPENAI_API_KEY="your_openai_key"
+$env:PERPLEXITY_API_KEY="your_perplexity_key"
+$env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
+$env:MESHY_API_KEY="your_meshy_key"
+$env:ELEVENLABS_API_KEY="your_elevenlabs_key"
 ```
 
 ### Use cases
 
-You can download these use cases in python in folder "usecases". See `RESULTSTYPE.md` for brief description how to handle generated contents.
+You can find and download these use case codes in folder [usecases](https://github.com/Habatakurikei/llmmaster/tree/main/usecases).
+
+**Important:** How to handle or save generated contents? LLM Master basically returns raw output defined by each provider. Some models return REST API Response object of requests library, while some other models return bytes object of media or specific class instance defined by provider. See [RESULTSTYPE.md](https://github.com/Habatakurikei/llmmaster/blob/main/RESULTSTYPE.md) for brief description of what type of object is returned.
 
   1. Using **single Text-to-Text** LLM
 
@@ -268,6 +286,8 @@ llmmaster.dismiss()
 
   4. Using **Text-to-Audio** (Text-to-Speech) Models
 
+      4.1 OpenAI
+
 ```python
 from llmmaster import LLMMaster
 from llmmaster.config import OPENAI_TTS_VOICE_OPTIONS
@@ -304,6 +324,37 @@ for name, response in master.results.items():
     with open(save_as, 'wb') as f:
         for chunk in response.iter_bytes():
             f.write(chunk)
+    print(f'Saved as {save_as} for case {name}')
+
+# Check elapsed time
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
+      4.2 ElevenLabs
+
+```python
+import elevenlabs
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+to_say = "Do not concentrate on the finger, or you will miss all that heavenly glory."
+
+test_case = master.pack_parameters(provider='elevenlabs_tts', prompt=to_say)
+
+master.summon({'elevenlabs_tts': test_case})
+
+# Run LLM
+print('Start running LLMMaster...')
+master.run()
+
+# Get results
+print('Responses')
+if master.results['elevenlabs_tts']:
+    save_as = f"elevenlabs_tts.mp3"
+    elevenlabs.save(master.results['elevenlabs_tts'], save_as)
     print(f'Saved as {save_as} for case {name}')
 
 # Check elapsed time
@@ -544,7 +595,58 @@ master.dismiss()
   10. Using **3D Models** (Meshy)
 
 ```python
-# To be updated soon.
+import requests
+from requests.models import Response
+from llmmaster import LLMMaster
+
+REQUEST_OK = 200
+TEST_OUTPUT_PATH = 'test-outputs'
+
+master = LLMMaster()
+
+# This is a case of generating Voxel model from text prompt
+params = master.pack_parameters(provider='meshy_ttvx',
+                                prompt='A cute robot boy.',
+                                negative_prompt='ugly, low resolution')
+
+master.summon({'meshy_ttvx_test': params})
+
+# Run LLM
+print('Start running LLMMaster...')
+master.run()
+
+# Get results
+print('Responses')
+
+if isinstance(master.results['meshy_ttvx_test'], Response):
+
+    json_result = master.results['meshy_ttvx_test'].json()
+
+    # Meshy returns several different model formats
+    for key, value in json_result['model_urls'].items():
+        if value:
+            res = requests.get(value)
+            if res.status_code == REQUEST_OK:
+                filename = f'meshy_ttvx_test.{key}'
+                filepath = os.path.join(TEST_OUTPUT_PATH, filename)
+                with open(filepath, 'wb') as f:
+                    f.write(res.content)
+                print(f'Saved as {filepath}')
+
+    # Meshy also returns thumbnail png for preview
+    if 'thumbnail_url' in json_result:
+        res = requests.get(json_result['thumbnail_url'])
+        if res.status_code == REQUEST_OK:
+            filename = 'meshy_ttvx_test_thumbnail.png'
+            filepath = os.path.join(TEST_OUTPUT_PATH, filename)
+            with open(filepath, 'wb') as f:
+                f.write(res.content)
+            print(f'Saved as {filepath}')
+
+# Check elapsed time
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
 ```
 
 ## Applications

@@ -3,10 +3,18 @@
 # - text-to-music model (TTM)
 import os
 
+from elevenlabs import Voice
+from elevenlabs import VoiceSettings
+from elevenlabs.client import ElevenLabs
 from openai import OpenAI
 
 from .base_model import BaseModel
 
+from .config import ELEVENLABS_KEY_NAME
+from .config import ELEVENLABS_TTS_MODELS
+from .config import ELEVENLABS_DEFAULT_VOICE_ID
+from .config import ELEVENLABS_DEFAULT_STABILITY
+from .config import ELEVENLABS_DEFAULT_SIMILARITY
 from .config import OPENAI_KEY_NAME
 from .config import OPENAI_TTS_RESPONSE_FORMAT_LIST
 from .config import OPENAI_TTS_VOICE_OPTIONS
@@ -45,7 +53,7 @@ class OpenAITextToSpeech(BaseModel):
         # msg = f'Summon OpenAI Text-To-Speech with {self.parameters["model"]}'
         # print(msg)
 
-        answer = 'Audio not generated.'
+        answer = 'Speech not generated. '
 
         try:
             client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
@@ -61,7 +69,7 @@ class OpenAITextToSpeech(BaseModel):
                 answer = response
 
         except Exception as e:
-            answer = str(e)
+            answer += str(e)
 
         self.response = answer
 
@@ -94,5 +102,111 @@ class OpenAITextToSpeech(BaseModel):
                 pass
             else:
                 parameters['speed'] = OPENAI_TTS_DEFAULT_SPEED
+
+        return parameters
+
+
+class ElevenLabsTextToSpeech(BaseModel):
+    '''
+    List of available models as of 2024-07-29:
+      - eleven_multilingual_v2
+      - see ELEVENLABS_TTS_MODELS for full list but not recommended to use
+    Output formats: mp3
+    Voice variations: see formal document
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'ElevenLabsTextToSpeech'
+            raise Exception(msg) from e
+
+    def run(self):
+        '''
+        Note:
+        ElevenLabs Text-To-Speech returns binary audio data.
+        Save the generated audio using `elevenlabs.save()`.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
+        '''
+        answer = 'Speech not generated. '
+
+        try:
+            client = ElevenLabs(api_key=os.getenv(ELEVENLABS_KEY_NAME))
+
+            response = client.generate(text=self.parameters['prompt'],
+                                       voice=self.parameters['voice'],
+                                       model=self.parameters['model'])
+
+            if response:
+                answer = response
+
+        except Exception as e:
+            answer += str(e)
+
+        self.response = answer
+
+    def _verify_arguments(self, **kwargs):
+        '''
+        Expected inputs:
+          - model_id: str
+          - language_code: str
+          - voice_settings: VoiceSettings class
+          - seed: int
+          - previous_text: str
+          - next_text: str
+          - pronunciation_dictionary_locators: list
+          - previous_request_ids: list
+          - next_request_ids: list
+        '''
+        parameters = kwargs
+
+        # model
+        if kwargs['model'] in ELEVENLABS_TTS_MODELS:
+            pass
+        else:
+            parameters.update(model=ELEVENLABS_TTS_MODELS[0])
+
+        # voice_id
+        if 'voice_id' in kwargs and isinstance(kwargs['voice_id'], str):
+            voice_id = kwargs['voice_id']
+        else:
+            voice_id = ELEVENLABS_DEFAULT_VOICE_ID
+
+        # voice settings
+        if ('stability' in kwargs and isinstance(kwargs['stability'], float)):
+            stability = kwargs['stability']
+        else:
+            stability = ELEVENLABS_DEFAULT_STABILITY
+
+        if ('similarity_boost' in kwargs and
+           isinstance(kwargs['similarity_boost'], float)):
+            similarity_boost = kwargs['similarity_boost']
+        else:
+            similarity_boost = ELEVENLABS_DEFAULT_SIMILARITY
+
+        if ('style' in kwargs and isinstance(kwargs['style'], int)):
+            style = kwargs['style']
+        else:
+            style = 0.0
+
+        if ('use_speaker_boost' in kwargs and
+           isinstance(kwargs['use_speaker_boost'], bool)):
+            use_speaker_boost = kwargs['use_speaker_boost']
+        else:
+            use_speaker_boost = True
+
+        voice_settings = VoiceSettings(stability=stability,
+                                       similarity_boost=similarity_boost,
+                                       style=style,
+                                       use_speaker_boost=use_speaker_boost)
+
+        voice = Voice(voice_id=voice_id, settings=voice_settings)
+
+        parameters.update(voice=voice)
 
         return parameters

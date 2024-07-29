@@ -13,6 +13,7 @@ from .text_to_text_models import OpenAILLM
 from .text_to_text_models import PerplexityLLM
 from .text_to_image_models import OpenAITextToImage
 from .text_to_image_models import StableDiffusionTextToImage
+from .text_to_audio_models import ElevenLabsTextToSpeech
 from .text_to_audio_models import OpenAITextToSpeech
 from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
@@ -37,6 +38,7 @@ ACTIVE_MODELS = {
     'perplexity': PerplexityLLM,
     'openai_tti': OpenAITextToImage,
     'stable_diffusion_tti': StableDiffusionTextToImage,
+    'elevenlabs_tts': ElevenLabsTextToSpeech,
     'openai_tts': OpenAITextToSpeech,
     'openai_itt': OpenAIImageToText,
     'google_itt': GoogleImageToText,
@@ -65,6 +67,7 @@ class LLMMaster():
             - PERPLEXITY_API_KEY
             - STABLE_DIFFUSION_API_KEY
             - MESHY_API_KEY
+            - ELEVENLABS_API_KEY
     Usage:
       1. create this class instance.
       2. call summon to set a new LLM instance with parameters.

@@ -24,7 +24,7 @@ def test_stable_diffusion_image_to_video_instances(run_api):
     master = LLMMaster()
 
     sd_itv_test = master.pack_parameters(provider='stable_diffusion_itv',
-                                         image='test-inputs/test_itv_image.png')
+                                         image='test-inputs/def_dragon_girl_2.png')
 
     master.summon({'sd_itv_test': sd_itv_test})
 

@@ -6,13 +6,22 @@
   - StableDiffusion API through ModelsLab
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
-- Text-To-3DImage models
-  - Meshy API
-- Text-To-Speech models pending to be added
-  - ElevenLabs API
 - Text-To-Video models pending to be added
   - Runway API not released for public
   - Pika.art API
+
+## [0.2.3] - 2024-07-30
+### Added
+- `ElevenLabsTextToSpeech`
+
+## [0.2.2] - 2024-07-29
+### Added
+- support Meshy 3D modeling APIs
+  - `MeshyTextToTexture`
+  - `MeshyTextTo3D`
+  - `MeshyTextTo3DRefine`
+  - `MeshyTextToVoxel`
+  - `MeshyImageTo3D`
 
 ## [0.2.1] - 2024-07-28
 ### Changed

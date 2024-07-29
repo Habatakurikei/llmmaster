@@ -8,6 +8,7 @@ OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
 STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
 MESHY_KEY_NAME = 'MESHY_API_KEY'
+ELEVENLABS_KEY_NAME = 'ELEVENLABS_API_KEY'
 
 
 # Default models setting
@@ -20,7 +21,8 @@ DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-5-sonnet-20240620',
 DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
 
-DEFAULT_TTA_MODELS = {'openai_tts': 'tts-1'}
+DEFAULT_TTA_MODELS = {'openai_tts': 'tts-1',
+                      'elevenlabs_tts': 'eleven_multilingual_v2'}
 
 DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
                       'google_itt': 'gemini-1.5-flash'}
@@ -163,6 +165,14 @@ OPENAI_TTS_MAX_SPEED = 4.0
 OPENAI_TTS_MIN_SPEED = 0.25
 OPENAI_TTS_DEFAULT_SPEED = 1.0
 
+ELEVENLABS_TTS_MODELS = ['eleven_multilingual_v2', 'eleven_turbo_v2_5',
+                         'eleven_turbo_v2', 'eleven_monolingual_v1',
+                         'eleven_monolingual_v1']
+
+ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM' # Rachel
+ELEVENLABS_DEFAULT_STABILITY = 1.0
+ELEVENLABS_DEFAULT_SIMILARITY = 0.75
+
 # Image-To-Image settings
 OPENAI_ITI_DEFAULT_N = 1
 OPENAI_ITI_MAX_N = 10
@@ -203,6 +213,9 @@ OPENAI_STT_MODE_LIST = ['transcriptions', 'translations']
 OPENAI_STT_RESPONSE_FORMAT_LIST = ['json', 'text', 'srt',
                                    'verbose_json', 'vtt']
 OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
+
+# Audio-To-Audio settings
+ELEVENLABS_STS_MODELS = ['eleven_multilingual_sts_v2', 'eleven_english_sts_v2']
 
 # Video-To-Text settings
 WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
