@@ -14,21 +14,23 @@ This is a Python library that provides a unified interface for interacting with 
 - Customizable generation parameters
   - Required parameters: `provider` and `prompt`
   - Optional parameters: `model` and particular parameters for different model
-  - **Exception:** `prompt` is not required for Audio-to-Text, Image-to-Image and Image-To-Video models, which is dependent on mode you select.
+  - **Exception:** `prompt` is not required for some dedicated models. Follow the instructions released by provider.
 
 ## Supported LLM Providers and Models
 
-LLM Master respects multi-modal approach. There are many generative AI models that can be used for different purposes. There are 2 categories: major data formats and 3D models.
+LLM Master respects multi-modal approach. There are many generative AI models that can be used for different purposes.
 
-**1. Major Data Formats**
+There are 2 categories in LLM Master: major data formats and 3D models.
+
+  1. **Major Data Formats**
 
 The table below represents various conversion capabilities between different media types (text, image, audio/speech and video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
-Use highlighted word for `provider` to make LLMMaster instance.
+Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, google_tta (pending) | (pending) |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, google_tta (pending) | `pikapikapika_ttv` |
 | Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
 | Audio | `openai_stt`, `google_stt` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
@@ -51,6 +53,9 @@ And the list below represents the models that are supported by each provider. Se
 - OpenAI (`tts-1`, `tts-1-hd`)
 - ElevenLabs (`eleven_multilingual_v2`)
 
+### Text-to-Video Models
+- Pika.art (`pikapikapika_ttv`)
+
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
 - Google (`gemini-1.5-flash`)
@@ -69,11 +74,11 @@ And the list below represents the models that are supported by each provider. Se
 ### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
 
-Use highlighted word for `model` to make LLMMaster instance.
+Use highlighted word for `model` to make `LLMMaster` instance.
 
 The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
 
-**2. 3D Models**
+  2. **3D Models**
 
 From ver. 0.2.2, LLM Master supports 3D models thanks to Meshy API. Here are the list of supported models:
 
@@ -114,6 +119,7 @@ export PERPLEXITY_API_KEY="your_perplexity_key"
 export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 export MESHY_API_KEY="your_meshy_key"
 export ELEVENLABS_API_KEY="your_elevenlabs_key"
+export PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 ```
 
 For Windows (cmd),
@@ -127,6 +133,7 @@ SET PERPLEXITY_API_KEY=your_perplexity_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 SET MESHY_API_KEY=your_meshy_key
 SET ELEVENLABS_API_KEY=your_elevenlabs_key
+SET PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
 ```
 
 For Windows (PowerShell)
@@ -140,19 +147,20 @@ $env:PERPLEXITY_API_KEY="your_perplexity_key"
 $env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 $env:MESHY_API_KEY="your_meshy_key"
 $env:ELEVENLABS_API_KEY="your_elevenlabs_key"
+$env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 ```
 
 ### Use cases
 
 You can find and download these use case codes in folder [usecases](https://github.com/Habatakurikei/llmmaster/tree/main/usecases).
 
-**Important:** How to handle or save generated contents? LLM Master basically returns raw output defined by each provider. Some models return REST API Response object of requests library, while some other models return bytes object of media or specific class instance defined by provider. See [RESULTSTYPE.md](https://github.com/Habatakurikei/llmmaster/blob/main/RESULTSTYPE.md) for brief description of what type of object is returned.
+**Important:** How to handle or save generated contents? LLM Master basically returns raw output defined by each provider. Some models return REST API Response object from the requests library, while some other models return bytes object of media or specific class instance defined by provider. See [RESULTSTYPE.md](https://github.com/Habatakurikei/llmmaster/blob/main/RESULTSTYPE.md) for brief description of what type of object is returned.
 
   1. Using **single Text-to-Text** LLM
 
 This is the most basic usage of LLM Master.
 
-`openai_instance` is actually a unique label to manage multiple instances. You may set any string for it. The next case will be a multi-LLM example.
+In the code below, `openai_instance` is actually a unique label to manage multiple instances. You may set any string for it. The next case will be a multi-LLM example.
 
 ```python
 from llmmaster import LLMMaster
@@ -286,7 +294,7 @@ llmmaster.dismiss()
 
   4. Using **Text-to-Audio** (Text-to-Speech) Models
 
-      4.1 OpenAI
+4.1 OpenAI
 
 ```python
 from llmmaster import LLMMaster
@@ -332,7 +340,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-      4.2 ElevenLabs
+4.2 ElevenLabs
 
 ```python
 import elevenlabs
@@ -363,7 +371,59 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  5. Using **Image-to-Text** Models
+  5. Using **Text-to-Video** Models
+
+```python
+import requests
+from llmmaster import LLMMaster
+
+# Create an instance of LLMMaster
+master = LLMMaster()
+
+# Configure LLM instance
+prompt = 'A cute robot boy flying high to the space.'
+camera = {'zoom': 'out'}
+parameters = {"guidanceScale":16,"motion":2,"negativePrompt": "ugly"}
+
+params = master.pack_parameters(provider='pikapikapika_ttv',
+                                prompt=prompt,
+                                style='Anime',
+                                sfx=True,
+                                frameRate=24,
+                                aspectRatio='16:9',
+                                camera=camera,
+                                parameters=parameters)
+
+master.summon({'pikapikapika_ttv': params})
+
+# You can check what parameters are set before run
+print('Parameters set before run.')
+for label, instance in master.instances.items():
+    print(f'{label} = {instance.parameters}')
+
+# Run LLM
+print('Start running LLMMaster...')
+master.run()
+
+# Get results
+print('Responses')
+response = master.results['pikapikapika_ttv'].json()
+
+if 'resultUrl' in response['videos'][0] and response['videos'][0]:
+    res = requests.get(response['videos'][0]['resultUrl'])
+    if res.status_code == 200:
+        filename = f'pikapikapika_ttv_test_video.mp4'
+        with open(filepath, 'wb') as f:
+            f.write(res.content)
+            print(f'Saved as {filepath}')
+
+# Check elapsed time
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
+  6. Using **Image-to-Text** Models
 
 ```python
 from llmmaster import LLMMaster
@@ -410,7 +470,7 @@ print(f'Elapsed time: {master.elapsed_time} seconds')
 master.dismiss()
 ```
 
-  6. Using **Image-to-Image** Models
+  7. Using **Image-to-Image** Models
 
 ```python
 import requests
@@ -471,7 +531,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  7. Using **Image-to-Video** Model
+  8. Using **Image-to-Video** Model
 
 ```python
 from llmmaster import LLMMaster
@@ -501,7 +561,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  8. Using **Audio-to-Text** (Speech-to-Text) Models
+  9. Using **Audio-to-Text** (Speech-to-Text) Models
 
 ```python
 from llmmaster import LLMMaster
@@ -567,7 +627,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  9. Using **Video-to-Text** Model
+  10. Using **Video-to-Text** Model
 
 ```python
 from llmmaster import LLMMaster
@@ -592,7 +652,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  10. Using **3D Models** (Meshy)
+  11. Using **3D Models** (Meshy)
 
 ```python
 import requests

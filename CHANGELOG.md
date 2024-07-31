@@ -6,9 +6,19 @@
   - StableDiffusion API through ModelsLab
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
+- Text-To-Music models pending to be added
+  - Mubert API for rather enterprise use
+  - Suno API for rather enterprise use
 - Text-To-Video models pending to be added
   - Runway API not released for public
-  - Pika.art API
+- Pending additional functions
+  - ElevenLabs dubbing, cloning, etc.
+  - Pika.art video extension, etc.
+
+## [0.3.0] - 2024-08-01
+### Added
+- Pika.art third-party Text-To-Video model class
+  - `PikaPikaPikaGeneration`
 
 ## [0.2.3] - 2024-07-30
 ### Added

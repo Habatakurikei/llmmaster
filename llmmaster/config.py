@@ -9,6 +9,7 @@ PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
 STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
 MESHY_KEY_NAME = 'MESHY_API_KEY'
 ELEVENLABS_KEY_NAME = 'ELEVENLABS_API_KEY'
+PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
 
 
 # Default models setting
@@ -16,7 +17,7 @@ DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-5-sonnet-20240620',
                       'google': 'gemini-1.5-flash',
                       'groq': 'llama3-70b-8192',
                       'openai': 'gpt-4o',
-                      'perplexity': 'llama-3-sonar-large-32k-online'}
+                      'perplexity': 'llama-3.1-sonar-small-128k-online'}
 
 DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
@@ -43,6 +44,8 @@ DEFAULT_MESHY_MODELS = {'meshy_tttx': 'dummy',
                         'meshy_ttvx': 'dummy',
                         'meshy_it3d': 'dummy'}
 
+DEFAULT_PIKAPIKAPIKA_MODELS = {'pikapikapika_ttv': 'dummy'}
+
 
 def _full_default_list():
     full_list = {}
@@ -55,6 +58,7 @@ def _full_default_list():
     full_list.update(DEFAULT_ATT_MODELS)
     full_list.update(DEFAULT_VTT_MODELS)
     full_list.update(DEFAULT_MESHY_MODELS)
+    full_list.update(DEFAULT_PIKAPIKAPIKA_MODELS)
     return full_list
 
 
@@ -104,6 +108,14 @@ MESHY_TTTX_START_EP = '/v1/text-to-texture'
 MESHY_TT3D_START_EP = '/v2/text-to-3d'
 MESHY_TTVX_START_EP = '/v1/text-to-voxel'
 MESHY_IT3D_START_EP = '/v1/image-to-3d'
+
+PIKAPIKAPIKA_BASE_EP = 'https://api.pikapikapika.io/web'
+PIKAPIKAPIKA_GENERATION_EP = '/generate'
+PIKAPIKAPIKA_LIPSYNC_EP = '/lipSync'
+PIKAPIKAPIKA_ADJUST_EP = '/adjust'
+PIKAPIKAPIKA_EXTEND_EP = '/extend'
+PIKAPIKAPIKA_UPSCALE_EP = '/upscale'
+PIKAPIKAPIKA_RESULT_EP = '/jobs/{id}'
 
 # settings for summon
 SUMMON_LIMIT = 32
@@ -169,7 +181,7 @@ ELEVENLABS_TTS_MODELS = ['eleven_multilingual_v2', 'eleven_turbo_v2_5',
                          'eleven_turbo_v2', 'eleven_monolingual_v1',
                          'eleven_monolingual_v1']
 
-ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM' # Rachel
+ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'
 ELEVENLABS_DEFAULT_STABILITY = 1.0
 ELEVENLABS_DEFAULT_SIMILARITY = 0.75
 
@@ -240,3 +252,10 @@ MESHY_STATUS_SUCCEEDED = 'SUCCEEDED'
 MESHY_STATUS_FAILED = 'FAILED'
 
 WAIT_FOR_MESHY_RESULT = 5
+
+# PikaPikaPika.art specific settings
+PIKAPIKAPIKA_STYLE_LIST = ['Anime', 'Moody', '3D', 'Watercolor', 'Natural',
+                           'Claymation', 'Black & white']
+PIKAPIKAPIKA_ASPECT_RATIO_LIST = ['16:9', '9:16', '1:1', '5:2', '4:5', '4:3']
+PIKAPIKAPIKA_MAX_FPS = 24
+WAIT_FOR_PIKAPIKAPIKA_RESULT = 5

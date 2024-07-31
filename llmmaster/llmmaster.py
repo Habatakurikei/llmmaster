@@ -28,6 +28,7 @@ from .meshy_models import MeshyTextTo3D
 from .meshy_models import MeshyTextTo3DRefine
 from .meshy_models import MeshyTextToVoxel
 from .meshy_models import MeshyImageTo3D
+from .pikapikapika_models import PikaPikaPikaGeneration
 
 
 ACTIVE_MODELS = {
@@ -52,7 +53,8 @@ ACTIVE_MODELS = {
     'meshy_tt3d': MeshyTextTo3D,
     'meshy_tt3d_refine': MeshyTextTo3DRefine,
     'meshy_ttvx': MeshyTextToVoxel,
-    'meshy_it3d': MeshyImageTo3D
+    'meshy_it3d': MeshyImageTo3D,
+    'pikapikapika_ttv': PikaPikaPikaGeneration
 }
 
 
@@ -68,6 +70,7 @@ class LLMMaster():
             - STABLE_DIFFUSION_API_KEY
             - MESHY_API_KEY
             - ELEVENLABS_API_KEY
+            - PIKAPIKAPIKA_API_KEY
     Usage:
       1. create this class instance.
       2. call summon to set a new LLM instance with parameters.

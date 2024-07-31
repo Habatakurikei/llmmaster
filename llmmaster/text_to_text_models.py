@@ -227,14 +227,13 @@ class OpenAILLM(BaseModel):
 class PerplexityLLM(BaseModel):
     '''
     Use OpenAI library according to Perplexity formal document.
-    List of available models as of 2024-07-04:
-      - llama-3-sonar-small-32k-chat
-      - llama-3-sonar-small-32k-online
-      - llama-3-sonar-large-32k-chat
-      - llama-3-sonar-large-32k-online
-      - llama-3-8b-instruct
-      - llama-3-70b-instruct
-      - mixtral-8x7b-instruct
+    List of available models as of 2024-07-31:
+      - llama-3.1-sonar-small-128k-online
+      - llama-3.1-sonar-small-128k-chat
+      - llama-3.1-sonar-large-128k-online
+      - llama-3.1-sonar-large-128k-chat
+      - llama-3.1-8b-instruct
+      - llama-3.1-70b-instruct
     '''
     def __init__(self, **kwargs):
 

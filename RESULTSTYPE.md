@@ -27,6 +27,9 @@ In case of any error, the result will be stored as str. Print it to see problem 
   - OpenAITextToSpeech: openai._legacy_response.HttpxBinaryResponseContent object
   - ElevenLabsTextToSpeech: TextToSpeechClient.convert.generator object
 
+## Text-To-Video
+  - PikaPikaPikaGeneration: requests.models.Response class
+
 ## Image-To-Text
   - OpenAIImageToText: response.choices[0].message.content.strip()
   - GoogleImageToText: response.text.strip()

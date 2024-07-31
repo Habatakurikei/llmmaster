@@ -274,7 +274,7 @@ def test_meshy_text_to_voxel_instances(run_api):
                             f.write(res.content)
                         print(f'Saved as {filepath}')
 
-            if 'thumbnail_url' in json_result:
+            if 'thumbnail_url' in json_result and json_result['thumbnail_url']:
                 res = requests.get(json_result['thumbnail_url'])
                 if res.status_code == REQUEST_OK:
                     filename = f'meshy_ttvx_test_thumbnail.png'
