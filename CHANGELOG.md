@@ -6,6 +6,8 @@
   - StableDiffusion API through ModelsLab
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
+- Text-To-Speech models pending to be added
+  - VOICEVOX API for character voices
 - Text-To-Music models pending to be added
   - Mubert API for rather enterprise use
   - Suno API for rather enterprise use
@@ -14,6 +16,10 @@
 - Pending additional functions
   - ElevenLabs dubbing, cloning, etc.
   - Pika.art video extension, etc.
+
+## [0.3.1] - 2024-08-04
+### Changed
+- For Meshy models, changed to stop polling result when status is `SUCCEEDED` or `FAILED`
 
 ## [0.3.0] - 2024-08-01
 ### Added

@@ -17,8 +17,7 @@ from .config import MESHY_TT3D_TEXTURE_RICHNESS_LIST
 from .config import MESHY_TTTX_RESOLUTION_LIST
 from .config import MESHY_TTTX_STYLES_LIST
 from .config import MESHY_VOXEL_SHRINK_LIST
-from .config import MESHY_STATUS_IN_PROGRESS
-from .config import REQUEST_ACCEPTED
+from .config import MESHY_STATUS_FOR_RESULT
 from .config import REQUEST_OK
 from .config import WAIT_FOR_MESHY_RESULT
 
@@ -87,10 +86,8 @@ class MeshyModelBase(BaseModel):
                                         url=ep,
                                         headers=header)
 
-            if (response.status_code == REQUEST_ACCEPTED or
-               response.json().get('status') == MESHY_STATUS_IN_PROGRESS):
+            if response.json().get('status') not in MESHY_STATUS_FOR_RESULT:
                 time.sleep(WAIT_FOR_MESHY_RESULT)
-
             else:
                 answer = response
                 flg = False
