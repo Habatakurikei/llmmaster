@@ -6,6 +6,7 @@
   - StableDiffusion API through ModelsLab
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
+  - Flux.1 API through fal
 - Text-To-Speech models pending to be added
   - VOICEVOX API for character voices
 - Text-To-Music models pending to be added
@@ -16,6 +17,12 @@
 - Pending additional functions
   - ElevenLabs dubbing, cloning, etc.
   - Pika.art video extension, etc.
+  - OpenAi structured output
+
+## [0.3.2] - 2024-08-07
+### Changed
+- `WAIT_FOR_SUMMONING` changed to `WAIT_FOR_STARTING`
+- For Meshy models, changed to stop polling result when status is `SUCCEEDED` or `FAILED` or `EXPIRED`
 
 ## [0.3.1] - 2024-08-04
 ### Changed

@@ -5,7 +5,7 @@ from .config import PROVIDERS_NEED_DUMMY_PROMPT
 from .config import OPENAI_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import SUMMON_LIMIT
-from .config import WAIT_FOR_SUMMONING
+from .config import WAIT_FOR_STARTING
 from .text_to_text_models import AnthropicLLM
 from .text_to_text_models import GoogleLLM
 from .text_to_text_models import GroqLLM
@@ -78,11 +78,20 @@ class LLMMaster():
       3. call run to start working for each instance.
       4. access self.results to get results for each instance.
       5. call dismiss to clear instances and results, then finish work.
+      6. (optional) set wait_for_starting to change waiting time between
+         . Default is 1 second and must no be shorter.
     '''
-    def __init__(self):
+    def __init__(self, wait_for_starting: float = WAIT_FOR_STARTING):
         self.instances = {}
         self.results = {}
         self.elapsed_time = 0
+
+        if not isinstance(wait_for_starting, float):
+            raise ValueError('wait_for_starting must be positive float.')
+        elif wait_for_starting < WAIT_FOR_STARTING:
+            self.wait_for_starting = WAIT_FOR_STARTING
+        else:
+            self.wait_for_starting = wait_for_starting
 
     def summon(self, entries={}):
         '''
@@ -133,7 +142,7 @@ class LLMMaster():
         start_time = time.time()
 
         for instance in self.instances.values():
-            time.sleep(WAIT_FOR_SUMMONING)
+            time.sleep(self.wait_for_starting)
             instance.start()
 
         for instance in self.instances.values():
