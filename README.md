@@ -30,7 +30,7 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, google_tta (pending) | `pikapikapika_ttv` |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, `google_tta (pending) | `pikapikapika_ttv` |
 | Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
 | Audio | `openai_stt`, `google_stt` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
@@ -52,6 +52,7 @@ And the list below represents the models that are supported by each provider. Se
 ### Text-to-Audio (Speech) Models
 - OpenAI (`tts-1`, `tts-1-hd`)
 - ElevenLabs (`eleven_multilingual_v2`)
+- Voicevox (`dummy`)
 
 ### Text-to-Video Models
 - Pika.art (`pikapikapika_ttv`)
@@ -77,6 +78,8 @@ And the list below represents the models that are supported by each provider. Se
 Use highlighted word for `model` to make `LLMMaster` instance.
 
 The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
+
+**Important:** You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
 
   2. **3D Models**
 

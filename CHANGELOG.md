@@ -7,8 +7,6 @@
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
   - Flux.1 API through fal
-- Text-To-Speech models pending to be added
-  - VOICEVOX API for character voices
 - Text-To-Music models pending to be added
   - Mubert API for rather enterprise use
   - Suno API for rather enterprise use
@@ -18,6 +16,11 @@
   - ElevenLabs dubbing, cloning, etc.
   - Pika.art video extension, etc.
   - OpenAi structured output
+
+## [0.3.3] - 2024-08-12
+### Added
+- Text-To-Speech model class
+  - VoicevoxTextToSpeech
 
 ## [0.3.2] - 2024-08-07
 ### Changed

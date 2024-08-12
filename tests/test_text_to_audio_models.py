@@ -6,10 +6,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 import elevenlabs
+from requests.models import Response
 
 from llmmaster.config import OPENAI_TTS_VOICE_OPTIONS
 from llmmaster.text_to_audio_models import OpenAITextToSpeech
 from llmmaster.text_to_audio_models import ElevenLabsTextToSpeech
+from llmmaster.text_to_audio_models import VoicevoxTextToSpeech
 from llmmaster import LLMMaster
 
 TEST_OUTPUT_PATH = 'test-outputs'
@@ -145,6 +147,48 @@ def test_elevenlabs_text_to_speech(run_api):
             filepath = os.path.join(TEST_OUTPUT_PATH, 'elevenlabs_tts.mp3')
             elevenlabs.save(master.results['elevenlabs_tts'], filepath)
             print(f'Saved as {filepath} for elevenlabs_tts')
+
+    print(f'Elapsed time: {master.elapsed_time} seconds')
+    master.dismiss()
+
+    assert judgment is True
+
+
+def test_voicevox_text_to_speech(run_api):
+    judgment = True
+    master = LLMMaster()
+
+    prompt = 'こんにちは。今日もいい天気ですね！'
+
+    case1 = master.pack_parameters(provider='voicevox_tts', prompt=prompt, speaker=1)
+    case2 = master.pack_parameters(provider='voicevox_tts', prompt=prompt, speaker=2)
+    master.summon({'case1': case1, 'case2': case2})
+
+    for name, instance in master.instances.items():
+        print(f'{name} = {instance}, {instance.parameters}')
+        if not isinstance(instance, VoicevoxTextToSpeech):
+            judgment = False
+
+
+    if run_api:
+        print('Run API')
+        try:
+            master.run()
+        except Exception as e:
+            pytest.fail(f"An error occurred during API calls: {str(e)}")
+
+        if not os.path.isdir(TEST_OUTPUT_PATH):
+            os.makedirs(TEST_OUTPUT_PATH)
+
+        print('Responses')
+        for name, response in master.results.items():
+            if not isinstance(response, Response):
+                judgment = False
+            else:
+                filepath = os.path.join(TEST_OUTPUT_PATH, f'{name}.wav')
+                with open(filepath, 'wb') as f:
+                    f.write(response.content)
+                print(f'Saved as {filepath} for {name}')
 
     print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()

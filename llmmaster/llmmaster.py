@@ -15,6 +15,7 @@ from .text_to_image_models import OpenAITextToImage
 from .text_to_image_models import StableDiffusionTextToImage
 from .text_to_audio_models import ElevenLabsTextToSpeech
 from .text_to_audio_models import OpenAITextToSpeech
+from .text_to_audio_models import VoicevoxTextToSpeech
 from .image_to_text_models import OpenAIImageToText
 from .image_to_text_models import GoogleImageToText
 from .image_to_image_models import OpenAIImageToImage
@@ -41,6 +42,7 @@ ACTIVE_MODELS = {
     'stable_diffusion_tti': StableDiffusionTextToImage,
     'elevenlabs_tts': ElevenLabsTextToSpeech,
     'openai_tts': OpenAITextToSpeech,
+    'voicevox_tts': VoicevoxTextToSpeech,
     'openai_itt': OpenAIImageToText,
     'google_itt': GoogleImageToText,
     'openai_iti': OpenAIImageToImage,

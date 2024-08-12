@@ -26,6 +26,7 @@ In case of any error, the result will be stored as str. Print it to see problem 
 ## Text-To-Audio
   - OpenAITextToSpeech: openai._legacy_response.HttpxBinaryResponseContent object
   - ElevenLabsTextToSpeech: TextToSpeechClient.convert.generator object
+  - VoicevoxTextToSpeech: requests.models.Response class
 
 ## Text-To-Video
   - PikaPikaPikaGeneration: requests.models.Response class

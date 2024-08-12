@@ -23,7 +23,8 @@ DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
 
 DEFAULT_TTA_MODELS = {'openai_tts': 'tts-1',
-                      'elevenlabs_tts': 'eleven_multilingual_v2'}
+                      'elevenlabs_tts': 'eleven_multilingual_v2',
+                      'voicevox_tts': 'dummy'}
 
 DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
                       'google_itt': 'gemini-1.5-flash'}
@@ -184,6 +185,12 @@ ELEVENLABS_TTS_MODELS = ['eleven_multilingual_v2', 'eleven_turbo_v2_5',
 ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'
 ELEVENLABS_DEFAULT_STABILITY = 1.0
 ELEVENLABS_DEFAULT_SIMILARITY = 0.75
+
+VOICEVOX_BASE_EP = 'http://localhost:50021'
+VOICEVOX_QUERY_EP = '/audio_query'
+VOICEVOX_SYNTHESIS_EP = "/synthesis"
+VOICEVOX_DEFAULT_VOICE_ID = 1
+
 
 # Image-To-Image settings
 OPENAI_ITI_DEFAULT_N = 1

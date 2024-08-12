@@ -3,6 +3,7 @@
 # - text-to-music model (TTM)
 import os
 
+import requests
 from elevenlabs import Voice
 from elevenlabs import VoiceSettings
 from elevenlabs.client import ElevenLabs
@@ -21,6 +22,11 @@ from .config import OPENAI_TTS_VOICE_OPTIONS
 from .config import OPENAI_TTS_DEFAULT_SPEED
 from .config import OPENAI_TTS_MAX_SPEED
 from .config import OPENAI_TTS_MIN_SPEED
+from .config import VOICEVOX_BASE_EP
+from .config import VOICEVOX_QUERY_EP
+from .config import VOICEVOX_SYNTHESIS_EP
+from .config import VOICEVOX_DEFAULT_VOICE_ID
+from .config import REQUEST_OK
 
 
 class OpenAITextToSpeech(BaseModel):
@@ -210,3 +216,78 @@ class ElevenLabsTextToSpeech(BaseModel):
         parameters.update(voice=voice)
 
         return parameters
+
+
+class VoicevoxTextToSpeech(BaseModel):
+    '''
+    Voicevox Text-to-Speech model
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'VoicevoxTextToSpeech'
+            raise Exception(msg) from e
+
+    def run(self):
+        '''
+        Note:
+        Voicevox Text-To-Speech returns binary audio data.
+        Save the generated audio using `wb`.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
+        '''
+        answer = 'Speech not generated. '
+
+        try:
+            res_query = requests.post(
+                url=VOICEVOX_BASE_EP+VOICEVOX_QUERY_EP,
+                params=self.parameters['params'])
+
+            if res_query.status_code == REQUEST_OK:
+                answer = self._query_to_speech(res_query.text)
+            else:
+                answer += f'Error: {res_query.text}'
+
+        except Exception as e:
+            answer += f'Error: {str(e)}'
+
+        self.response = answer
+
+    def _verify_arguments(self, **kwargs):
+        """
+        Verify and process arguments for Voicevox Text-to-Speech.
+        Expected inputs:
+          - speaker: int
+        """
+        parameters = kwargs
+
+        params = {'text': kwargs['prompt']}
+
+        if ('speaker' in kwargs and
+           isinstance(kwargs['speaker'], int) and
+           0 < kwargs['speaker']):
+            params['speaker'] = kwargs['speaker']
+        else:
+            params['speaker'] = VOICEVOX_DEFAULT_VOICE_ID
+
+        parameters.update(params=params)
+
+        return parameters
+
+    def _query_to_speech(self, query_json: str):
+        '''
+        Convert query json to speech
+        '''
+        headers = {'Content-Type': 'application/json'}
+        params = {'speaker': self.parameters['params']['speaker']}
+        res_synth = requests.post(
+            url=VOICEVOX_BASE_EP+VOICEVOX_SYNTHESIS_EP,
+            headers=headers,
+            params=params,
+            data=query_json)
+        return res_synth
