@@ -17,6 +17,13 @@
   - Pika.art video extension, etc.
   - OpenAi structured output
 
+## [0.3.4] - 2024-08-13
+### Changed
+- `SUMMON_LIMIT` changed to 100 as default
+- Deleted `wait_for_starting` parameter verification from `LLMMaster` class
+### Added
+- `summon_limit` parameter added to `LLMMaster` class
+
 ## [0.3.3] - 2024-08-12
 ### Added
 - Text-To-Speech model class

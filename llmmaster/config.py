@@ -119,7 +119,7 @@ PIKAPIKAPIKA_UPSCALE_EP = '/upscale'
 PIKAPIKAPIKA_RESULT_EP = '/jobs/{id}'
 
 # settings for summon
-SUMMON_LIMIT = 32
+SUMMON_LIMIT = 100
 WAIT_FOR_STARTING = 1.0
 
 # Dummy prompt settings

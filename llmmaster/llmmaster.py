@@ -83,19 +83,20 @@ class LLMMaster():
       6. (optional) set wait_for_starting to change waiting time between
          . Default is 1 second and must no be shorter.
     '''
-    def __init__(self, wait_for_starting: float = WAIT_FOR_STARTING):
+    def __init__(self,
+                 summon_limit: int = SUMMON_LIMIT,
+                 wait_for_starting: float = WAIT_FOR_STARTING):
         self.instances = {}
         self.results = {}
         self.elapsed_time = 0
 
-        if not isinstance(wait_for_starting, float):
-            raise ValueError('wait_for_starting must be positive float.')
-        elif wait_for_starting < WAIT_FOR_STARTING:
+        self.summon_limit = summon_limit
+        if wait_for_starting < WAIT_FOR_STARTING:
             self.wait_for_starting = WAIT_FOR_STARTING
         else:
             self.wait_for_starting = wait_for_starting
 
-    def summon(self, entries={}):
+    def summon(self, entries: dict = {}):
         '''
         Set LLM instance. Provide argument in dictionary format as:
         {
@@ -113,7 +114,7 @@ class LLMMaster():
         '''
         num_to_summon = len(entries.keys())
 
-        if num_to_summon < 1 or SUMMON_LIMIT < num_to_summon:
+        if num_to_summon < 1 or self.summon_limit < num_to_summon:
             msg = f'LLM entries must be between 1 and 32 but {num_to_summon}.'
             raise ValueError(msg)
 
@@ -121,9 +122,10 @@ class LLMMaster():
 
         for key, value in entries.items():
 
-            if SUMMON_LIMIT < len(self.instances.keys()):
-                msg = 'LLM entries to summon reached to limit {SUMMON_LIMIT} '
-                msg += f'- now attempted to add {len(self.instances.keys())}.'
+            if self.summon_limit < len(self.instances.keys()):
+                msg = 'LLM entries to summon reached to limit '
+                msg += f'{self.summon_limit} - now attempted to add '
+                msg += f'{len(self.instances.keys())}.'
                 raise Exception(msg)
 
             if key in self.instances.keys():
