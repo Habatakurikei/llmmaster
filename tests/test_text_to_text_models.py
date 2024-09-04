@@ -15,6 +15,10 @@ from llmmaster.text_to_text_models import PerplexityLLM
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
     'google': GoogleLLM,
@@ -85,7 +89,28 @@ def test_prompt_empty():
     assert 'Error' in str(e.value)
 
 
+def test_preset_api_key():
+    '''
+    2024-09-03: test for one-time api key.
+    '''
+    judgment = False
+    master = LLMMaster()
+    entry = master.pack_parameters(provider='openai', prompt='Hello.')
+    # master.set_api_keys(API_KEY)
+    master.summon({'test': entry})
+    if isinstance(master.instances['test'], OpenAILLM):
+        judgment = True
+        print(f"parameters = {master.instances['test'].parameters}")
+        print(f"api_key_pairs = {master.api_key_pairs}")
+        print(f"api_key = {master.instances['test'].api_key}")
+    master.dismiss()
+    assert judgment is True
+
+
 def test_instance_limit():
+    '''
+    Fail if api key is not set in the environment variable.
+    '''
     master = LLMMaster()
     i = 1
     with pytest.raises(Exception) as e:
@@ -97,18 +122,22 @@ def test_instance_limit():
 
 
 def test_ttt_instances(run_api):
+    '''
+    Fail if api key is not set in the environment variable.
+    '''
     judgment = True
     master = LLMMaster()
 
     test_cases = [
-        {'name': 'case_1', 'params': {'provider': 'openai', 'prompt': 'Hello.'}},
-        {'name': 'case_2', 'params': {'provider': 'anthropic', 'prompt': 'Hello.', 'max_tokens': 0, 'temperature': -0.1}},
-        {'name': 'case_3', 'params': {'provider': 'google', 'prompt': 'Hello.', 'max_tokens': 5000, 'temperature': 1.1}},
-        {'name': 'case_4', 'params': {'provider': 'groq', 'prompt': 'Hello.', 'max_tokens': 100, 'temperature': 0.5}},
-        {'name': 'case_5', 'params': {'provider': 'perplexity', 'prompt': 'Hello.', 'temperature': 0.0}},
+        {'name': 'case_1', 'params': {'provider': 'openai', 'model': 'gpt-4o-mini', 'prompt': 'Hello.'}},
+        {'name': 'case_2', 'params': {'provider': 'anthropic', 'model': 'claude-3-haiku-20240307', 'prompt': 'Hello.', 'max_tokens': 0, 'temperature': -0.1, 'top_p': 0.1, 'top_k': 0}},
+        {'name': 'case_3', 'params': {'provider': 'google', 'model': 'gemini-1.5-flash', 'prompt': 'Hello.', 'max_tokens': 5000, 'temperature': 1.1, 'top_p': 0.7, 'top_k': 30}},
+        {'name': 'case_4', 'params': {'provider': 'groq', 'model': 'mixtral-8x7b-32768', 'prompt': 'Hello.', 'max_tokens': 100, 'temperature': 0.5, 'top_p': 0.5}},
+        {'name': 'case_5', 'params': {'provider': 'perplexity', 'model': 'llama-3.1-sonar-small-128k-online', 'prompt': 'Hello.', 'temperature': 0.0}},
         {'name': 'case_6', 'params': {'provider': 'openai', 'model': 'gpt-4o-mini', 'prompt': 'Hello.', 'max_tokens': 10000}}
     ]
 
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 

@@ -14,6 +14,10 @@ from llmmaster.pikapikapika_models import PikaPikaPikaGeneration
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 TEST_OUTPUT_PATH = 'test-outputs'
 
 
@@ -38,9 +42,11 @@ def test_pikapikapika_generation_instances(run_api):
                                     aspectRatio='16:9',
                                     camera=camera,
                                     parameters=parameters)
+    master.set_api_keys(API_KEY)
     master.summon({'pikapikapika_ttv': params})
 
     print(f"Parameters = {master.instances['pikapikapika_ttv'].parameters}")
+    print(f"API Key = {master.instances['pikapikapika_ttv'].api_key}")
 
     if not isinstance(master.instances['pikapikapika_ttv'], PikaPikaPikaGeneration):
         judgment = False

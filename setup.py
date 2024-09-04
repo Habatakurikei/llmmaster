@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="llmmaster",
-    version="0.3.4",
+    version="0.4.0",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
-    description="A unified interface for interacting with multiple LLMs.",
+    description="A unified interface for interacting with multiple LLMs and generative AIs.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://pypi.org/project/llmmaster/",
@@ -30,12 +30,12 @@ setuptools.setup(
     ],
     python_requires=">=3.9",
     install_requires=[
-        "anthropic>=0.25.9",
+        "anthropic>=0.34.1",
         "google-generativeai>=0.7.2",
-        "groq>=0.5.0",
-        "openai>=1.30.1",
+        "groq>=0.10.0",
+        "openai>=1.43.0",
         "pillow>=9.5.0",
-        "elevenlabs>=1.6.0",
+        "elevenlabs>=1.7.0",
     ],
     extras_require={
         "dev": [

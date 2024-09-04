@@ -1,3 +1,4 @@
+import os
 import time
 
 from .config import FULL_DEFAULT_MODELS
@@ -6,6 +7,17 @@ from .config import OPENAI_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import SUMMON_LIMIT
 from .config import WAIT_FOR_STARTING
+from .config import ANTHROPIC_KEY_NAME
+from .config import DALLE_KEY_NAME
+from .config import DUMMY_KEY_NAME
+from .config import GOOGLE_KEY_NAME
+from .config import GROQ_KEY_NAME
+from .config import OPENAI_KEY_NAME
+from .config import PERPLEXITY_KEY_NAME
+from .config import STABLE_DIFFUSION_KEY_NAME
+from .config import MESHY_KEY_NAME
+from .config import ELEVENLABS_KEY_NAME
+from .config import PIKAPIKAPIKA_KEY_NAME
 from .text_to_text_models import AnthropicLLM
 from .text_to_text_models import GoogleLLM
 from .text_to_text_models import GroqLLM
@@ -33,59 +45,79 @@ from .pikapikapika_models import PikaPikaPikaGeneration
 
 
 ACTIVE_MODELS = {
-    'anthropic': AnthropicLLM,
-    'google': GoogleLLM,
-    'groq': GroqLLM,
-    'openai': OpenAILLM,
-    'perplexity': PerplexityLLM,
-    'openai_tti': OpenAITextToImage,
-    'stable_diffusion_tti': StableDiffusionTextToImage,
-    'elevenlabs_tts': ElevenLabsTextToSpeech,
-    'openai_tts': OpenAITextToSpeech,
-    'voicevox_tts': VoicevoxTextToSpeech,
-    'openai_itt': OpenAIImageToText,
-    'google_itt': GoogleImageToText,
-    'openai_iti': OpenAIImageToImage,
-    'stable_diffusion_iti': StableDiffusionImageToImage,
-    'stable_diffusion_itv': StableDiffusionImageToVideo,
-    'google_stt': GoogleSpeechToText,
-    'openai_stt': OpenAISpeechToText,
-    'google_vtt': GoogleVideoToText,
-    'meshy_tttx': MeshyTextToTexture,
-    'meshy_tt3d': MeshyTextTo3D,
-    'meshy_tt3d_refine': MeshyTextTo3DRefine,
-    'meshy_ttvx': MeshyTextToVoxel,
-    'meshy_it3d': MeshyImageTo3D,
-    'pikapikapika_ttv': PikaPikaPikaGeneration
+    'anthropic': {'model': AnthropicLLM,
+                  'key': ANTHROPIC_KEY_NAME},
+    'google': {'model': GoogleLLM,
+               'key': GOOGLE_KEY_NAME},
+    'groq': {'model': GroqLLM,
+             'key': GROQ_KEY_NAME},
+    'openai': {'model': OpenAILLM,
+               'key': OPENAI_KEY_NAME},
+    'perplexity': {'model': PerplexityLLM,
+                   'key': PERPLEXITY_KEY_NAME},
+    'openai_tti': {'model': OpenAITextToImage,
+                   'key': DALLE_KEY_NAME},
+    'stable_diffusion_tti': {'model': StableDiffusionTextToImage,
+                             'key': STABLE_DIFFUSION_KEY_NAME},
+    'elevenlabs_tts': {'model': ElevenLabsTextToSpeech,
+                       'key': ELEVENLABS_KEY_NAME},
+    'openai_tts': {'model': OpenAITextToSpeech,
+                   'key': OPENAI_KEY_NAME},
+    'voicevox_tts': {'model': VoicevoxTextToSpeech,
+                     'key': DUMMY_KEY_NAME},
+    'openai_itt': {'model': OpenAIImageToText,
+                   'key': OPENAI_KEY_NAME},
+    'google_itt': {'model': GoogleImageToText,
+                   'key': GOOGLE_KEY_NAME},
+    'openai_iti': {'model': OpenAIImageToImage,
+                   'key': DALLE_KEY_NAME},
+    'stable_diffusion_iti': {'model': StableDiffusionImageToImage,
+                             'key': STABLE_DIFFUSION_KEY_NAME},
+    'stable_diffusion_itv': {'model': StableDiffusionImageToVideo,
+                             'key': STABLE_DIFFUSION_KEY_NAME},
+    'google_stt': {'model': GoogleSpeechToText,
+                   'key': GOOGLE_KEY_NAME},
+    'openai_stt': {'model': OpenAISpeechToText,
+                   'key': OPENAI_KEY_NAME},
+    'google_vtt': {'model': GoogleVideoToText,
+                   'key': GOOGLE_KEY_NAME},
+    'meshy_tttx': {'model': MeshyTextToTexture,
+                   'key': MESHY_KEY_NAME},
+    'meshy_tt3d': {'model': MeshyTextTo3D,
+                   'key': MESHY_KEY_NAME},
+    'meshy_tt3d_refine': {'model': MeshyTextTo3DRefine,
+                          'key': MESHY_KEY_NAME},
+    'meshy_ttvx': {'model': MeshyTextToVoxel,
+                   'key': MESHY_KEY_NAME},
+    'meshy_it3d': {'model': MeshyImageTo3D,
+                   'key': MESHY_KEY_NAME},
+    'pikapikapika_ttv': {'model': PikaPikaPikaGeneration,
+                         'key': PIKAPIKAPIKA_KEY_NAME}
 }
 
 
 class LLMMaster():
     '''
-    Note: configure your API key in advance in your OS environment,
-          using SET (Win) or export (Mac/Linux) command for:
-            - ANTHROPIC_API_KEY
-            - GOOGLE_API_KEY
-            - GROQ_API_KEY
-            - OPENAI_API_KEY
-            - PERPLEXITY_API_KEY
-            - STABLE_DIFFUSION_API_KEY
-            - MESHY_API_KEY
-            - ELEVENLABS_API_KEY
-            - PIKAPIKAPIKA_API_KEY
+    Note: prepare your API keys before calling summon().
+      Either environment variables or in string from text file.
+      See config.py for name defined in each provider.
     Usage:
       1. create this class instance.
-      2. call summon to set a new LLM instance with parameters.
-         Use pack_parameters() to make parameters into dictionary.
-      3. call run to start working for each instance.
-      4. access self.results to get results for each instance.
-      5. call dismiss to clear instances and results, then finish work.
-      6. (optional) set wait_for_starting to change waiting time between
-         . Default is 1 second and must no be shorter.
+        (optional) set summon_limit and wait_for_starting.
+        Default of summon_limit is 100 and wait_for_starting is 1 second.
+        wait_for_starting must not be shorter than 1 second.
+      2. (optional) set API keys with set_api_keys() method.
+      3. call summon() to set a new LLM/AI entry with parameters.
+        Use pack_parameters() to make parameters into dictionary.
+      4. call run() to start working for each entry.
+      5. access self.results to get results for each LLM/AI entry.
+      6. call dismiss() to clear entries and results, then finish work.
+    2024-09-03: added `api_key_pairs` for one-time use.
     '''
     def __init__(self,
                  summon_limit: int = SUMMON_LIMIT,
                  wait_for_starting: float = WAIT_FOR_STARTING):
+        self.api_key_pairs = {}
         self.instances = {}
         self.results = {}
         self.elapsed_time = 0
@@ -112,20 +144,21 @@ class LLMMaster():
         Acceptable for single entry or multiple entries at once.
         Use self.pack_parameters() for batch parameters input.
         '''
-        num_to_summon = len(entries.keys())
+        num_to_summon = len(entries)
 
         if num_to_summon < 1 or self.summon_limit < num_to_summon:
-            msg = f'LLM entries must be between 1 and 32 but {num_to_summon}.'
+            msg = f'LLM entries must be between 1 and {self.summon_limit} '
+            msg += f'but {num_to_summon}.'
             raise ValueError(msg)
 
         creator = LLMInstanceCreator()
 
         for key, value in entries.items():
 
-            if self.summon_limit < len(self.instances.keys()):
+            if self.summon_limit < len(self.instances):
                 msg = 'LLM entries to summon reached to limit '
                 msg += f'{self.summon_limit} - now attempted to add '
-                msg += f'{len(self.instances.keys())}.'
+                msg += f'{len(self.instances)}.'
                 raise Exception(msg)
 
             if key in self.instances.keys():
@@ -133,7 +166,9 @@ class LLMMaster():
                 raise Exception(msg)
 
             try:
-                creator.verify(key, **value)
+                creator.verify(label=key,
+                               api_key_pairs=self.api_key_pairs,
+                               **value)
                 self.instances.update(creator.create())
 
             except Exception as e:
@@ -160,6 +195,7 @@ class LLMMaster():
             self.results.update(buff)
 
     def dismiss(self):
+        self.api_key_pairs = {}
         self.instances = {}
         self.results = {}
         self.elapsed_time = 0
@@ -170,6 +206,20 @@ class LLMMaster():
         '''
         return kwargs
 
+    def set_api_keys(self, source: str):
+        '''
+        2024-09-03: load API keys from multiple-line text
+        Format: APE_KEY = "your_key" or APE_KEY=your_key
+        One key-pair per line.
+        '''
+        active_api_keys = [model['key'] for model in ACTIVE_MODELS.values()]
+        lines = source.splitlines()
+        for line in lines:
+            buff = line.replace(" ", "").replace('"', "").replace("'", "")
+            word_list = buff.split('=')
+            if 1 < len(word_list) and word_list[0] in active_api_keys:
+                self.api_key_pairs[word_list[0]] = word_list[1]
+
 
 class LLMInstanceCreator():
     '''
@@ -178,48 +228,55 @@ class LLMInstanceCreator():
     def __init__(self):
         self.label = ''
         self.parameters = {}
+        self.api_key = ''
         self.verified_OK = False
 
-    def verify(self, label: str, **kwargs):
+    def verify(self, label: str, api_key_pairs: dict, **kwargs):
         '''
         Check validity of minimum parameters for single entry.
 
         Arguments:
         - label (required): unique identifier in string for instance
             - empty str not acceptable
+        - api_key_pairs (required): dictionary for API keys
         - entry parameters in dictionary:
             - provider (required): string
             - model: string defined by provider, default model is available
             - prompt (basically required): string, empty str not acceptable
+        Steps:
+          1. verify label
+          2. verify provider
+          3. verify model
+          4. verify prompt
+          5. verify api key
         '''
         self.verified_OK = False
         self.parameters = kwargs
 
-        # 1. verify label
         if not label or not isinstance(label, str):
             raise Exception('No label given in input.')
-
         self.label = label
 
-        # 2. verify provider
         if 'provider' not in kwargs:
             raise Exception('No provider given in input.')
-
-        elif kwargs['provider'] not in FULL_DEFAULT_MODELS.keys():
+        elif kwargs['provider'] not in ACTIVE_MODELS.keys():
             msg = 'Provider name not given or non-supported provider given: '
             msg += f'{kwargs["provider"]}.'
             raise ValueError(msg)
 
-        # 3. verify model
         if 'model' not in kwargs or not kwargs['model']:
             self.parameters['model'] = FULL_DEFAULT_MODELS[kwargs['provider']]
 
-        # 4. verify prompt
         if self._is_dummy_prompt_required(**kwargs) and 'prompt' not in kwargs:
             kwargs.update(prompt='dummy prompt to avoid error')
-
         if 'prompt' not in kwargs or not kwargs['prompt']:
             raise ValueError('Prompt not given.')
+
+        try:
+            self.api_key = self._load_api_key(
+                api_key_pairs, ACTIVE_MODELS[kwargs['provider']]['key'])
+        except Exception as e:
+            raise Exception(f'Failed finding API key. {e}') from e
 
         self.verified_OK = True
 
@@ -236,8 +293,9 @@ class LLMInstanceCreator():
             raise Exception(msg)
 
         try:
-            instance_class = ACTIVE_MODELS.get(self.parameters['provider'])
-            instance = instance_class(**self.parameters)
+            provider = self.parameters['provider']
+            instance_class = ACTIVE_MODELS[provider]['model']
+            instance = instance_class(api_key=self.api_key, **self.parameters)
 
         except Exception as e:
             raise Exception('Failed creating LLM instance.') from e
@@ -245,6 +303,21 @@ class LLMInstanceCreator():
         self.verified_OK = False
 
         return {self.label: instance}
+
+    def _load_api_key(self, api_key_pairs: dict, key_name: str):
+        '''
+        2024-09-03: find API key for provider (key_name) from environment
+        variables or one-time API key pairs.
+        '''
+        value = os.getenv(key_name)
+        value = value if value else api_key_pairs.get(key_name, None)
+        if key_name == DUMMY_KEY_NAME:
+            value = 'dummy'
+        elif value is None:
+            msg = f'{key_name} is not found in environment variables'
+            msg += ' or one-time API key pairs.'
+            raise Exception(msg)
+        return value
 
     def _is_dummy_prompt_required(self, **kwargs):
         '''

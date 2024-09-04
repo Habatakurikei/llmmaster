@@ -14,6 +14,10 @@ from llmmaster.text_to_image_models import StableDiffusionTextToImage
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 TEST_OUTPUT_PATH = 'test-outputs'
 
 
@@ -37,7 +41,7 @@ def test_openai_text_to_image_instances(run_api):
         {'name': 'case_7_invalid_quality', 'params': {'provider': 'openai_tti', 'prompt': prompt, 'quality': 'ultra'}},
         {'name': 'case_8_invalid_n', 'params': {'provider': 'openai_tti', 'prompt': prompt, 'n': 5}},
     ]
-
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 
@@ -94,7 +98,7 @@ def test_stable_diffusion_text_to_image_instances(run_api):
         {'name': 'case_7_invalid_aspect_ratio', 'params': {'provider': 'stable_diffusion_tti', 'prompt': prompt, 'aspect_ratio': '5:5'}},
         {'name': 'case_8_invalid_style_preset', 'params': {'provider': 'stable_diffusion_tti', 'model': 'core', 'prompt': prompt, 'style_preset': 'invalid_style'}},
     ]
-
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 

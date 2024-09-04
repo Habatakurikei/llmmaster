@@ -1,18 +1,13 @@
-import os
 import requests
-
 from openai import OpenAI
 from openai.types.images_response import ImagesResponse
 
 from .base_model import BaseModel
-
 from .config import MAX_SEED
-from .config import OPENAI_KEY_NAME
 from .config import OPENAI_TTI_DEFAULT_N
 from .config import OPENAI_TTI_QUALITY_LIST
 from .config import OPENAI_TTI_SIZE_LIST
 from .config import STABLE_DIFFUSION_BASE_EP
-from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import STABLE_DIFFUSION_TTI_ASPECT_RATIO_LIST
 from .config import STABLE_DIFFUSION_TTI_EP
 from .config import STABLE_DIFFUSION_TTI_MODELS
@@ -52,7 +47,7 @@ class OpenAITextToImage(BaseModel):
         answer = 'Valid image not generated. '
 
         try:
-            client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
+            client = OpenAI(api_key=self.api_key)
 
             response = client.images.generate(
                 model=self.parameters['model'],
@@ -163,8 +158,7 @@ class StableDiffusionTextToImage(BaseModel):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'authorization':
-                   f'Bearer {os.getenv(STABLE_DIFFUSION_KEY_NAME)}'}
+        headers = {'authorization': f'Bearer {self.api_key}'}
         headers.update(accept='image/*')
 
         parameters.update(headers=headers)

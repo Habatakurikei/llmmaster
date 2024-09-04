@@ -1,21 +1,16 @@
-import os
 import time
 
 import google.generativeai as genai
 
 from .base_model import BaseModel
-from .config import GOOGLE_KEY_NAME
 from .config import WAIT_FOR_GOOGLE_VTT_UPLOAD
 from .config import WAIT_FOR_GOOGLE_VTT_TIMEOUT
 
 
 class GoogleVideoToText(BaseModel):
     '''
-    List of typical available models as of 2024-07-04:
-      - gemini-1.5-pro
-      - gemini-1.5-flash
-      - gemini-1.0-pro
     Note: Ensure the chosen model supports video processing.
+      Gemini models mainly support this function.
     Input formats: mp4, mpeg, mov, avi, x-flv, mpg, webm, wmv and 3gpp
     '''
     def __init__(self, **kwargs):
@@ -33,7 +28,7 @@ class GoogleVideoToText(BaseModel):
         message = 'Video description not generated.'
 
         try:
-            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
+            genai.configure(api_key=self.api_key)
 
             model = genai.GenerativeModel(model_name=self.parameters['model'])
             video = self._upload_file()

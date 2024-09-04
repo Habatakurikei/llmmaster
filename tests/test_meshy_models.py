@@ -17,6 +17,10 @@ from llmmaster.meshy_models import MeshyImageTo3D
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 PROMPT ='A Japanese anime girl inspired by Akira Toriyama. Light blue hair, ponytail, pink dress, full body.'
 TEST_OUTPUT_PATH = 'test-outputs'
 
@@ -27,6 +31,9 @@ def run_api(request):
 
 
 def test_meshy_text_to_3d_instances(run_api):
+    '''
+    Comment/Uncomment API key handling from environment variable or constant above.
+    '''
     judgment = True
     master = LLMMaster()
 
@@ -36,10 +43,11 @@ def test_meshy_text_to_3d_instances(run_api):
                                              prompt=PROMPT,
                                              art_style='cartoon',
                                              negative_prompt='ugly, low resolution')
-
+    master.set_api_keys(API_KEY)
     master.summon({'meshy_tt3d_test': meshy_tt3d_test})
 
     print(f"Parameters = {master.instances['meshy_tt3d_test'].parameters}")
+    print(f"API Key = {master.instances['meshy_tt3d_test'].api_key}")
 
     if not isinstance(master.instances['meshy_tt3d_test'], MeshyTextTo3D):
         judgment = False
@@ -98,6 +106,7 @@ def test_meshy_text_to_3d_instances(run_api):
         master.dismiss()
 
         meshy_tt3d_refine_test = master.pack_parameters(provider='meshy_tt3d_refine', preview_task_id=id)
+        master.set_api_keys(API_KEY)
         master.summon({'meshy_tt3d_refine_test': meshy_tt3d_refine_test})
 
         print(f"Parameters = {master.instances['meshy_tt3d_refine_test'].parameters}")
@@ -168,7 +177,7 @@ def test_meshy_text_to_texture_instances(run_api):
                                              art_style='japanese-anime',
                                              negative_prompt='ugly, low resolution',
                                              resolution='1024')
-
+    master.set_api_keys(API_KEY)
     master.summon({'meshy_tttx_test': meshy_tttx_test})
 
     print(f"Parameters = {master.instances['meshy_tttx_test'].parameters}")
@@ -239,7 +248,7 @@ def test_meshy_text_to_voxel_instances(run_api):
     meshy_ttvx_test = master.pack_parameters(provider='meshy_ttvx',
                                              prompt=PROMPT,
                                              negative_prompt='ugly, low resolution')
-
+    master.set_api_keys(API_KEY)
     master.summon({'meshy_ttvx_test': meshy_ttvx_test})
 
     print(f"Parameters = {master.instances['meshy_ttvx_test'].parameters}")
@@ -293,11 +302,11 @@ def test_meshy_image_to_3d_instances(run_api):
     judgment = True
     master = LLMMaster()
 
-    image_url='https://habatakurikei.com/dlfiles/zoltraak/dragon-girl-2.png'
+    image_url='https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png'
 
     meshy_it3d_test = master.pack_parameters(provider='meshy_it3d',
                                              image_url=image_url)
-
+    master.set_api_keys(API_KEY)
     master.summon({'meshy_it3d_test': meshy_it3d_test})
 
     print(f"Parameters = {master.instances['meshy_it3d_test'].parameters}")

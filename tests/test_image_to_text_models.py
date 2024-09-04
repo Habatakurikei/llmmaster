@@ -11,6 +11,10 @@ from llmmaster.image_to_text_models import OpenAIImageToText
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 INSTANCE_CLASSES = {
     'google': GoogleImageToText,
     'openai': OpenAIImageToText,
@@ -31,23 +35,24 @@ def test_openai_image_to_text_instances(run_api):
             'name': 'openai_case_1',
             'params': {
                 'provider': 'openai_itt',
-                'model': 'gpt-4o',
+                'model': 'gpt-4o-mini',
                 'prompt': 'Describe this image.',
-                'image_url': ['https://habatakurikei.com/wp-content/uploads/2022/03/sleep-tracker-collection-202203.jpg']
+                'image_url': ['https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png']
             }
         },
         {
             'name': 'openai_case_2',
             'params': {
                 'provider': 'openai_itt',
-                'model': 'gpt-4o',
-                'prompt': 'Which photo is more described Europe and why?',
-                'image_url': ['https://habatakurikei.com/wp-content/uploads/2018/06/cover-singapore-opt.jpg',
-                              'https://habatakurikei.com/wp-content/uploads/2018/05/cover-gent-old-town-opt.jpg']
+                'model': 'gpt-4o-mini',
+                'prompt': 'What are different between these two images?',
+                'image_url': ['https://assets.st-note.com/production/uploads/images/152744645/rectangle_large_type_2_8bd3dd8828595922135ec877661d9cbe.png',
+                              'https://assets.st-note.com/production/uploads/images/152744949/rectangle_large_type_2_7a85229175b92366e4059afe7927d811.png']
             }
         }
     ]
 
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 
@@ -89,7 +94,7 @@ def test_google_image_to_text_instances(run_api):
                 'provider': 'google_itt',
                 'model': 'gemini-1.5-flash',
                 'prompt': 'Describe this image.',
-                'image_url': ['test-inputs/test_image.png']
+                'image_url': ['test-inputs/def_dragon_girl_2.png']
             }
         },
         {
@@ -97,13 +102,14 @@ def test_google_image_to_text_instances(run_api):
             'params': {
                 'provider': 'google_itt',
                 'model': 'gemini-1.5-flash',
-                'prompt': 'Which brand of sleep tracker does seem more beneficial for users?',
-                'image_url': ['https://habatakurikei.com/wp-content/uploads/2022/11/sleep-tracker-applewatch-sample.png',
-                              'https://habatakurikei.com/wp-content/uploads/2020/02/sleep-tracker-fitbit-sample.png']
+                'prompt': 'What are different between these two images?',
+                'image_url': ['https://assets.st-note.com/production/uploads/images/152744645/rectangle_large_type_2_8bd3dd8828595922135ec877661d9cbe.png',
+                              'https://assets.st-note.com/production/uploads/images/152744949/rectangle_large_type_2_7a85229175b92366e4059afe7927d811.png']
             }
         }
     ]
 
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 

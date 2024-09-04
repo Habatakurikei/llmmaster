@@ -1,11 +1,8 @@
-import os
 import time
 
 import requests
 
 from .base_model import BaseModel
-
-from .config import PIKAPIKAPIKA_KEY_NAME
 from .config import PIKAPIKAPIKA_BASE_EP
 from .config import PIKAPIKAPIKA_GENERATION_EP
 # from .config import PIKAPIKAPIKA_LIPSYNC_EP
@@ -75,8 +72,7 @@ class PikaPikaPikaModelBase(BaseModel):
         '''
         answer = 'Generated result not found.'
 
-        header = {'Authorization':
-                  f'Bearer {os.getenv(PIKAPIKAPIKA_KEY_NAME)}'}
+        header = {'Authorization': f'Bearer {self.api_key}'}
 
         ep = PIKAPIKAPIKA_BASE_EP + PIKAPIKAPIKA_RESULT_EP.format(id=id)
 
@@ -114,8 +110,7 @@ class PikaPikaPikaGeneration(PikaPikaPikaModelBase):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'Authorization':
-                   f'Bearer {os.getenv(PIKAPIKAPIKA_KEY_NAME)}',
+        headers = {'Authorization': f'Bearer {self.api_key}',
                    'Content-Type': 'application/json'}
 
         parameters.update(headers=headers)

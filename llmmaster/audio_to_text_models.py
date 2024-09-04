@@ -7,12 +7,9 @@ import google.generativeai as genai
 from openai import OpenAI
 
 from .base_model import BaseModel
-
-from .config import GOOGLE_KEY_NAME
 from .config import OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES
 from .config import OPENAI_STT_MODE_LIST
 from .config import OPENAI_STT_RESPONSE_FORMAT_LIST
-from .config import OPENAI_KEY_NAME
 from .config import TEMPERATURE
 
 
@@ -49,13 +46,10 @@ class OpenAISpeechToText(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure. Also differ from `response_format`.
         '''
-        # msg = f'Summon OpenAI Audio-to-Text with {self.parameters["model"]}'
-        # print(msg)
-
         answer = 'Text not generated.'
 
         try:
-            client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
+            client = OpenAI(api_key=self.api_key)
 
             if self.parameters['mode'] == 'translations':
                 # print('OpenAI Audio-to-Text: translations')
@@ -165,13 +159,10 @@ class GoogleSpeechToText(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon Google Speech-to-Text with {self.parameters["model"]}'
-        # print(msg)
-
         message = 'Speech analysis not generated.'
 
         try:
-            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
+            genai.configure(api_key=self.api_key)
 
             model = genai.GenerativeModel(model_name=self.parameters['model'])
 

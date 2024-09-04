@@ -10,9 +10,14 @@ from llmmaster.video_to_text_models import GoogleVideoToText
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 INSTANCE_CLASSES = {
     'google': GoogleVideoToText
 }
+
 
 @pytest.fixture
 def run_api(request):
@@ -26,6 +31,7 @@ def test_google_vtt(run_api):
     google_vtt_test = master.pack_parameters(provider='google_vtt',
                                              prompt='Describe attached video.',
                                              video_file='test-inputs/test_video.mp4')
+    master.set_api_keys(API_KEY)
     master.summon({'google_vtt_test': google_vtt_test})
 
     for key, value in master.instances.items():

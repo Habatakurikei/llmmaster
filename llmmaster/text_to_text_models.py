@@ -1,26 +1,19 @@
-import os
-
 import google.generativeai as genai
 from anthropic import Anthropic
 from groq import Groq
 from openai import OpenAI
 
 from .base_model import BaseModel
-
-from .config import ANTHROPIC_KEY_NAME
-from .config import GOOGLE_KEY_NAME
-from .config import GROQ_KEY_NAME
-from .config import OPENAI_KEY_NAME
-from .config import PERPLEXITY_KEY_NAME
-
 from .config import PERPLEXITY_TTT_EP
 from .config import DEFAULT_TOKENS
 from .config import TEMPERATURE
+from .config import TOP_P
+from .config import TOP_K
 
 
 class AnthropicLLM(BaseModel):
     '''
-    List of available models as of 2024-07-04:
+    List of available models as of 2024-09-03:
       - claude-3-5-sonnet-20240620
       - claude-3-opus-20240229
       - claude-3-sonnet-20240229
@@ -38,22 +31,18 @@ class AnthropicLLM(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon Anthropic with {self.parameters["model"]}, '
-        # msg += f'{self.parameters["max_tokens"]}, '
-        # msg += f'{self.parameters["temperature"]}...'
-        # print(msg)
-
         message = 'No response.'
 
         try:
-            client = Anthropic(api_key=os.getenv(ANTHROPIC_KEY_NAME))
-
+            client = Anthropic(api_key=self.api_key)
             to_send = {'type': 'text', 'text': self.parameters['prompt']}
 
             response = client.messages.create(
                 model=self.parameters['model'],
                 max_tokens=self.parameters['max_tokens'],
                 temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
+                top_k=self.parameters['top_k'],
                 messages=[{'role': 'user', 'content': [to_send]}])
 
             if hasattr(response, 'content'):
@@ -61,8 +50,6 @@ class AnthropicLLM(BaseModel):
 
         except Exception as e:
             message = str(e)
-
-        # print(f'Anthropic responded =\n{message}\n')
 
         self.response = message
 
@@ -72,12 +59,15 @@ class AnthropicLLM(BaseModel):
 
 class GroqLLM(BaseModel):
     '''
-    List of available models as of 2024-07-04:
-      - llama3-8b-8192
-      - llama3-70b-8192
-      - mixtral-8x7b-32768
+    List of available models as of 2024-09-03:
       - gemma-7b-it
       - gemma2-9b-it
+      - llama-3.1-70b-versatile
+      - llama-3.1-8b-instant
+      - llama3-70b-8192
+      - llama3-8b-8192
+      - llama3-8b-8192
+      - mixtral-8x7b-32768
     '''
     def __init__(self, **kwargs):
 
@@ -91,20 +81,16 @@ class GroqLLM(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon Groq with {self.parameters["model"]}, '
-        # msg += f'{self.parameters["max_tokens"]}, '
-        # msg += f'{self.parameters["temperature"]}...'
-        # print(msg)
-
         message = 'No response.'
 
         try:
-            client = Groq(api_key=os.environ.get(GROQ_KEY_NAME))
+            client = Groq(api_key=self.api_key)
 
             response = client.chat.completions.create(
                 model=self.parameters['model'],
                 max_tokens=self.parameters['max_tokens'],
                 temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
                 messages=[{'role': 'user',
                            'content': self.parameters['prompt']}])
 
@@ -114,8 +100,6 @@ class GroqLLM(BaseModel):
         except Exception as e:
             message = str(e)
 
-        # print(f'Groq responded =\n{message}\n')
-
         self.response = message
 
     def _verify_arguments(self, **kwargs):
@@ -124,10 +108,11 @@ class GroqLLM(BaseModel):
 
 class GoogleLLM(BaseModel):
     '''
-    List of typical available models as of 2024-07-04:
+    List of typical available models as of 2024-09-03:
       - gemini-1.5-pro
       - gemini-1.5-flash
-      - gemini-1.0-pro
+      - gemini-1.5-pro-exp-0827
+      - gemini-1.5-flash-exp-0827
     '''
     def __init__(self, **kwargs):
 
@@ -141,17 +126,14 @@ class GoogleLLM(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon Google with {self.parameters["model"]}, '
-        # msg += f'{self.parameters["max_tokens"]}, '
-        # msg += f'{self.parameters["temperature"]}...'
-        # print(msg)
-
         message = 'No response.'
 
         try:
-            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
+            genai.configure(api_key=self.api_key)
             generation_config = genai.GenerationConfig(
-                temperature=self.parameters['temperature'])
+                temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
+                top_k=self.parameters['top_k'])
 
             model = genai.GenerativeModel(model_name=self.parameters['model'],
                                           generation_config=generation_config)
@@ -163,8 +145,6 @@ class GoogleLLM(BaseModel):
         except Exception as e:
             message = str(e)
 
-        # print(f'Google responded =\n{message}\n')
-
         self.response = message
 
     def _verify_arguments(self, **kwargs):
@@ -173,13 +153,10 @@ class GoogleLLM(BaseModel):
 
 class OpenAILLM(BaseModel):
     '''
-    List of typical available models as of 2024-07-04:
+    List of typical available models as of 2024-09-03:
       - gpt-4o
-      - gpt-4o-2024-05-13
-      - gpt-4-0613
-      - gpt-4
-      - gpt-3.5-turbo-0125
-      - gpt-3.5-turbo-instruct-0914
+      - gpt-4o-2024-08-06
+      - gpt-4o-mini
     '''
     def __init__(self, **kwargs):
 
@@ -193,20 +170,16 @@ class OpenAILLM(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon OpenAI with {self.parameters["model"]}, '
-        # msg += f'{self.parameters["max_tokens"]}, '
-        # msg += f'{self.parameters["temperature"]}...'
-        # print(msg)
-
         message = 'No response.'
 
         try:
-            client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
+            client = OpenAI(api_key=self.api_key)
 
             response = client.chat.completions.create(
                 model=self.parameters['model'],
                 max_tokens=self.parameters['max_tokens'],
                 temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
                 messages=[{'role': 'user',
                            'content': self.parameters['prompt']}])
 
@@ -215,8 +188,6 @@ class OpenAILLM(BaseModel):
 
         except Exception as e:
             message = str(e)
-
-        # print(f'OpenAI responded =\n{message}\n')
 
         self.response = message
 
@@ -227,13 +198,10 @@ class OpenAILLM(BaseModel):
 class PerplexityLLM(BaseModel):
     '''
     Use OpenAI library according to Perplexity formal document.
-    List of available models as of 2024-07-31:
+    List of available models as of 2024-09-03:
       - llama-3.1-sonar-small-128k-online
-      - llama-3.1-sonar-small-128k-chat
       - llama-3.1-sonar-large-128k-online
-      - llama-3.1-sonar-large-128k-chat
-      - llama-3.1-8b-instruct
-      - llama-3.1-70b-instruct
+      - llama-3.1-sonar-huge-128k-online
     '''
     def __init__(self, **kwargs):
 
@@ -247,21 +215,16 @@ class PerplexityLLM(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon Perplexity with {self.parameters["model"]}, '
-        # msg += f'{self.parameters["max_tokens"]}, '
-        # msg += f'{self.parameters["temperature"]}...'
-        # print(msg)
-
         message = 'No response.'
 
         try:
-            client = OpenAI(api_key=os.getenv(PERPLEXITY_KEY_NAME),
-                            base_url=PERPLEXITY_TTT_EP)
+            client = OpenAI(api_key=self.api_key, base_url=PERPLEXITY_TTT_EP)
 
             response = client.chat.completions.create(
                 model=self.parameters['model'],
                 max_tokens=self.parameters['max_tokens'],
                 temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
                 messages=[{'role': 'user',
                            'content': self.parameters['prompt']}])
 
@@ -270,8 +233,6 @@ class PerplexityLLM(BaseModel):
 
         except Exception as e:
             message = str(e)
-
-        # print(f'Perplexity responded =\n{message}\n')
 
         self.response = message
 
@@ -284,12 +245,13 @@ def _verify_ttt_args(**kwargs):
     Expected inputs:
       - max_tokens: natural number between 1 and 4096 (in most providers)
       - temperature: positive float between 0 and 1
+      - top_p: positive float between 0 and 1
+      - top_k: positive integer
     '''
     parameters = kwargs
 
     if 'max_tokens' not in kwargs:
         parameters.update(max_tokens=DEFAULT_TOKENS)
-
     else:
         buff = kwargs['max_tokens']
         if isinstance(buff, int) and 0 < buff:
@@ -299,12 +261,29 @@ def _verify_ttt_args(**kwargs):
 
     if 'temperature' not in kwargs:
         parameters.update(temperature=TEMPERATURE)
-
     else:
         buff = kwargs['temperature']
         if isinstance(buff, float) and 0.0 <= buff and buff <= 1.0:
             pass
         else:
             parameters['temperature'] = TEMPERATURE
+
+    if 'top_p' not in kwargs:
+        parameters.update(top_p=TOP_P)
+    else:
+        buff = kwargs['top_p']
+        if isinstance(buff, float) and 0.0 <= buff and buff <= 1.0:
+            pass
+        else:
+            parameters['top_p'] = TOP_P
+
+    if 'top_k' not in kwargs:
+        parameters.update(top_k=TOP_K)
+    else:
+        buff = kwargs['top_k']
+        if 0 < buff:
+            parameters['top_k'] = int(buff)
+        else:
+            parameters['top_k'] = TOP_K
 
     return parameters

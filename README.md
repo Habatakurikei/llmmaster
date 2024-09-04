@@ -1,5 +1,9 @@
 ![llmmaster_logo_full](https://github.com/Habatakurikei/llmmaster/assets/131997581/35bc6932-def9-4595-a2b3-2c122fb4e61e)
 
+[![Downloads](https://static.pepy.tech/badge/llmmaster)](https://pepy.tech/project/llmmaster)
+[![Downloads](https://static.pepy.tech/badge/llmmaster/month)](https://pepy.tech/project/llmmaster)
+[![Downloads](https://static.pepy.tech/badge/llmmaster/week)](https://pepy.tech/project/llmmaster)
+
 # LLM Master
 
 LLM Master, L2M2 in short, is a powerful engine to boost your creativity by working with multiple generative AIs.
@@ -30,7 +34,7 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, `google_tta (pending) | `pikapikapika_ttv` |
+| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv` |
 | Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
 | Audio | `openai_stt`, `google_stt` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
@@ -40,9 +44,9 @@ And the list below represents the models that are supported by each provider. Se
 ### Text-to-Text Models (typical)
 - Anthropic (`claude-3-5-sonnet-20240620`)
 - Google (`gemini-1.5-flash`)
-- Groq (`llama3-70b-8192`)
+- Groq (`llama-3.1-70b-versatile`)
 - OpenAI (`gpt-4o`)
-- Perplexity (`llama-3-sonar-large-32k-online`)
+- Perplexity (`llama-3.1-sonar-huge-128k-online`)
 
 ### Text-to-Image Models
 - OpenAI (`dall-e-3`, `dall-e-2`)
@@ -105,7 +109,7 @@ Relevant packages will also be installed.
 
 ## Usage
 
-### Set API keys for your environment in advance
+### Set API keys for your environment
 
 Set up your API keys as environment variables. Note that you do not have to set all of the API keys as shown below. You can set only the ones that you need.
 
@@ -153,6 +157,26 @@ $env:ELEVENLABS_API_KEY="your_elevenlabs_key"
 $env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 ```
 
+### Set API keys prepared in text file
+
+This is new since ver. 0.4.0. Your API keys are also set to LLMMaster from a saved text file, e.g. `api_key_pairs.txt`. The format shall be the following:
+
+```
+ANTHROPIC_API_KEY=your_anthropic_key
+GOOGLE_API_KEY=your_google_key
+GROQ_API_KEY=your_groq_key
+OPENAI_API_KEY=your_openai_key
+PERPLEXITY_API_KEY=your_perplexity_key
+STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
+MESHY_API_KEY=your_meshy_key
+ELEVENLABS_API_KEY=your_elevenlabs_key
+PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
+```
+
+Read the file in python script as string, then load to a `LLMMaster` instance. Explain in use case.
+
+This is useful for third-party application usage.
+
 ### Use cases
 
 You can find and download these use case codes in folder [usecases](https://github.com/Habatakurikei/llmmaster/tree/main/usecases).
@@ -163,7 +187,9 @@ You can find and download these use case codes in folder [usecases](https://gith
 
 This is the most basic usage of LLM Master.
 
-In the code below, `openai_instance` is actually a unique label to manage multiple instances. You may set any string for it. The next case will be a multi-LLM example.
+In the code below, `openai_instance` is actually a unique label to manage multiple instances. You may set any string for it.
+
+This case uses an API key of OpenAI from enriroment variable.
 
 ```python
 from llmmaster import LLMMaster
@@ -195,6 +221,31 @@ print(f"Elapsed time: {llmmaster.elapsed_time} seconds")
 
 # Clear instances
 llmmaster.dismiss()
+```
+
+The following case is way of using API keys written in a text file instead of environment variable.
+
+```python
+from pathlib import Path
+from llmmaster import LLMMaster
+
+api_key_text = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+
+master = LLMMaster()
+
+parameters = master.pack_parameters(provider="openai",
+                                    prompt="Hello, how are you?")
+master.set_api_keys(api_key_text)
+print(f'API key pairs: {master.api_key_pairs}')
+
+master.summon({"openai": parameters})
+master.run()
+
+results = master.results
+print(f'OpenAI responded: {results["openai"]}')
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
 ```
 
   2 Using **multiple Text-to-Text** LLMs simultaneously
@@ -713,15 +764,28 @@ master.dismiss()
 ```
 
 ## Applications
+- [Zoltraak Klein](https://github.com/Habatakurikei/zoltraakklein): [Zoltraak](https://github.com/dai-motoki/zoltraak) is a framework of digital content plant, generating texts/codes, images, speeches and videos. LLMMaster is core interface for external AI services.
 - Multi-AI brainstorming web app monju [https://monju.ai](https://monju.ai). This app generates ideas from 3 different LLMs simultaneously, and then shows the result in mindmap.
 
 ## Notes
 
+### General
+
 - Please comply with the terms of service for each provider's API.
 - Securely manage your API keys and be careful not to commit them to public repositories.
-- There is a limit (32) to the number of LLM instances that can be created at once.
-- If you apply a single model for multiple entrys, running simultaneously, each entry will start in every 1 second of interval. This is a strict limitation of providers for security reason.
 - Input parameters are not strictly checked by the rules defined by each provider. You may face an error due to some wrong paramer or combination of parameters.
+
+### Initial arguments for LLMMaster
+
+- There is a limit to the number of LLM instances that can be created at once. This limit is adjustable by one of the new arguments, `summon_limit`, default is 100.
+- If you apply multiple model entries in a single LLMMaster instance, running simultaneously, each entry will start in a certain period of interval. This is a strict limitation of providers for security reason. The minimum interval should be 1 second but this value is adjustable with another argument `wait_for_starting`.
+
+Both arguments shall be set in the following manner:
+
+```python
+from llmmaster import LLMMaster
+master = LLMMaster(summon_limit=150, wait_for_starting=2.5)
+```
 
 ## Customization
 

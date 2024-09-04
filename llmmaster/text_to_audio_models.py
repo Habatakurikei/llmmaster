@@ -1,8 +1,6 @@
 # this file may contain classes of:
 # - text-to-speech model (TTS)
 # - text-to-music model (TTM)
-import os
-
 import requests
 from elevenlabs import Voice
 from elevenlabs import VoiceSettings
@@ -10,13 +8,10 @@ from elevenlabs.client import ElevenLabs
 from openai import OpenAI
 
 from .base_model import BaseModel
-
-from .config import ELEVENLABS_KEY_NAME
 from .config import ELEVENLABS_TTS_MODELS
 from .config import ELEVENLABS_DEFAULT_VOICE_ID
 from .config import ELEVENLABS_DEFAULT_STABILITY
 from .config import ELEVENLABS_DEFAULT_SIMILARITY
-from .config import OPENAI_KEY_NAME
 from .config import OPENAI_TTS_RESPONSE_FORMAT_LIST
 from .config import OPENAI_TTS_VOICE_OPTIONS
 from .config import OPENAI_TTS_DEFAULT_SPEED
@@ -56,13 +51,10 @@ class OpenAITextToSpeech(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure.
         '''
-        # msg = f'Summon OpenAI Text-To-Speech with {self.parameters["model"]}'
-        # print(msg)
-
         answer = 'Speech not generated. '
 
         try:
-            client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
+            client = OpenAI(api_key=self.api_key)
 
             response = client.audio.speech.create(
                 model=self.parameters['model'],
@@ -142,7 +134,7 @@ class ElevenLabsTextToSpeech(BaseModel):
         answer = 'Speech not generated. '
 
         try:
-            client = ElevenLabs(api_key=os.getenv(ELEVENLABS_KEY_NAME))
+            client = ElevenLabs(api_key=self.api_key)
 
             response = client.generate(text=self.parameters['prompt'],
                                        voice=self.parameters['voice'],

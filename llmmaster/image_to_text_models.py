@@ -1,26 +1,19 @@
-import os
-import requests
 from io import BytesIO
-from PIL import Image
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
 import google.generativeai as genai
+import requests
 from openai import OpenAI
+from PIL import Image
 
 from .base_model import BaseModel
-
-from .config import GOOGLE_KEY_NAME
-from .config import OPENAI_KEY_NAME
 from .config import DEFAULT_TOKENS
 
 
 class OpenAIImageToText(BaseModel):
     '''
-    List of available models as of 2024-07-04:
-      - gpt-4o
-      - gpt-4-turbo
-      - relevant models in famiry of GPT-4o or GPT4-Turbo
+    Use GPT-4o or GPT4-Turbo family models.
     Note that all models do not support vision capability.
     Acceptable formats: png, jpg, webp and gif
     Only online images are supported for the moment.
@@ -37,13 +30,10 @@ class OpenAIImageToText(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon OpenAI Image-to-Text with {self.parameters["model"]}'
-        # print(msg)
-
         message = 'Image description not generated.'
 
         try:
-            client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
+            client = OpenAI(api_key=self.api_key)
 
             content = [{"type": "text", "text": self.parameters['prompt']}]
             content.extend(self.parameters['image_url'])
@@ -100,10 +90,8 @@ class OpenAIImageToText(BaseModel):
 
 class GoogleImageToText(BaseModel):
     '''
-    List of typical available models as of 2024-07-04:
-      - gemini-1.5-pro
-      - gemini-1.5-flash
-      - gemini-1.0-pro
+    Note: Ensure the chosen model supports image processing.
+      Gemini models mainly support this function.
     Acceptable formats: png, jpg, webp, heic and heif
     Both online and offline (local) images are supported.
     '''
@@ -119,13 +107,10 @@ class GoogleImageToText(BaseModel):
 
     def run(self):
 
-        # msg = f'Summon Google Image-to-Text with {self.parameters["model"]}'
-        # print(msg)
-
         message = 'Image description not generated.'
 
         try:
-            genai.configure(api_key=os.getenv(GOOGLE_KEY_NAME))
+            genai.configure(api_key=self.api_key)
 
             model = genai.GenerativeModel(model_name=self.parameters['model'])
 
@@ -167,6 +152,6 @@ class GoogleImageToText(BaseModel):
         return parameters
 
 
-def _sanitize_url(url=''):
+def _sanitize_url(url: str = ''):
     parsed = urlparse(url)
     return urlunparse(parsed)

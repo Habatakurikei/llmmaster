@@ -8,7 +8,6 @@ from .base_model import BaseModel
 from .config import MAX_SEED
 from .config import REQUEST_ACCEPTED
 from .config import STABLE_DIFFUSION_BASE_EP
-from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_DEFAULT
 from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_MIN
 from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_MAX
@@ -88,8 +87,7 @@ class StableDiffusionImageToVideo(BaseModel):
         parameters.update(url_result=endpoint)
 
         # headers
-        headers = {'authorization':
-                   f'Bearer {os.getenv(STABLE_DIFFUSION_KEY_NAME)}'}
+        headers = {'authorization': f'Bearer {self.api_key}'}
 
         parameters.update(headers=headers)
 

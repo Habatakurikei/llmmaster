@@ -14,6 +14,10 @@ from llmmaster.image_to_image_models import StableDiffusionImageToImage
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 TEST_IMAGE = 'test-inputs/test_image.png'
 TEST_MASK = 'test-inputs/test_mask.png'
 TEST_OUTPUT_PATH = 'test-outputs'
@@ -36,6 +40,7 @@ def test_openai_image_to_image_instances(run_api):
         {'name': 'case_3_edits_with_mask', 'params': {'provider': 'openai_iti', 'mode': 'edits', 'image': TEST_IMAGE, 'mask': TEST_MASK, 'prompt': edit_prompt, 'size': '512x512', 'n': 2}},
     ]
 
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 
@@ -98,6 +103,7 @@ def test_stable_diffusion_image_to_image_instances(run_api):
         {'name': 'case_7_remove_background', 'params': {'provider': 'stable_diffusion_iti', 'mode': 'remove_background', 'image': TEST_IMAGE}},
     ]
 
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 

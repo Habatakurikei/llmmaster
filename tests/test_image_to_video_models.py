@@ -10,6 +10,9 @@ import pytest
 from llmmaster.image_to_video_models import StableDiffusionImageToVideo
 from llmmaster import LLMMaster
 
+API_KEY = '''
+'''
+
 
 TEST_OUTPUT_PATH = 'test-outputs'
 
@@ -24,8 +27,8 @@ def test_stable_diffusion_image_to_video_instances(run_api):
     master = LLMMaster()
 
     sd_itv_test = master.pack_parameters(provider='stable_diffusion_itv',
-                                         image='test-inputs/def_dragon_girl_2.png')
-
+                                         image='test-inputs/elf_girl_1.png')
+    master.set_api_keys(API_KEY)
     master.summon({'sd_itv_test': sd_itv_test})
 
     for name, instance in master.instances.items():

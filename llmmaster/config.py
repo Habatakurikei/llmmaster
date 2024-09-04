@@ -2,6 +2,8 @@
 ADOBE_FIREFLY_CLIENT_ID_NAME = 'ADOBE_FIREFLY_CLIENT_ID'
 ADOBE_FIREFLY_CLIENT_SECRET_NAME = 'ADOBE_FIREFLY_CLIENT_SECRET'
 ANTHROPIC_KEY_NAME = 'ANTHROPIC_API_KEY'
+DALLE_KEY_NAME = 'DALLE_API_KEY'
+DUMMY_KEY_NAME = 'DUMMY_API_KEY'
 GOOGLE_KEY_NAME = 'GOOGLE_API_KEY'
 GROQ_KEY_NAME = 'GROQ_API_KEY'
 OPENAI_KEY_NAME = 'OPENAI_API_KEY'
@@ -15,9 +17,9 @@ PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
 # Default models setting
 DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-5-sonnet-20240620',
                       'google': 'gemini-1.5-flash',
-                      'groq': 'llama3-70b-8192',
+                      'groq': 'llama-3.1-70b-versatile',
                       'openai': 'gpt-4o',
-                      'perplexity': 'llama-3.1-sonar-small-128k-online'}
+                      'perplexity': 'llama-3.1-sonar-huge-128k-online'}
 
 DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
@@ -129,8 +131,13 @@ OPENAI_ITI_MODE_NEED_DUMMY_PROMPT = ['variations']
 SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
 
 # Text-To-Text settings
+# Note:
+# top_p is common for all models but top_k is only for anthropic and google.
+# Not available for openai, groq and perplexity (OpenAI-based models).
 DEFAULT_TOKENS = 4096
 TEMPERATURE = 0.7
+TOP_P = 0.9
+TOP_K = 50
 
 # Text-To-Image settings
 MAX_SEED = 4294967294
@@ -182,7 +189,8 @@ ELEVENLABS_TTS_MODELS = ['eleven_multilingual_v2', 'eleven_turbo_v2_5',
                          'eleven_turbo_v2', 'eleven_monolingual_v1',
                          'eleven_monolingual_v1']
 
-ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'
+ELEVENLABS_DEFAULT_VOICE_ID = '8EkOjt4xTPGMclNlh1pk'
+# ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'
 ELEVENLABS_DEFAULT_STABILITY = 1.0
 ELEVENLABS_DEFAULT_SIMILARITY = 0.75
 

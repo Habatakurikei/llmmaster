@@ -11,6 +11,10 @@ from llmmaster.audio_to_text_models import OpenAISpeechToText
 from llmmaster import LLMMaster
 
 
+API_KEY = '''
+'''
+
+
 @pytest.fixture
 def run_api(request):
     return request.config.getoption("--run-api")
@@ -51,6 +55,7 @@ def test_openai_speech_to_text_instances(run_api):
         }
     ]
 
+    master.set_api_keys(API_KEY)
     for case in test_cases:
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 
@@ -88,7 +93,7 @@ def test_google_speech_to_text_instances(run_api):
     params = master.pack_parameters(provider='google_stt',
                                     prompt='Make a transcript for attached audio file.',
                                     audio_file='test-inputs/enter_the_dragon.mp3')
-
+    master.set_api_keys(API_KEY)
     master.summon({'google_stt': params})
 
     print(f'{master.instances["google_stt"]} = {master.instances["google_stt"].parameters}')

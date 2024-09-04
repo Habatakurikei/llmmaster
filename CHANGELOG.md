@@ -17,6 +17,14 @@
   - Pika.art video extension, etc.
   - OpenAi structured output
 
+## [0.4.0] - 2024-09-04
+### Added
+- `self.api_key_pairs` and `set_api_keys()` added to `LLMMaster` class
+- `_load_api_key()` added to `LLMInstanceCreator` class
+### Changed
+- Revised all the models to set API key from either `os.getenv()` or  `self.api_key_pairs`
+- Changed `ACTIVE_MODELS` in llmmaster.py from list to dictionary
+
 ## [0.3.4] - 2024-08-13
 ### Changed
 - `SUMMON_LIMIT` changed to 100 as default

@@ -8,10 +8,8 @@ from openai.types.images_response import ImagesResponse
 from PIL import Image
 
 from .base_model import BaseModel
-
 from .config import DEFAULT_ITI_MODELS
 from .config import MAX_SEED
-from .config import OPENAI_KEY_NAME
 from .config import OPENAI_ITI_ACCEPTABLE_COLOR_MODE
 from .config import OPENAI_ITI_DEFAULT_N
 from .config import OPENAI_ITI_MAX_N
@@ -19,7 +17,6 @@ from .config import OPENAI_ITI_MODE_LIST
 from .config import OPENAI_ITI_SIZE_LIST
 from .config import REQUEST_ACCEPTED
 from .config import STABLE_DIFFUSION_BASE_EP
-from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import STABLE_DIFFUSION_ITI_EDIT_ERASE_EP
 from .config import STABLE_DIFFUSION_ITI_EDIT_INPAINT_EP
 from .config import STABLE_DIFFUSION_ITI_EDIT_OUTPAINT_EP
@@ -77,7 +74,7 @@ class OpenAIImageToImage(BaseModel):
         answer = 'Editted image not found. '
 
         try:
-            client = OpenAI(api_key=os.getenv(OPENAI_KEY_NAME))
+            client = OpenAI(api_key=self.api_key)
 
             if self.parameters['mode'] == 'variations':
                 response = client.images.create_variation(
@@ -236,8 +233,7 @@ class StableDiffusionImageToImage(BaseModel):
         parameters = {}
 
         # header for REST API
-        headers = {'authorization':
-                   f'Bearer {os.getenv(STABLE_DIFFUSION_KEY_NAME)}'}
+        headers = {'authorization': f'Bearer {self.api_key}'}
         headers.update(accept='image/*')
 
         parameters.update(headers=headers)

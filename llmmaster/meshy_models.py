@@ -1,12 +1,9 @@
-import os
 import time
 
 import requests
 
 from .base_model import BaseModel
-
 from .config import MESHY_BASE_EP
-from .config import MESHY_KEY_NAME
 from .config import MESHY_IT3D_START_EP
 from .config import MESHY_TT3D_START_EP
 from .config import MESHY_TTTX_START_EP
@@ -76,7 +73,7 @@ class MeshyModelBase(BaseModel):
         '''
         answer = 'Generated model not found.'
 
-        header = {'Authorization': f'Bearer {os.getenv(MESHY_KEY_NAME)}'}
+        header = {'Authorization': f'Bearer {self.api_key}'}
         ep = self.parameters['url'] + f'/{id}'
 
         flg = True
@@ -114,8 +111,7 @@ class MeshyTextToTexture(MeshyModelBase):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'Authorization':
-                   f'Bearer {os.getenv(MESHY_KEY_NAME)}',
+        headers = {'Authorization': f'Bearer {self.api_key}',
                    'Content-Type': 'application/json'}
 
         parameters.update(headers=headers)
@@ -197,8 +193,7 @@ class MeshyTextTo3D(MeshyModelBase):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'Authorization':
-                   f'Bearer {os.getenv(MESHY_KEY_NAME)}',
+        headers = {'Authorization': f'Bearer {self.api_key}',
                    'Content-Type': 'application/json'}
 
         parameters.update(headers=headers)
@@ -232,7 +227,9 @@ class MeshyTextTo3D(MeshyModelBase):
 
 
 class MeshyTextTo3DRefine(MeshyModelBase):
-    # to be implemented soon.
+    '''
+    Use this class after made base model with MeshyTextTo3D.
+    '''
     def _verify_arguments(self, **kwargs):
         '''
         Expected options:
@@ -246,8 +243,7 @@ class MeshyTextTo3DRefine(MeshyModelBase):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'Authorization':
-                   f'Bearer {os.getenv(MESHY_KEY_NAME)}',
+        headers = {'Authorization': f'Bearer {self.api_key}',
                    'Content-Type': 'application/json'}
 
         parameters.update(headers=headers)
@@ -290,8 +286,7 @@ class MeshyTextToVoxel(MeshyModelBase):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'Authorization':
-                   f'Bearer {os.getenv(MESHY_KEY_NAME)}',
+        headers = {'Authorization': f'Bearer {self.api_key}',
                    'Content-Type': 'application/json'}
 
         parameters.update(headers=headers)
@@ -342,8 +337,7 @@ class MeshyImageTo3D(MeshyModelBase):
         parameters.update(url=endpoint)
 
         # headers
-        headers = {'Authorization':
-                   f'Bearer {os.getenv(MESHY_KEY_NAME)}',
+        headers = {'Authorization': f'Bearer {self.api_key}',
                    'Content-Type': 'application/json'}
 
         parameters.update(headers=headers)
