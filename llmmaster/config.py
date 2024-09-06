@@ -2,10 +2,12 @@
 ADOBE_FIREFLY_CLIENT_ID_NAME = 'ADOBE_FIREFLY_CLIENT_ID'
 ADOBE_FIREFLY_CLIENT_SECRET_NAME = 'ADOBE_FIREFLY_CLIENT_SECRET'
 ANTHROPIC_KEY_NAME = 'ANTHROPIC_API_KEY'
+CEREBRAS_KEY_NAME = 'CEREBRAS_API_KEY'
 DALLE_KEY_NAME = 'DALLE_API_KEY'
 DUMMY_KEY_NAME = 'DUMMY_API_KEY'
 GOOGLE_KEY_NAME = 'GOOGLE_API_KEY'
 GROQ_KEY_NAME = 'GROQ_API_KEY'
+MISTRAL_KEY_NAME = 'MISTRAL_API_KEY'
 OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
 STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
@@ -15,11 +17,13 @@ PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
 
 
 # Default models setting
-DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-5-sonnet-20240620',
+DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-haiku-20240307',
+                      'cerebras': 'llama3.1-8b',
                       'google': 'gemini-1.5-flash',
-                      'groq': 'llama-3.1-70b-versatile',
-                      'openai': 'gpt-4o',
-                      'perplexity': 'llama-3.1-sonar-huge-128k-online'}
+                      'groq': 'llama-3.1-8b-instant',
+                      'mistral': 'mistral-small-latest',
+                      'openai': 'gpt-4o-mini',
+                      'perplexity': 'llama-3.1-sonar-small-128k-online'}
 
 DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}

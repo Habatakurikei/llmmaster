@@ -1,7 +1,9 @@
 import google.generativeai as genai
 from anthropic import Anthropic
+from cerebras.cloud.sdk import Cerebras
 from groq import Groq
 from openai import OpenAI
+from mistralai import Mistral
 
 from .base_model import BaseModel
 from .config import PERPLEXITY_TTT_EP
@@ -47,6 +49,49 @@ class AnthropicLLM(BaseModel):
 
             if hasattr(response, 'content'):
                 message = response.content[0].text.strip()
+
+        except Exception as e:
+            message = str(e)
+
+        self.response = message
+
+    def _verify_arguments(self, **kwargs):
+        return _verify_ttt_args(**kwargs)
+
+
+class CerebrasLLM(BaseModel):
+    '''
+    List of available models as of 2024-09-06:
+      - llama3.1-8b
+      - llama3.1-70b
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'CerebrasLLM'
+            raise Exception(msg) from e
+
+    def run(self):
+
+        message = 'No response.'
+
+        try:
+            client = Cerebras(api_key=self.api_key)
+
+            response = client.chat.completions.create(
+                model=self.parameters['model'],
+                max_tokens=self.parameters['max_tokens'],
+                temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
+                messages=[{'role': 'user',
+                           'content': self.parameters['prompt']}])
+
+            if hasattr(response, 'choices') and response.choices:
+                message = response.choices[0].message.content.strip()
 
         except Exception as e:
             message = str(e)
@@ -141,6 +186,52 @@ class GoogleLLM(BaseModel):
 
             if hasattr(response, 'text'):
                 message = response.text.strip()
+
+        except Exception as e:
+            message = str(e)
+
+        self.response = message
+
+    def _verify_arguments(self, **kwargs):
+        return _verify_ttt_args(**kwargs)
+
+
+class MistralLLM(BaseModel):
+    '''
+    List of typical available models as of 2024-09-06:
+      - mistral-large-latest
+      - mistral-medium-latest
+      - mistral-small-latest
+      - open-mistral-nemo
+      - codestral-latest
+      - mistral-embed
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'MistralLLM'
+            raise Exception(msg) from e
+
+    def run(self):
+        message = 'No response.'
+
+        try:
+            client = Mistral(api_key=self.api_key)
+
+            response = client.chat.complete(
+                model=self.parameters['model'],
+                max_tokens=self.parameters['max_tokens'],
+                temperature=self.parameters['temperature'],
+                top_p=self.parameters['top_p'],
+                messages=[{'role': 'user',
+                           'content': self.parameters['prompt']}])
+
+            if hasattr(response, 'choices'):
+                message = response.choices[0].message.content.strip()
 
         except Exception as e:
             message = str(e)

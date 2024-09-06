@@ -8,10 +8,12 @@ from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import SUMMON_LIMIT
 from .config import WAIT_FOR_STARTING
 from .config import ANTHROPIC_KEY_NAME
+from .config import CEREBRAS_KEY_NAME
 from .config import DALLE_KEY_NAME
 from .config import DUMMY_KEY_NAME
 from .config import GOOGLE_KEY_NAME
 from .config import GROQ_KEY_NAME
+from .config import MISTRAL_KEY_NAME
 from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
 from .config import STABLE_DIFFUSION_KEY_NAME
@@ -19,8 +21,10 @@ from .config import MESHY_KEY_NAME
 from .config import ELEVENLABS_KEY_NAME
 from .config import PIKAPIKAPIKA_KEY_NAME
 from .text_to_text_models import AnthropicLLM
+from .text_to_text_models import CerebrasLLM
 from .text_to_text_models import GoogleLLM
 from .text_to_text_models import GroqLLM
+from .text_to_text_models import MistralLLM
 from .text_to_text_models import OpenAILLM
 from .text_to_text_models import PerplexityLLM
 from .text_to_image_models import OpenAITextToImage
@@ -47,10 +51,14 @@ from .pikapikapika_models import PikaPikaPikaGeneration
 ACTIVE_MODELS = {
     'anthropic': {'model': AnthropicLLM,
                   'key': ANTHROPIC_KEY_NAME},
+    'cerebras': {'model': CerebrasLLM,
+                 'key': CEREBRAS_KEY_NAME},
     'google': {'model': GoogleLLM,
                'key': GOOGLE_KEY_NAME},
     'groq': {'model': GroqLLM,
              'key': GROQ_KEY_NAME},
+    'mistral': {'model': MistralLLM,
+                'key': MISTRAL_KEY_NAME},
     'openai': {'model': OpenAILLM,
                'key': OPENAI_KEY_NAME},
     'perplexity': {'model': PerplexityLLM,

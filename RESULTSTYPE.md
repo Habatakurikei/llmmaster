@@ -14,8 +14,10 @@ In case of any error, the result will be stored as str. Print it to see problem 
 
 ## Text-To-Text
   - AnthropicLLM: response.content[0].text.strip()
+  - CerebrasLLM: response.choices[0].message.content.strip()
   - GroqLLM: response.choices[0].message.content.strip()
   - GoogleLLM: response.text.strip()
+  - MistralLLM: response.choices[0].message.content.strip()
   - OpenAILLM: response.choices[0].message.content.strip()
   - PerplexityLLM: response.choices[0].message.content.strip()
 

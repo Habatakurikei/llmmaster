@@ -34,7 +34,7 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `google`, `groq`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv` |
+| Text | `openai`, `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv` |
 | Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
 | Audio | `openai_stt`, `google_stt` | NA | NA | NA |
 | Video | `google_vtt` | NA | NA | NA |
@@ -42,11 +42,13 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
 
 ### Text-to-Text Models (typical)
-- Anthropic (`claude-3-5-sonnet-20240620`)
+- Anthropic (`claude-3-haiku-20240307`)
+- Cerebras (`llama3.1-8b`)
 - Google (`gemini-1.5-flash`)
-- Groq (`llama-3.1-70b-versatile`)
-- OpenAI (`gpt-4o`)
-- Perplexity (`llama-3.1-sonar-huge-128k-online`)
+- Groq (`llama-3.1-8b-instant`)
+- MistralAI (`mistral-small-latest`)
+- OpenAI (`gpt-4o-mini`)
+- Perplexity (`llama-3.1-sonar-small-128k-online`)
 
 ### Text-to-Image Models
 - OpenAI (`dall-e-3`, `dall-e-2`)

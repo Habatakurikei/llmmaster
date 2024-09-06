@@ -8,8 +8,10 @@ import pytest
 
 from llmmaster.config import DEFAULT_TOKENS
 from llmmaster.text_to_text_models import AnthropicLLM
+from llmmaster.text_to_text_models import CerebrasLLM
 from llmmaster.text_to_text_models import GoogleLLM
 from llmmaster.text_to_text_models import GroqLLM
+from llmmaster.text_to_text_models import MistralLLM
 from llmmaster.text_to_text_models import OpenAILLM
 from llmmaster.text_to_text_models import PerplexityLLM
 from llmmaster import LLMMaster
@@ -21,8 +23,10 @@ API_KEY = '''
 
 INSTANCE_CLASSES = {
     'anthropic': AnthropicLLM,
+    'cerebras': CerebrasLLM,
     'google': GoogleLLM,
     'groq': GroqLLM,
+    'mistral': MistralLLM,
     'openai': OpenAILLM,
     'perplexity': PerplexityLLM
 }
@@ -129,12 +133,13 @@ def test_ttt_instances(run_api):
     master = LLMMaster()
 
     test_cases = [
-        {'name': 'case_1', 'params': {'provider': 'openai', 'model': 'gpt-4o-mini', 'prompt': 'Hello.'}},
+        {'name': 'case_1', 'params': {'provider': 'openai', 'model': 'gpt-4o-mini', 'prompt': 'Hello.', 'max_tokens': 10000}},
         {'name': 'case_2', 'params': {'provider': 'anthropic', 'model': 'claude-3-haiku-20240307', 'prompt': 'Hello.', 'max_tokens': 0, 'temperature': -0.1, 'top_p': 0.1, 'top_k': 0}},
         {'name': 'case_3', 'params': {'provider': 'google', 'model': 'gemini-1.5-flash', 'prompt': 'Hello.', 'max_tokens': 5000, 'temperature': 1.1, 'top_p': 0.7, 'top_k': 30}},
         {'name': 'case_4', 'params': {'provider': 'groq', 'model': 'mixtral-8x7b-32768', 'prompt': 'Hello.', 'max_tokens': 100, 'temperature': 0.5, 'top_p': 0.5}},
         {'name': 'case_5', 'params': {'provider': 'perplexity', 'model': 'llama-3.1-sonar-small-128k-online', 'prompt': 'Hello.', 'temperature': 0.0}},
-        {'name': 'case_6', 'params': {'provider': 'openai', 'model': 'gpt-4o-mini', 'prompt': 'Hello.', 'max_tokens': 10000}}
+        {'name': 'case_6', 'params': {'provider': 'cerebras', 'model': 'llama3.1-8b', 'prompt': 'Hello.', 'max_tokens': 4096, 'temperature': 0.2, 'top_p': 0.2}},
+        {'name': 'case_7', 'params': {'provider': 'mistral', 'model': 'mistral-small-latest', 'prompt': 'Hello.', 'max_tokens': 2000, 'temperature': 0.4, 'top_p': 0.3}}
     ]
 
     master.set_api_keys(API_KEY)

@@ -17,6 +17,11 @@
   - Pika.art video extension, etc.
   - OpenAi structured output
 
+## [0.4.1] - 2024-09-06
+### Added
+- CerebrasLLM class
+- MistralLLM class
+
 ## [0.4.0] - 2024-09-04
 ### Added
 - `self.api_key_pairs` and `set_api_keys()` added to `LLMMaster` class
