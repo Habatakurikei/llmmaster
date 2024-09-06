@@ -121,8 +121,10 @@ For Mac/Linux,
 
 ```
 export ANTHROPIC_API_KEY="your_anthropic_key"
+export CEREBRAS_API_KEY="your_cerebras_key"
 export GOOGLE_API_KEY="your_google_key"
 export GROQ_API_KEY="your_groq_key"
+export MISTRAL_API_KEY="your_mistral_key"
 export OPENAI_API_KEY="your_openai_key"
 export PERPLEXITY_API_KEY="your_perplexity_key"
 export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
@@ -135,8 +137,10 @@ For Windows (cmd),
 
 ```
 SET ANTHROPIC_API_KEY=your_anthropic_key
+SET CEREBRAS_API_KEY=your_cerebras_key
 SET GOOGLE_API_KEY=your_google_key
 SET GROQ_API_KEY=your_groq_key
+SET MISTRAL_API_KEY=your_mistral_key
 SET OPENAI_API_KEY=your_openai_key
 SET PERPLEXITY_API_KEY=your_perplexity_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
@@ -149,8 +153,10 @@ For Windows (PowerShell)
 
 ```
 $env:ANTHROPIC_API_KEY="your_anthropic_key"
+$env:CEREBRAS_API_KEY="your_cerebras_key"
 $env:GOOGLE_API_KEY="your_google_key"
 $env:GROQ_API_KEY="your_groq_key"
+$env:MISTRAL_API_KEY="your_mistral_key"
 $env:OPENAI_API_KEY="your_openai_key"
 $env:PERPLEXITY_API_KEY="your_perplexity_key"
 $env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
@@ -165,8 +171,10 @@ This is new since ver. 0.4.0. Your API keys are also set to LLMMaster from a sav
 
 ```
 ANTHROPIC_API_KEY=your_anthropic_key
+CEREBRAS_API_KEY=your_cerebras_key
 GOOGLE_API_KEY=your_google_key
 GROQ_API_KEY=your_groq_key
+MISTRAL_API_KEY=your_mistral_key
 OPENAI_API_KEY=your_openai_key
 PERPLEXITY_API_KEY=your_perplexity_key
 STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
@@ -175,7 +183,7 @@ ELEVENLABS_API_KEY=your_elevenlabs_key
 PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
 ```
 
-Read the file in python script as string, then load to a `LLMMaster` instance. Explain in use case.
+Read the file in python script as string, then load to a `LLMMaster` instance. Explain in use cases.
 
 This is useful for third-party application usage.
 
