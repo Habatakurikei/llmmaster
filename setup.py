@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="llmmaster",
-    version="0.4.1",
+    version="0.5.0",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A unified interface for interacting with multiple LLMs and generative AIs.",
@@ -38,6 +38,8 @@ setuptools.setup(
         "elevenlabs>=1.7.0",
         "cerebras_cloud_sdk>=1.1.0",
         "mistralai>=1.0.3",
+        "fal-client>=0.4.1",
+        "lumaai>=1.0.2",
     ],
     extras_require={
         "dev": [

@@ -17,6 +17,13 @@
   - Pika.art video extension, etc.
   - OpenAi structured output
 
+## [0.5.0] - 2024-09-17
+### Added
+- Luma Dream Machine video generation models
+  - `LumaDreamMachineTextToVideo`
+  - `LumaDreamMachineImageToVideo`
+  - `LumaDreamMachineVideoToVideo`
+
 ## [0.4.1] - 2024-09-06
 ### Added
 - CerebrasLLM class
@@ -40,7 +47,7 @@
 ## [0.3.3] - 2024-08-12
 ### Added
 - Text-To-Speech model class
-  - VoicevoxTextToSpeech
+  - `VoicevoxTextToSpeech`
 
 ## [0.3.2] - 2024-08-07
 ### Changed

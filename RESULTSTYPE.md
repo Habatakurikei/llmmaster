@@ -30,9 +30,6 @@ In case of any error, the result will be stored as str. Print it to see problem 
   - ElevenLabsTextToSpeech: TextToSpeechClient.convert.generator object
   - VoicevoxTextToSpeech: requests.models.Response class
 
-## Text-To-Video
-  - PikaPikaPikaGeneration: requests.models.Response class
-
 ## Image-To-Text
   - OpenAIImageToText: response.choices[0].message.content.strip()
   - GoogleImageToText: response.text.strip()
@@ -57,3 +54,11 @@ In case of any error, the result will be stored as str. Print it to see problem 
   - MeshyTextTo3DRefine: requests.models.Response class
   - MeshyTextToVoxel: requests.models.Response class
   - MeshyImageTo3D: requests.models.Response class
+
+## Pika
+  - PikaPikaPikaGeneration: requests.models.Response class
+
+## Luma Dream Machine
+  - LumaDreamMachineTextToVideo: dict converted from Generation class
+  - LumaDreamMachineImageToVideo: dict converted from Generation class
+  - LumaDreamMachineVideoToVideo: dict converted from Generation class

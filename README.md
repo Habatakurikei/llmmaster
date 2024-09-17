@@ -34,10 +34,10 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv` |
-| Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv` |
+| Text | `openai`, `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv`, `lumaai_ttv` |
+| Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv`, `lumaai_itv` |
 | Audio | `openai_stt`, `google_stt` | NA | NA | NA |
-| Video | `google_vtt` | NA | NA | NA |
+| Video | `google_vtt` | NA | NA | `lumaai_vtv` |
 
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
 
@@ -61,7 +61,8 @@ And the list below represents the models that are supported by each provider. Se
 - Voicevox (`dummy`)
 
 ### Text-to-Video Models
-- Pika.art (`pikapikapika_ttv`)
+- Pika.art (`dummy`)
+- Luma Dream Machine (`dummy`)
 
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
@@ -73,6 +74,7 @@ And the list below represents the models that are supported by each provider. Se
 
 ### Image-to-Video Models
 - Stable Diffusion (`v2beta`)
+- Luma Dream Machine (`dummy`)
 
 ### Audio(Speech)-to-Text Models (typical)
 - OpenAI (`whisper-1`)
@@ -80,6 +82,9 @@ And the list below represents the models that are supported by each provider. Se
 
 ### Video-to-Text Models (typical)
 - Google (`gemini-1.5-flash`)
+
+### Video-to-Video Models
+- Luma Dream Machine (`dummy`)
 
 Use highlighted word for `model` to make `LLMMaster` instance.
 
@@ -131,6 +136,7 @@ export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 export MESHY_API_KEY="your_meshy_key"
 export ELEVENLABS_API_KEY="your_elevenlabs_key"
 export PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
+export LUMAAI_API_KEY="your_lumaai_key"
 ```
 
 For Windows (cmd),
@@ -147,6 +153,7 @@ SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 SET MESHY_API_KEY=your_meshy_key
 SET ELEVENLABS_API_KEY=your_elevenlabs_key
 SET PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
+SET LUMAAI_API_KEY=your_lumaai_key
 ```
 
 For Windows (PowerShell)
@@ -163,6 +170,7 @@ $env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 $env:MESHY_API_KEY="your_meshy_key"
 $env:ELEVENLABS_API_KEY="your_elevenlabs_key"
 $env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
+$env:LUMAAI_API_KEY="your_lumaai_key"
 ```
 
 ### Set API keys prepared in text file
@@ -181,6 +189,7 @@ STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 MESHY_API_KEY=your_meshy_key
 ELEVENLABS_API_KEY=your_elevenlabs_key
 PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
+LUMAAI_API_KEY=your_lumaai_key
 ```
 
 Read the file in python script as string, then load to a `LLMMaster` instance. Explain in use cases.
@@ -768,6 +777,47 @@ if isinstance(master.results['meshy_ttvx_test'], Response):
             print(f'Saved as {filepath}')
 
 # Check elapsed time
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
+  12. Using **Video-to-Video** Model
+
+```python
+import requests
+from llmmaster import LLMMaster
+
+master = LLMMaster()
+
+prompt = 'The boy exploring the space finds Mars.'
+
+# Use generated video in Luma or public image in web.
+# This is a case to extend video with generated frame.
+keyframes={
+    "frame0": {
+    "type": "generation",
+    "id": "uuid-generated-by-lumaai"
+    }
+}
+
+params = master.pack_parameters(provider='lumaai_vtv',
+                                prompt=prompt,
+                                keyframes=keyframes)
+master.set_api_keys(API_KEY)
+master.summon({'lumaai_vtv': params})
+
+print('Start running LLMMaster...')
+master.run()
+
+print('Results')
+response = master.results["lumaai_vtv"]
+res = requests.get(response['assets']['video'])
+if res.status_code == 200:
+    with open("lumaai_vtv.mp4", 'wb') as f:
+        f.write(res.content)
+    print("lumaai_vtv.mp4 saved")
+
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()

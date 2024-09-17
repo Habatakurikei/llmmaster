@@ -20,6 +20,7 @@ from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import MESHY_KEY_NAME
 from .config import ELEVENLABS_KEY_NAME
 from .config import PIKAPIKAPIKA_KEY_NAME
+from .config import LUMAAI_KEY_NAME
 from .text_to_text_models import AnthropicLLM
 from .text_to_text_models import CerebrasLLM
 from .text_to_text_models import GoogleLLM
@@ -46,6 +47,9 @@ from .meshy_models import MeshyTextTo3DRefine
 from .meshy_models import MeshyTextToVoxel
 from .meshy_models import MeshyImageTo3D
 from .pikapikapika_models import PikaPikaPikaGeneration
+from .lumaai_models import LumaDreamMachineTextToVideo
+from .lumaai_models import LumaDreamMachineImageToVideo
+from .lumaai_models import LumaDreamMachineVideoToVideo
 
 
 ACTIVE_MODELS = {
@@ -100,7 +104,13 @@ ACTIVE_MODELS = {
     'meshy_it3d': {'model': MeshyImageTo3D,
                    'key': MESHY_KEY_NAME},
     'pikapikapika_ttv': {'model': PikaPikaPikaGeneration,
-                         'key': PIKAPIKAPIKA_KEY_NAME}
+                         'key': PIKAPIKAPIKA_KEY_NAME},
+    'lumaai_ttv': {'model': LumaDreamMachineTextToVideo,
+                   'key': LUMAAI_KEY_NAME},
+    'lumaai_itv': {'model': LumaDreamMachineImageToVideo,
+                   'key': LUMAAI_KEY_NAME},
+    'lumaai_vtv': {'model': LumaDreamMachineVideoToVideo,
+                   'key': LUMAAI_KEY_NAME}
 }
 
 

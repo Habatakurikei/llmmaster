@@ -14,6 +14,7 @@ STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
 MESHY_KEY_NAME = 'MESHY_API_KEY'
 ELEVENLABS_KEY_NAME = 'ELEVENLABS_API_KEY'
 PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
+LUMAAI_KEY_NAME = 'LUMAAI_API_KEY'
 
 
 # Default models setting
@@ -53,6 +54,10 @@ DEFAULT_MESHY_MODELS = {'meshy_tttx': 'dummy',
 
 DEFAULT_PIKAPIKAPIKA_MODELS = {'pikapikapika_ttv': 'dummy'}
 
+DEFAULT_LUMAAI_MODELS = {'lumaai_ttv': 'dummy',
+                         'lumaai_itv': 'dummy',
+                         'lumaai_vtv': 'dummy'}
+
 
 def _full_default_list():
     full_list = {}
@@ -66,6 +71,7 @@ def _full_default_list():
     full_list.update(DEFAULT_VTT_MODELS)
     full_list.update(DEFAULT_MESHY_MODELS)
     full_list.update(DEFAULT_PIKAPIKAPIKA_MODELS)
+    full_list.update(DEFAULT_LUMAAI_MODELS)
     return full_list
 
 
@@ -281,3 +287,9 @@ PIKAPIKAPIKA_STYLE_LIST = ['Anime', 'Moody', '3D', 'Watercolor', 'Natural',
 PIKAPIKAPIKA_ASPECT_RATIO_LIST = ['16:9', '9:16', '1:1', '5:2', '4:5', '4:3']
 PIKAPIKAPIKA_MAX_FPS = 24
 WAIT_FOR_PIKAPIKAPIKA_RESULT = 5
+
+
+# Luma AI specific settings
+LUMAAI_ASPECT_RATIO_LIST = ['16:9', '4:3']
+LUMAAI_STATUS_IN_PROGRESS = ['queued', 'dreaming']
+WAIT_FOR_LUMAI_RESULT = 5
