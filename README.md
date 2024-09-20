@@ -34,9 +34,9 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `openai`, `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `perplexity` | `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `openai_tts`, `elevenlabs_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv`, `lumaai_ttv` |
-| Image | `openai_itt`, `google_itt` | `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv`, `lumaai_itv` |
-| Audio | `openai_stt`, `google_stt` | NA | NA | NA |
+| Text | `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `openai`, `perplexity` | `flux1_fal_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `openai_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv`, `lumaai_ttv` |
+| Image | `google_itt`, `openai_itt` | `flux1_fal_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv`, `lumaai_itv` |
+| Audio | `google_stt`, `openai_stt` | NA | `elevenlabs_aiso` | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv` |
 
 And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
@@ -51,30 +51,36 @@ And the list below represents the models that are supported by each provider. Se
 - Perplexity (`llama-3.1-sonar-small-128k-online`)
 
 ### Text-to-Image Models
+- Flux.1 via fal (`fal-ai/flux/dev`)
 - OpenAI (`dall-e-3`, `dall-e-2`)
 - Stable Diffusion (`core`, `ultra`)
 - Adobe Firely (pending deployment)
 
 ### Text-to-Audio (Speech) Models
+- ElevenLabs Speech (`eleven_multilingual_v2`)
+- ElevenLabs Sound Effect (`dummy`)
 - OpenAI (`tts-1`, `tts-1-hd`)
-- ElevenLabs (`eleven_multilingual_v2`)
 - Voicevox (`dummy`)
 
 ### Text-to-Video Models
-- Pika.art (`dummy`)
 - Luma Dream Machine (`dummy`)
+- Pika.art (`dummy`)
 
 ### Image-to-Text Models (typical)
 - OpenAI (`gpt-4o`)
 - Google (`gemini-1.5-flash`)
 
 ### Image-to-Image Models
+- Flux.1 via fal (`fal-ai/flux/dev/image-to-image`)
 - OpenAI (`dall-e-2`)
 - Stable Diffusion (`v2beta`)
 
 ### Image-to-Video Models
 - Stable Diffusion (`v2beta`)
 - Luma Dream Machine (`dummy`)
+
+### Audio-to-Audio Models
+- ElevenLabs Audio Isolation (`dummy`)
 
 ### Audio(Speech)-to-Text Models (typical)
 - OpenAI (`whisper-1`)
@@ -137,6 +143,7 @@ export MESHY_API_KEY="your_meshy_key"
 export ELEVENLABS_API_KEY="your_elevenlabs_key"
 export PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 export LUMAAI_API_KEY="your_lumaai_key"
+export FAL_KEY="your_fal_key"
 ```
 
 For Windows (cmd),
@@ -154,6 +161,7 @@ SET MESHY_API_KEY=your_meshy_key
 SET ELEVENLABS_API_KEY=your_elevenlabs_key
 SET PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
 SET LUMAAI_API_KEY=your_lumaai_key
+SET FAL_KEY=your_fal_key
 ```
 
 For Windows (PowerShell)
@@ -171,6 +179,7 @@ $env:MESHY_API_KEY="your_meshy_key"
 $env:ELEVENLABS_API_KEY="your_elevenlabs_key"
 $env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 $env:LUMAAI_API_KEY="your_lumaai_key"
+$env:FAL_KEY="your_fal_key"
 ```
 
 ### Set API keys prepared in text file
@@ -195,6 +204,8 @@ LUMAAI_API_KEY=your_lumaai_key
 Read the file in python script as string, then load to a `LLMMaster` instance. Explain in use cases.
 
 This is useful for third-party application usage.
+
+Note that `FAL_KEY` is only loaded from the OS environmental variable.
 
 ### Use cases
 

@@ -1,5 +1,3 @@
-import time
-
 import requests
 
 from .base_model import BaseModel
@@ -81,7 +79,7 @@ class PikaPikaPikaModelBase(BaseModel):
             response = requests.request(method='GET', url=ep, headers=header)
             json = response.json()
             if json['job']['status'] != 'finished':
-                time.sleep(WAIT_FOR_PIKAPIKAPIKA_RESULT)
+                self._wait(WAIT_FOR_PIKAPIKAPIKA_RESULT)
             else:
                 answer = response
                 flg = False

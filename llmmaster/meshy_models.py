@@ -1,5 +1,3 @@
-import time
-
 import requests
 
 from .base_model import BaseModel
@@ -84,7 +82,7 @@ class MeshyModelBase(BaseModel):
                                         headers=header)
 
             if response.json().get('status') not in MESHY_STATUS_FOR_RESULT:
-                time.sleep(WAIT_FOR_MESHY_RESULT)
+                self._wait(WAIT_FOR_MESHY_RESULT)
             else:
                 answer = response
                 flg = False

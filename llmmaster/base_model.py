@@ -1,4 +1,7 @@
+import time
 from threading import Thread
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 
 
 class BaseModel(Thread):
@@ -21,3 +24,10 @@ class BaseModel(Thread):
 
     def _verify_arguments(self, **kwargs):
         return kwargs
+
+    def _sanitize_url(self, url: str = ''):
+        parsed = urlparse(url)
+        return urlunparse(parsed)
+
+    def _wait(self, to_wait: float):
+        time.sleep(to_wait)

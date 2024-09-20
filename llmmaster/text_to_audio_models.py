@@ -1,5 +1,6 @@
 # this file may contain classes of:
 # - text-to-speech model (TTS)
+# - text-to-sound model (TTSE)
 # - text-to-music model (TTM)
 import requests
 from elevenlabs import Voice
@@ -12,6 +13,7 @@ from .config import ELEVENLABS_TTS_MODELS
 from .config import ELEVENLABS_DEFAULT_VOICE_ID
 from .config import ELEVENLABS_DEFAULT_STABILITY
 from .config import ELEVENLABS_DEFAULT_SIMILARITY
+from .config import ELEVENLABS_DEFAULT_PROMPT_INFLUENCE
 from .config import OPENAI_TTS_RESPONSE_FORMAT_LIST
 from .config import OPENAI_TTS_VOICE_OPTIONS
 from .config import OPENAI_TTS_DEFAULT_SPEED
@@ -51,7 +53,7 @@ class OpenAITextToSpeech(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure.
         '''
-        answer = 'Speech not generated. '
+        answer = 'Valid speech not generated. '
 
         try:
             client = OpenAI(api_key=self.api_key)
@@ -131,7 +133,7 @@ class ElevenLabsTextToSpeech(BaseModel):
         Handle return value `answer` with care for different type
         in case of success and failure.
         '''
-        answer = 'Speech not generated. '
+        answer = 'Valid speech not generated. '
 
         try:
             client = ElevenLabs(api_key=self.api_key)
@@ -210,6 +212,70 @@ class ElevenLabsTextToSpeech(BaseModel):
         return parameters
 
 
+class ElevenLabsTextToSoundEffect(BaseModel):
+    '''
+    No specific model for this function.
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'ElevenLabsTextToSoundEffect'
+            raise Exception(msg) from e
+
+    def run(self):
+        '''
+        Note:
+        ElevenLabs Text-To-Sound returns binary audio data.
+        Save the generated audio using `elevenlabs.save()`.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
+        '''
+        answer = 'Valid sound not generated. '
+
+        try:
+            client = ElevenLabs(api_key=self.api_key)
+
+            response = client.text_to_sound_effects.convert(
+                text=self.parameters['prompt'],
+                duration_seconds=self.parameters['duration_seconds'],
+                prompt_influence=self.parameters['prompt_influence'])
+
+            if response:
+                answer = response
+
+        except Exception as e:
+            answer += str(e)
+
+        self.response = answer
+
+    def _verify_arguments(self, **kwargs):
+        """
+        Verify and process arguments for Voicevox Text-to-Speech.
+        Expected inputs:
+          - duration_seconds: int/float
+          - prompt_influence: float
+        """
+        parameters = kwargs
+
+        if 'duration_seconds' in kwargs:
+            pass
+        else:
+            parameters.update(duration_seconds=None)
+
+        if 'prompt_influence' in kwargs:
+            pass
+        else:
+            parameters.update(
+                prompt_influence=ELEVENLABS_DEFAULT_PROMPT_INFLUENCE)
+
+        return parameters
+
+
 class VoicevoxTextToSpeech(BaseModel):
     '''
     Voicevox Text-to-Speech model
@@ -233,7 +299,7 @@ class VoicevoxTextToSpeech(BaseModel):
         Handle return value `answer` with care for different type
         in case of success and failure.
         '''
-        answer = 'Speech not generated. '
+        answer = 'Valid speech not generated. '
 
         try:
             res_query = requests.post(

@@ -3,19 +3,31 @@
 ## [Unreleased]
 - Text-To-Image models pending to be added
   - Midjourney API through ImaginePro
-  - StableDiffusion API through ModelsLab
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
-  - Flux.1 API through fal
 - Text-To-Music models pending to be added
   - Mubert API for rather enterprise use
   - Suno API for rather enterprise use
 - Text-To-Video models pending to be added
   - Runway API not released for public
 - Pending additional functions
-  - ElevenLabs dubbing, cloning, etc.
+  - ElevenLabs using native RESTAPI like dubbing and cloning, etc.
   - Pika.art video extension, etc.
   - OpenAi structured output
+  - Anthropic Claude cache
+
+## [0.5.1] - 2024-09-20
+### Added
+- Flux.1 image models via fal-ai
+  - `Flux1FalImageToImage`
+  - `Flux1FalTextToImage`
+- ElevenLabs audio models
+  - `ElevenLabsTextToSoundEffect`
+  - `ElevenLabsAudioIsolation`
+### Changed
+- Commonized functions from `BaseModel`
+  - `_wait()`: waiting response from API provider
+  - `_sanitize_url()`: sanitizing URL text
 
 ## [0.5.0] - 2024-09-17
 ### Added

@@ -15,26 +15,29 @@ In case of any error, the result will be stored as str. Print it to see problem 
 ## Text-To-Text
   - AnthropicLLM: response.content[0].text.strip()
   - CerebrasLLM: response.choices[0].message.content.strip()
-  - GroqLLM: response.choices[0].message.content.strip()
   - GoogleLLM: response.text.strip()
+  - GroqLLM: response.choices[0].message.content.strip()
   - MistralLLM: response.choices[0].message.content.strip()
   - OpenAILLM: response.choices[0].message.content.strip()
   - PerplexityLLM: response.choices[0].message.content.strip()
 
 ## Text-To-Image
+  - Flux1FalTextToImage: dictionary of API response
   - OpenAITextToImage: ImagesResponse class
   - StableDiffusionTextToImage: requests.models.Response class
 
 ## Text-To-Audio
-  - OpenAITextToSpeech: openai._legacy_response.HttpxBinaryResponseContent object
   - ElevenLabsTextToSpeech: TextToSpeechClient.convert.generator object
+  - ElevenLabsTextToSoundEffect: TextToSpeechClient.convert.generator object
+  - OpenAITextToSpeech: openai._legacy_response.HttpxBinaryResponseContent object
   - VoicevoxTextToSpeech: requests.models.Response class
 
 ## Image-To-Text
-  - OpenAIImageToText: response.choices[0].message.content.strip()
   - GoogleImageToText: response.text.strip()
+  - OpenAIImageToText: response.choices[0].message.content.strip()
 
 ## Image-To-Image
+  - Flux1FalImageToImage: dictionary of API response
   - OpenAIImageToImage: ImagesResponse class
   - StableDiffusionImageToImage: requests.models.Response class
 
@@ -42,8 +45,11 @@ In case of any error, the result will be stored as str. Print it to see problem 
   - StableDiffusionImageToVideo: requests.models.Response class
 
 ## Audio-To-Text
-  - OpenAISpeechToText: Translation or Transcription class
   - GoogleSpeechToText: response.text.strip()
+  - OpenAISpeechToText: Translation or Transcription class
+
+## Audio-To-Audio
+  - ElevenLabsAudioIsolation: TextToSpeechClient.convert.generator object
 
 ## Video-To-Text
   - GoogleVideoToText: response.text.strip()

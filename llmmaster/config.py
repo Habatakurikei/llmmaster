@@ -5,17 +5,18 @@ ANTHROPIC_KEY_NAME = 'ANTHROPIC_API_KEY'
 CEREBRAS_KEY_NAME = 'CEREBRAS_API_KEY'
 DALLE_KEY_NAME = 'DALLE_API_KEY'
 DUMMY_KEY_NAME = 'DUMMY_API_KEY'
+ELEVENLABS_KEY_NAME = 'ELEVENLABS_API_KEY'
+FAL_KEY_NAME = 'FAL_KEY'
 GOOGLE_KEY_NAME = 'GOOGLE_API_KEY'
 GROQ_KEY_NAME = 'GROQ_API_KEY'
+LUMAAI_KEY_NAME = 'LUMAAI_API_KEY'
+MESHY_KEY_NAME = 'MESHY_API_KEY'
 MISTRAL_KEY_NAME = 'MISTRAL_API_KEY'
 OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
-STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
-MESHY_KEY_NAME = 'MESHY_API_KEY'
-ELEVENLABS_KEY_NAME = 'ELEVENLABS_API_KEY'
 PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
-LUMAAI_KEY_NAME = 'LUMAAI_API_KEY'
-
+STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
+TRIPO_KEY_NAME = 'TRIPO_API_KEY'
 
 # Default models setting
 DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-haiku-20240307',
@@ -26,23 +27,28 @@ DEFAULT_TTT_MODELS = {'anthropic': 'claude-3-haiku-20240307',
                       'openai': 'gpt-4o-mini',
                       'perplexity': 'llama-3.1-sonar-small-128k-online'}
 
-DEFAULT_TTI_MODELS = {'openai_tti': 'dall-e-3',
+DEFAULT_TTI_MODELS = {'flux1_fal_tti': 'fal-ai/flux/dev',
+                      'openai_tti': 'dall-e-3',
                       'stable_diffusion_tti': 'core'}
 
-DEFAULT_TTA_MODELS = {'openai_tts': 'tts-1',
-                      'elevenlabs_tts': 'eleven_multilingual_v2',
+DEFAULT_TTA_MODELS = {'elevenlabs_tts': 'eleven_multilingual_v2',
+                      'elevenlabs_ttse': 'dummy',
+                      'openai_tts': 'tts-1',
                       'voicevox_tts': 'dummy'}
 
-DEFAULT_ITT_MODELS = {'openai_itt': 'gpt-4o',
-                      'google_itt': 'gemini-1.5-flash'}
+DEFAULT_ITT_MODELS = {'google_itt': 'gemini-1.5-flash',
+                      'openai_itt': 'gpt-4o'}
 
-DEFAULT_ITI_MODELS = {'openai_iti': 'dall-e-2',
+DEFAULT_ITI_MODELS = {'flux1_fal_iti': 'fal-ai/flux/dev/image-to-image',
+                      'openai_iti': 'dall-e-2',
                       'stable_diffusion_iti': 'v2beta'}
 
 DEFAULT_ITV_MODELS = {'stable_diffusion_itv': 'v2beta'}
 
-DEFAULT_ATT_MODELS = {'openai_stt': 'whisper-1',
-                      'google_stt': 'gemini-1.5-flash'}
+DEFAULT_ATT_MODELS = {'google_stt': 'gemini-1.5-flash',
+                      'openai_stt': 'whisper-1'}
+
+DEFAULT_ATA_MODELS = {'elevenlabs_aiso': 'dummy'}
 
 DEFAULT_VTT_MODELS = {'google_vtt': 'gemini-1.5-flash'}
 
@@ -68,6 +74,7 @@ def _full_default_list():
     full_list.update(DEFAULT_ITI_MODELS)
     full_list.update(DEFAULT_ITV_MODELS)
     full_list.update(DEFAULT_ATT_MODELS)
+    full_list.update(DEFAULT_ATA_MODELS)
     full_list.update(DEFAULT_VTT_MODELS)
     full_list.update(DEFAULT_MESHY_MODELS)
     full_list.update(DEFAULT_PIKAPIKAPIKA_MODELS)
@@ -122,6 +129,12 @@ MESHY_TT3D_START_EP = '/v2/text-to-3d'
 MESHY_TTVX_START_EP = '/v1/text-to-voxel'
 MESHY_IT3D_START_EP = '/v1/image-to-3d'
 
+TRIPO_BASE_EP = 'https://api.tripo3d.ai/v2/openapi'
+TRIPO_RESULT_EP = 'wss://api.tripo3d.ai/v2/openapi/task/watch/{tid}'
+TRIPO_UPLOAD_EP = '/upload'
+TRIPO_TASK_EP = '/task'
+TRIPO_WALLET_EP = '/user/balance'
+
 PIKAPIKAPIKA_BASE_EP = 'https://api.pikapikapika.io/web'
 PIKAPIKAPIKA_GENERATION_EP = '/generate'
 PIKAPIKAPIKA_LIPSYNC_EP = '/lipSync'
@@ -136,6 +149,7 @@ WAIT_FOR_STARTING = 1.0
 
 # Dummy prompt settings
 PROVIDERS_NEED_DUMMY_PROMPT = ['openai_stt', 'stable_diffusion_itv',
+                               'elevenlabs_aiso',
                                'meshy_tttx', 'meshy_tt3d_refine', 'meshy_it3d']
 OPENAI_ITI_MODE_NEED_DUMMY_PROMPT = ['variations']
 SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
@@ -148,6 +162,33 @@ DEFAULT_TOKENS = 4096
 TEMPERATURE = 0.7
 TOP_P = 0.9
 TOP_K = 50
+
+ANTHROPIC_MODELS = ['claude-3-haiku-20240307',
+                    'claude-3-sonnet-20240229',
+                    'claude-3-opus-20240229',
+                    'claude-3-5-sonnet-20240620']
+
+CEREBRAS_MODELS = ['llama3.1-8b', 'llama3.1-70b']
+
+GOOGLE_MODELS = ['gemini-1.5-flash',
+                 'gemini-1.5-pro',
+                 'gemini-1.5-flash-exp-0827',
+                 'gemini-1.5-pro-exp-0827']
+
+GROQ_MODELS = ['gemma-7b-it', 'gemma2-9b-it',
+               'llama-3.1-70b-versatile', 'llama-3.1-8b-instant',
+               'llama3-70b-8192', 'llama3-8b-8192',
+               'llama3-8b-8192', 'mixtral-8x7b-32768']
+
+MISTRAL_MODELS = ['mistral-small-latest', 'mistral-medium-latest',
+                  'mistral-large-latest', 'open-mistral-nemo',
+                  'codestral-latest', 'mistral-embed']
+
+OPENAI_MODELS = ['gpt-4o-mini', 'gpt-4o', 'gpt-4o-2024-08-06']
+
+PERPLEXITY_MODELS = ['llama-3.1-sonar-small-128k-online',
+                     'llama-3.1-sonar-large-128k-online',
+                     'llama-3.1-sonar-huge-128k-online']
 
 # Text-To-Image settings
 MAX_SEED = 4294967294
@@ -184,6 +225,12 @@ STABLE_DIFFUSION_TTI_STYLE_PRESET_LIST = ['anime', '3d-model', 'analog-film',
                                           'origami', 'photographic',
                                           'pixel-art', 'tile-texture']
 
+FLUX1_FAL_TTI_MODELS = ['fal-ai/flux/dev', 'fal-ai/flux/schnell']
+FLUX1_FAL_TTI_ASPECT_RATIO_LIST = ['square_hd', 'square',
+                                   'portrait_4_3', 'portrait_16_9',
+                                   'landscape_4_3', 'landscape_16_9']
+WAIT_FOR_FLUX1_FAL_TTI_RESULT = 2.0
+
 # Text-To-Audio settings
 OPENAI_TTS_MODELS = ['tts-1', 'tts-1-hd']
 OPENAI_TTS_VOICE_OPTIONS = ['alloy', 'echo', 'fable',
@@ -203,6 +250,7 @@ ELEVENLABS_DEFAULT_VOICE_ID = '8EkOjt4xTPGMclNlh1pk'
 # ELEVENLABS_DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'
 ELEVENLABS_DEFAULT_STABILITY = 1.0
 ELEVENLABS_DEFAULT_SIMILARITY = 0.75
+ELEVENLABS_DEFAULT_PROMPT_INFLUENCE = 0.3
 
 VOICEVOX_BASE_EP = 'http://localhost:50021'
 VOICEVOX_QUERY_EP = '/audio_query'
@@ -234,7 +282,7 @@ STABLE_DIFFUSION_OUTPAINT_UP_MAX = 2000
 STABLE_DIFFUSION_OUTPAINT_DOWN_MAX = 2000
 STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MIN = 0.0
 STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MAX = 1.0
-WAIT_FOR_UPSCALE_CREATIVE_RESULT = 5
+WAIT_FOR_UPSCALE_CREATIVE_RESULT = 5.0
 
 # Image-To-Video settings
 STABLE_DIFFUSION_ITV_CFG_SCALE_DEFAULT = 1.8
@@ -243,7 +291,7 @@ STABLE_DIFFUSION_ITV_CFG_SCALE_MAX = 10.0
 STABLE_DIFFUSION_ITV_MOTION_BUCKET_DEFAULT = 127
 STABLE_DIFFUSION_ITV_MOTION_BUCKET_MIN = 1
 STABLE_DIFFUSION_ITV_MOTION_BUCKET_MAX = 255
-WAIT_FOR_ITV_RESULT = 5
+WAIT_FOR_ITV_RESULT = 5.0
 
 # Audio-To-Text settings
 OPENAI_STT_MODE_LIST = ['transcriptions', 'translations']
@@ -255,8 +303,8 @@ OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
 ELEVENLABS_STS_MODELS = ['eleven_multilingual_sts_v2', 'eleven_english_sts_v2']
 
 # Video-To-Text settings
-WAIT_FOR_GOOGLE_VTT_UPLOAD = 5
-WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600
+WAIT_FOR_GOOGLE_VTT_UPLOAD = 5.0
+WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600.0
 
 # Meshy specific settings
 MESHY_TT3D_MODELS = ['meshy-3', 'meshy-3-turbo']
@@ -279,17 +327,21 @@ MESHY_STATUS_PENDING = 'PENDING'
 MESHY_STATUS_SUCCEEDED = 'SUCCEEDED'
 MESHY_STATUS_FOR_RESULT = ['SUCCEEDED', 'FAILED', 'EXPIRED']
 
-WAIT_FOR_MESHY_RESULT = 5
+WAIT_FOR_MESHY_RESULT = 5.0
+
+# Tripo specific settings
+TRIPO_MODELS = ['default', 'v2.0-20240919', 'v1.4-20240625', 'v1.3-20240522']
+TRIPO_STATUS_IN_PROGRESS = ['running', 'queued']
+WAIT_FOR_TRIPO_RESULT = 5.0
 
 # PikaPikaPika.art specific settings
 PIKAPIKAPIKA_STYLE_LIST = ['Anime', 'Moody', '3D', 'Watercolor', 'Natural',
                            'Claymation', 'Black & white']
 PIKAPIKAPIKA_ASPECT_RATIO_LIST = ['16:9', '9:16', '1:1', '5:2', '4:5', '4:3']
 PIKAPIKAPIKA_MAX_FPS = 24
-WAIT_FOR_PIKAPIKAPIKA_RESULT = 5
-
+WAIT_FOR_PIKAPIKAPIKA_RESULT = 5.0
 
 # Luma AI specific settings
 LUMAAI_ASPECT_RATIO_LIST = ['16:9', '4:3']
 LUMAAI_STATUS_IN_PROGRESS = ['queued', 'dreaming']
-WAIT_FOR_LUMAI_RESULT = 5
+WAIT_FOR_LUMAI_RESULT = 5.0

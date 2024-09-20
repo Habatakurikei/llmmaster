@@ -1,6 +1,4 @@
 from io import BytesIO
-from urllib.parse import urlparse
-from urllib.parse import urlunparse
 
 import google.generativeai as genai
 import requests
@@ -30,7 +28,7 @@ class OpenAIImageToText(BaseModel):
 
     def run(self):
 
-        message = 'Image description not generated.'
+        message = 'Valid text not generated. '
 
         try:
             client = OpenAI(api_key=self.api_key)
@@ -69,8 +67,8 @@ class OpenAIImageToText(BaseModel):
         image_url = []
 
         for entry in kwargs['image_url']:
-            buff = {"type": "image_url",
-                    "image_url": {"url": _sanitize_url(entry)}}
+            buff = {'type': 'image_url',
+                    'image_url': {'url': self._sanitize_url(entry)}}
             image_url.append(buff)
 
         parameters.update(image_url=image_url)
@@ -107,7 +105,7 @@ class GoogleImageToText(BaseModel):
 
     def run(self):
 
-        message = 'Image description not generated.'
+        message = 'Valid text not generated. '
 
         try:
             genai.configure(api_key=self.api_key)
@@ -150,8 +148,3 @@ class GoogleImageToText(BaseModel):
             raise ValueError(msg)
 
         return parameters
-
-
-def _sanitize_url(url: str = ''):
-    parsed = urlparse(url)
-    return urlunparse(parsed)

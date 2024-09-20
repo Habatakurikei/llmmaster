@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -11,6 +12,7 @@ from requests.models import Response
 from llmmaster.config import REQUEST_OK
 from llmmaster.image_to_image_models import OpenAIImageToImage
 from llmmaster.image_to_image_models import StableDiffusionImageToImage
+from llmmaster.image_to_image_models import Flux1FalImageToImage
 from llmmaster import LLMMaster
 
 
@@ -147,3 +149,56 @@ def test_stable_diffusion_image_to_image_instances(run_api):
     master.dismiss()
 
     assert judgment is True
+
+
+def test_flux1_image_to_image_instances(run_api):
+    judgment = True
+    master = LLMMaster()
+
+    prompt = 'The girl smiling with her eyes closed. The words "SHIN monju" are painted in front, in Japanese caligraphy style.'
+    url = 'https://monju.ai/app/static/monju-girl.png'
+
+    arguments = master.pack_parameters(
+        provider = 'flux1_fal_iti',
+        strength = 0.95,
+        image_url = url,
+        prompt = prompt,
+        image_size = 'landscape_16_9',
+        num_inference_steps = 40,
+        seed = 0,
+        guidance_scale = 3.5,
+        sync_mode = False,
+        num_images = 1,
+        enable_safety_checker = True
+    )
+
+    master.summon({'flux1_fal_iti': arguments})    
+    print(f"Parameters = {master.instances['flux1_fal_iti'].parameters}")
+
+    if not isinstance(master.instances['flux1_fal_iti'], Flux1FalImageToImage):
+        judgment = False
+
+    if run_api:
+        print('Run API')
+        try:
+            master.run()
+        except Exception as e:
+            pytest.fail(f"An error occurred during API calls: {str(e)}")
+
+        if not os.path.isdir(TEST_OUTPUT_PATH):
+            os.makedirs(TEST_OUTPUT_PATH)
+
+        print('Responses')
+        if isinstance(master.results['flux1_fal_iti'], str):
+            pytest.fail(f"Failed to generate: {master.results['flux1_fal_iti']}")
+        else:
+            print(f"Result = {json.dumps(master.results, indent=2)}")
+            filepath = os.path.join(TEST_OUTPUT_PATH, 'flux1_fal_iti.json')
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(master.results, f, indent=2, ensure_ascii=False)
+            print(f'Saved as {filepath}')
+
+    print(f"Elapsed time in total (sec): {master.elapsed_time}")
+    master.dismiss()
+
+    assert judgment

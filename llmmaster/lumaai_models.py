@@ -1,7 +1,4 @@
 import json
-import time
-from urllib.parse import urlparse
-from urllib.parse import urlunparse
 
 from lumaai import LumaAI
 
@@ -22,6 +19,7 @@ class LumaDreamMachineBase(BaseModel):
     Separately define _verify_arguments() due to different parameters.
     '''
     def __init__(self, **kwargs):
+
         try:
             super().__init__(**kwargs)
 
@@ -44,15 +42,11 @@ class LumaDreamMachineBase(BaseModel):
         while flg:
             status = instance.generations.get(id=id)
             if status.state in LUMAAI_STATUS_IN_PROGRESS:
-                time.sleep(WAIT_FOR_LUMAI_RESULT)
+                self._wait(WAIT_FOR_LUMAI_RESULT)
             else:
                 answer = json.loads(status.json())
                 flg = False
         return answer
-
-    def _sanitize_url(self, url: str = ''):
-        parsed = urlparse(url)
-        return urlunparse(parsed)
 
 
 class LumaDreamMachineTextToVideo(LumaDreamMachineBase):

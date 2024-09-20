@@ -1,14 +1,16 @@
 import os
-import time
 from io import BytesIO
 
+import fal_client
 import requests
+from fal_client import InProgress
 from openai import OpenAI
 from openai.types.images_response import ImagesResponse
 from PIL import Image
 
 from .base_model import BaseModel
 from .config import DEFAULT_ITI_MODELS
+from .config import FLUX1_FAL_TTI_ASPECT_RATIO_LIST
 from .config import MAX_SEED
 from .config import OPENAI_ITI_ACCEPTABLE_COLOR_MODE
 from .config import OPENAI_ITI_DEFAULT_N
@@ -39,7 +41,108 @@ from .config import STABLE_DIFFUSION_OUTPAINT_DOWN_MAX
 from .config import STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MIN
 from .config import STABLE_DIFFUSION_OUTPAINT_CREATIVITY_MAX
 from .config import REQUEST_OK
+from .config import WAIT_FOR_FLUX1_FAL_TTI_RESULT
 from .config import WAIT_FOR_UPSCALE_CREATIVE_RESULT
+
+
+class Flux1FalImageToImage(BaseModel):
+    '''
+    List of available models as of 2024-09-18
+      - fal-ai/flux/dev/image-to-image
+    Important:
+    Fal does not support API key import from instance creation.
+    API key must be set in console with `FAL_KEY` environment variable.
+    '''
+    def __init__(self, **kwargs):
+
+        try:
+            super().__init__(**kwargs)
+
+        except Exception as e:
+            msg = 'Error while verifying specific parameters for '
+            msg += 'Flux1FalImageToImage'
+            raise Exception(msg) from e
+
+    def run(self):
+        '''
+        Note:
+        Flux1FalImageToImage returns a dictionary including image url.
+        But when failed to generate, return value is given in str.
+        Handle return value `answer` with care for different type
+        in case of success and failure.
+        '''
+        answer = 'Valid image not generated. '
+
+        try:
+            handler = fal_client.submit(self.parameters['model'],
+                                        arguments=self.parameters['arguments'])
+            flg = True
+            while flg:
+                self._wait(WAIT_FOR_FLUX1_FAL_TTI_RESULT)
+                status = handler.status(with_logs=True)
+                flg = False if not isinstance(status, InProgress) else True
+            answer = handler.get()
+
+        except Exception as e:
+            answer += str(e)
+
+        self.response = answer
+
+    def _verify_arguments(self, **kwargs):
+        '''
+        Expected arguments:
+          - prompt
+          - image_url
+          - strength
+          - image_size
+          - num_inference_steps
+          - seed
+          - guidance_scale
+          - sync_mode
+          - num_images
+          - enable_safety_checker
+        '''
+        parameters = kwargs
+
+        arguments = {'prompt': kwargs['prompt']}
+
+        if ('image_url' in kwargs and
+           isinstance(kwargs['image_url'], str)):
+            arguments['image_url'] = self._sanitize_url(kwargs['image_url'])
+
+        if ('strength' in kwargs and
+           isinstance(kwargs['strength'], float)):
+            arguments['strength'] = kwargs['strength']
+
+        if ('image_size' in kwargs and
+           kwargs['image_size'] in FLUX1_FAL_TTI_ASPECT_RATIO_LIST):
+            arguments['image_size'] = kwargs['image_size']
+
+        if ('num_inference_steps' in kwargs and
+           isinstance(kwargs['num_inference_steps'], int)):
+            arguments['num_inference_steps'] = kwargs['num_inference_steps']
+
+        if 'seed' in kwargs and isinstance(kwargs['seed'], int):
+            arguments['seed'] = kwargs['seed']
+
+        if ('guidance_scale' in kwargs and
+           isinstance(kwargs['guidance_scale'], float)):
+            arguments['guidance_scale'] = kwargs['guidance_scale']
+
+        if 'sync_mode' in kwargs and isinstance(kwargs['sync_mode'], bool):
+            arguments['sync_mode'] = kwargs['sync_mode']
+
+        if 'num_images' in kwargs and isinstance(kwargs['num_images'], int):
+            arguments['num_images'] = kwargs['num_images']
+
+        if ('enable_safety_checker' in kwargs and
+           isinstance(kwargs['enable_safety_checker'], bool)):
+            arguments['enable_safety_checker'] = \
+                kwargs['enable_safety_checker']
+
+        parameters.update(arguments=arguments)
+
+        return parameters
 
 
 class OpenAIImageToImage(BaseModel):
@@ -71,7 +174,7 @@ class OpenAIImageToImage(BaseModel):
         Handle return value `answer` with care for different type
         in case of success and failure.
         '''
-        answer = 'Editted image not found. '
+        answer = 'Valid image not found. '
 
         try:
             client = OpenAI(api_key=self.api_key)
@@ -202,7 +305,7 @@ class StableDiffusionImageToImage(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure.
         '''
-        answer = 'Editted image not found. '
+        answer = 'Valid image not found. '
 
         try:
             response = self._execute_api_call(self.parameters['url'],
@@ -300,7 +403,7 @@ class StableDiffusionImageToImage(BaseModel):
                                         headers=self.parameters['headers'])
 
             if response.status_code == REQUEST_ACCEPTED:
-                time.sleep(WAIT_FOR_UPSCALE_CREATIVE_RESULT)
+                self._wait(WAIT_FOR_UPSCALE_CREATIVE_RESULT)
 
             else:
                 answer = response

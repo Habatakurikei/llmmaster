@@ -46,7 +46,7 @@ class OpenAISpeechToText(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure. Also differ from `response_format`.
         '''
-        answer = 'Text not generated.'
+        answer = 'Valid text not generated.'
 
         try:
             client = OpenAI(api_key=self.api_key)
@@ -159,7 +159,7 @@ class GoogleSpeechToText(BaseModel):
 
     def run(self):
 
-        message = 'Speech analysis not generated.'
+        message = 'Valid text not generated.'
 
         try:
             genai.configure(api_key=self.api_key)

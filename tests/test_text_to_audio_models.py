@@ -11,6 +11,7 @@ from requests.models import Response
 from llmmaster.config import OPENAI_TTS_VOICE_OPTIONS
 from llmmaster.text_to_audio_models import OpenAITextToSpeech
 from llmmaster.text_to_audio_models import ElevenLabsTextToSpeech
+from llmmaster.text_to_audio_models import ElevenLabsTextToSoundEffect
 from llmmaster.text_to_audio_models import VoicevoxTextToSpeech
 from llmmaster import LLMMaster
 
@@ -156,6 +157,44 @@ def test_elevenlabs_text_to_speech(run_api):
             filepath = os.path.join(TEST_OUTPUT_PATH, 'elevenlabs_tts.mp3')
             elevenlabs.save(master.results['elevenlabs_tts'], filepath)
             print(f'Saved as {filepath} for elevenlabs_tts')
+
+    print(f'Elapsed time: {master.elapsed_time} seconds')
+    master.dismiss()
+
+    assert judgment is True
+
+
+def test_elevenlabs_text_to_sound(run_api):
+    judgment = True
+    master = LLMMaster()
+
+    prompt = 'Drinking a bottle of coca-cola.'
+    test_case = master.pack_parameters(provider='elevenlabs_ttse', prompt=prompt)
+
+    master.set_api_keys(API_KEY)
+    master.summon({'elevenlabs_ttse': test_case})
+
+    print(f'elevenlabs_ttse = {master.instances["elevenlabs_ttse"]}, {master.instances["elevenlabs_ttse"].parameters}')
+    if not isinstance(master.instances["elevenlabs_ttse"], ElevenLabsTextToSoundEffect):
+        judgment = False
+
+    if run_api:
+        print('Run API')
+        try:
+            master.run()
+        except Exception as e:
+            pytest.fail(f"An error occurred during API calls: {str(e)}")
+
+        if not os.path.isdir(TEST_OUTPUT_PATH):
+            os.makedirs(TEST_OUTPUT_PATH)
+
+        print('Responses')
+        if not master.results['elevenlabs_ttse']:
+            judgment = False
+        else:
+            filepath = os.path.join(TEST_OUTPUT_PATH, 'elevenlabs_ttse.mp3')
+            elevenlabs.save(master.results['elevenlabs_ttse'], filepath)
+            print(f'Saved as {filepath} for elevenlabs_ttse')
 
     print(f'Elapsed time: {master.elapsed_time} seconds')
     master.dismiss()

@@ -1,26 +1,52 @@
 import os
 import time
 
-from .config import FULL_DEFAULT_MODELS
-from .config import PROVIDERS_NEED_DUMMY_PROMPT
-from .config import OPENAI_ITI_MODE_NEED_DUMMY_PROMPT
-from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
-from .config import SUMMON_LIMIT
-from .config import WAIT_FOR_STARTING
 from .config import ANTHROPIC_KEY_NAME
 from .config import CEREBRAS_KEY_NAME
 from .config import DALLE_KEY_NAME
 from .config import DUMMY_KEY_NAME
+from .config import ELEVENLABS_KEY_NAME
+from .config import FAL_KEY_NAME
+from .config import FULL_DEFAULT_MODELS
 from .config import GOOGLE_KEY_NAME
 from .config import GROQ_KEY_NAME
+from .config import LUMAAI_KEY_NAME
+from .config import MESHY_KEY_NAME
 from .config import MISTRAL_KEY_NAME
+from .config import OPENAI_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
-from .config import STABLE_DIFFUSION_KEY_NAME
-from .config import MESHY_KEY_NAME
-from .config import ELEVENLABS_KEY_NAME
 from .config import PIKAPIKAPIKA_KEY_NAME
-from .config import LUMAAI_KEY_NAME
+from .config import PROVIDERS_NEED_DUMMY_PROMPT
+from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
+from .config import STABLE_DIFFUSION_KEY_NAME
+from .config import SUMMON_LIMIT
+from .config import WAIT_FOR_STARTING
+from .audio_to_audio_models import ElevenLabsAudioIsolation
+from .audio_to_text_models import GoogleSpeechToText
+from .audio_to_text_models import OpenAISpeechToText
+from .image_to_image_models import Flux1FalImageToImage
+from .image_to_image_models import OpenAIImageToImage
+from .image_to_image_models import StableDiffusionImageToImage
+from .image_to_text_models import GoogleImageToText
+from .image_to_text_models import OpenAIImageToText
+from .image_to_video_models import StableDiffusionImageToVideo
+from .lumaai_models import LumaDreamMachineImageToVideo
+from .lumaai_models import LumaDreamMachineTextToVideo
+from .lumaai_models import LumaDreamMachineVideoToVideo
+from .meshy_models import MeshyImageTo3D
+from .meshy_models import MeshyTextTo3D
+from .meshy_models import MeshyTextTo3DRefine
+from .meshy_models import MeshyTextToTexture
+from .meshy_models import MeshyTextToVoxel
+from .pikapikapika_models import PikaPikaPikaGeneration
+from .text_to_audio_models import ElevenLabsTextToSoundEffect
+from .text_to_audio_models import ElevenLabsTextToSpeech
+from .text_to_audio_models import OpenAITextToSpeech
+from .text_to_audio_models import VoicevoxTextToSpeech
+from .text_to_image_models import Flux1FalTextToImage
+from .text_to_image_models import OpenAITextToImage
+from .text_to_image_models import StableDiffusionTextToImage
 from .text_to_text_models import AnthropicLLM
 from .text_to_text_models import CerebrasLLM
 from .text_to_text_models import GoogleLLM
@@ -28,28 +54,7 @@ from .text_to_text_models import GroqLLM
 from .text_to_text_models import MistralLLM
 from .text_to_text_models import OpenAILLM
 from .text_to_text_models import PerplexityLLM
-from .text_to_image_models import OpenAITextToImage
-from .text_to_image_models import StableDiffusionTextToImage
-from .text_to_audio_models import ElevenLabsTextToSpeech
-from .text_to_audio_models import OpenAITextToSpeech
-from .text_to_audio_models import VoicevoxTextToSpeech
-from .image_to_text_models import OpenAIImageToText
-from .image_to_text_models import GoogleImageToText
-from .image_to_image_models import OpenAIImageToImage
-from .image_to_image_models import StableDiffusionImageToImage
-from .image_to_video_models import StableDiffusionImageToVideo
-from .audio_to_text_models import GoogleSpeechToText
-from .audio_to_text_models import OpenAISpeechToText
 from .video_to_text_models import GoogleVideoToText
-from .meshy_models import MeshyTextToTexture
-from .meshy_models import MeshyTextTo3D
-from .meshy_models import MeshyTextTo3DRefine
-from .meshy_models import MeshyTextToVoxel
-from .meshy_models import MeshyImageTo3D
-from .pikapikapika_models import PikaPikaPikaGeneration
-from .lumaai_models import LumaDreamMachineTextToVideo
-from .lumaai_models import LumaDreamMachineImageToVideo
-from .lumaai_models import LumaDreamMachineVideoToVideo
 
 
 ACTIVE_MODELS = {
@@ -71,8 +76,16 @@ ACTIVE_MODELS = {
                    'key': DALLE_KEY_NAME},
     'stable_diffusion_tti': {'model': StableDiffusionTextToImage,
                              'key': STABLE_DIFFUSION_KEY_NAME},
+    'flux1_fal_tti': {'model': Flux1FalTextToImage,
+                      'key': FAL_KEY_NAME},
+    'flux1_fal_iti': {'model': Flux1FalImageToImage,
+                      'key': FAL_KEY_NAME},
     'elevenlabs_tts': {'model': ElevenLabsTextToSpeech,
                        'key': ELEVENLABS_KEY_NAME},
+    'elevenlabs_ttse': {'model': ElevenLabsTextToSoundEffect,
+                        'key': ELEVENLABS_KEY_NAME},
+    'elevenlabs_aiso': {'model': ElevenLabsAudioIsolation,
+                        'key': ELEVENLABS_KEY_NAME},
     'openai_tts': {'model': OpenAITextToSpeech,
                    'key': OPENAI_KEY_NAME},
     'voicevox_tts': {'model': VoicevoxTextToSpeech,
@@ -357,6 +370,8 @@ class LLMInstanceCreator():
           - provider = meshy_tt3d_refine
         - MeshyImageTo3D
           - provider = meshy_it3d
+        - ElevenLabsAudioIsolation
+          - provider = elevenlabs_aiso
         '''
         answer = False
 

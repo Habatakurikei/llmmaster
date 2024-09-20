@@ -1,10 +1,8 @@
-import time
-
 import google.generativeai as genai
 
 from .base_model import BaseModel
-from .config import WAIT_FOR_GOOGLE_VTT_UPLOAD
 from .config import WAIT_FOR_GOOGLE_VTT_TIMEOUT
+from .config import WAIT_FOR_GOOGLE_VTT_UPLOAD
 
 
 class GoogleVideoToText(BaseModel):
@@ -66,7 +64,7 @@ class GoogleVideoToText(BaseModel):
         video_file = genai.upload_file(path=self.parameters['video_file'])
 
         while video_file.state.name == 'PROCESSING':
-            time.sleep(WAIT_FOR_GOOGLE_VTT_UPLOAD)
+            self._wait(WAIT_FOR_GOOGLE_VTT_UPLOAD)
             video_file = genai.get_file(video_file.name)
 
         if video_file.state.name == 'FAILED':

@@ -2,12 +2,12 @@ import google.generativeai as genai
 from anthropic import Anthropic
 from cerebras.cloud.sdk import Cerebras
 from groq import Groq
-from openai import OpenAI
 from mistralai import Mistral
+from openai import OpenAI
 
 from .base_model import BaseModel
-from .config import PERPLEXITY_TTT_EP
 from .config import DEFAULT_TOKENS
+from .config import PERPLEXITY_TTT_EP
 from .config import TEMPERATURE
 from .config import TOP_P
 from .config import TOP_K
@@ -33,7 +33,7 @@ class AnthropicLLM(BaseModel):
 
     def run(self):
 
-        message = 'No response.'
+        message = 'No response. '
 
         try:
             client = Anthropic(api_key=self.api_key)
@@ -77,7 +77,7 @@ class CerebrasLLM(BaseModel):
 
     def run(self):
 
-        message = 'No response.'
+        message = 'No response. '
 
         try:
             client = Cerebras(api_key=self.api_key)
@@ -126,7 +126,7 @@ class GroqLLM(BaseModel):
 
     def run(self):
 
-        message = 'No response.'
+        message = 'No response. '
 
         try:
             client = Groq(api_key=self.api_key)
@@ -171,7 +171,7 @@ class GoogleLLM(BaseModel):
 
     def run(self):
 
-        message = 'No response.'
+        message = 'No response. '
 
         try:
             genai.configure(api_key=self.api_key)
@@ -217,7 +217,8 @@ class MistralLLM(BaseModel):
             raise Exception(msg) from e
 
     def run(self):
-        message = 'No response.'
+
+        message = 'No response. '
 
         try:
             client = Mistral(api_key=self.api_key)
@@ -261,7 +262,7 @@ class OpenAILLM(BaseModel):
 
     def run(self):
 
-        message = 'No response.'
+        message = 'No response. '
 
         try:
             client = OpenAI(api_key=self.api_key)
@@ -306,7 +307,7 @@ class PerplexityLLM(BaseModel):
 
     def run(self):
 
-        message = 'No response.'
+        message = 'No response. '
 
         try:
             client = OpenAI(api_key=self.api_key, base_url=PERPLEXITY_TTT_EP)

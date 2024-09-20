@@ -1,10 +1,8 @@
 import os
-import time
 
 import requests
 
 from .base_model import BaseModel
-
 from .config import MAX_SEED
 from .config import REQUEST_ACCEPTED
 from .config import STABLE_DIFFUSION_BASE_EP
@@ -156,7 +154,7 @@ class StableDiffusionImageToVideo(BaseModel):
                                         headers=headers_result)
 
             if response.status_code == REQUEST_ACCEPTED:
-                time.sleep(WAIT_FOR_ITV_RESULT)
+                self._wait(WAIT_FOR_ITV_RESULT)
 
             else:
                 answer = response
