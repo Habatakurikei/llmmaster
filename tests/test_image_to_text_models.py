@@ -1,24 +1,25 @@
 import os
 import sys
+from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
+from conftest import run_llmmaster
+from conftest import verify_instance
+from llmmaster import LLMMaster
 from llmmaster.image_to_text_models import GoogleImageToText
 from llmmaster.image_to_text_models import OpenAIImageToText
-from llmmaster import LLMMaster
 
 
-API_KEY = '''
-'''
+# API_KEY = Path('api_key_pairs.txt').read_text(encoding='utf-8')
+API_KEY = ''
 
-
-INSTANCE_CLASSES = {
-    'google': GoogleImageToText,
-    'openai': OpenAIImageToText,
-}
+IMAGE_URL_1 = 'https://assets.st-note.com/production/uploads/images/152744645/rectangle_large_type_2_8bd3dd8828595922135ec877661d9cbe.png'
+IMAGE_URL_2 = 'https://assets.st-note.com/production/uploads/images/152744949/rectangle_large_type_2_7a85229175b92366e4059afe7927d811.png'
+IMAGE_URL_3 = 'https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png'
 
 
 @pytest.fixture
@@ -26,28 +27,29 @@ def run_api(request):
     return request.config.getoption("--run-api")
 
 
-def test_openai_image_to_text_instances(run_api):
+def test_openai_image_to_text(run_api):
     judgment = True
     master = LLMMaster()
 
+    key = 'openai_itt'
+    model = 'gpt-4o-mini'
     test_cases = [
         {
-            'name': 'openai_case_1',
+            'name': f'{key}_1',
             'params': {
-                'provider': 'openai_itt',
-                'model': 'gpt-4o-mini',
+                'provider': key,
+                'model': model,
                 'prompt': 'Describe this image.',
-                'image_url': ['https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png']
+                'image_url': [IMAGE_URL_3]
             }
         },
         {
-            'name': 'openai_case_2',
+            'name': f'{key}_2',
             'params': {
-                'provider': 'openai_itt',
-                'model': 'gpt-4o-mini',
+                'provider': key,
+                'model': model,
                 'prompt': 'What are different between these two images?',
-                'image_url': ['https://assets.st-note.com/production/uploads/images/152744645/rectangle_large_type_2_8bd3dd8828595922135ec877661d9cbe.png',
-                              'https://assets.st-note.com/production/uploads/images/152744949/rectangle_large_type_2_7a85229175b92366e4059afe7927d811.png']
+                'image_url': [IMAGE_URL_1, IMAGE_URL_2]
             }
         }
     ]
@@ -57,54 +59,42 @@ def test_openai_image_to_text_instances(run_api):
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 
     for name, instance in master.instances.items():
-        print(f'{name} = {instance}, {instance.parameters}')
-        if not isinstance(instance, OpenAIImageToText):
-            judgment = False
-        if 'image_url' not in instance.parameters or not instance.parameters['image_url']:
-            judgment = False
+        judgment = verify_instance(instance, OpenAIImageToText)
+        if judgment is False:
+            pytest.fail(f'{name} is not an expected instance.')
 
     if run_api:
-        # add --run-api option for making actual API calls test, paying API credit
-        print('Run API')
         try:
-            master.run()
+            run_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        print('Responses')
-        for name, response in master.results.items():
-            print(f'{name} = {response}')
-            if not response:
-                judgment = False
-
-    print(f'Elapsed time: {master.elapsed_time} seconds')
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment
 
 
-def test_google_image_to_text_instances(run_api):
+def test_google_image_to_text(run_api):
     judgment = True
     master = LLMMaster()
 
+    key = 'google_itt'
+    model = 'gemini-1.5-flash'
     test_cases = [
         {
-            'name': 'google_case_1',
+            'name': f'{key}_1',
             'params': {
-                'provider': 'google_itt',
-                'model': 'gemini-1.5-flash',
+                'provider': key,
+                'model': model,
                 'prompt': 'Describe this image.',
-                'image_url': ['test-inputs/def_dragon_girl_2.png']
+                'image_url': ['test-inputs/dragon_girl_1.png']
             }
         },
         {
-            'name': 'google_case_2',
+            'name': f'{key}_2',
             'params': {
-                'provider': 'google_itt',
+                'provider': key,
                 'model': 'gemini-1.5-flash',
                 'prompt': 'What are different between these two images?',
-                'image_url': ['https://assets.st-note.com/production/uploads/images/152744645/rectangle_large_type_2_8bd3dd8828595922135ec877661d9cbe.png',
-                              'https://assets.st-note.com/production/uploads/images/152744949/rectangle_large_type_2_7a85229175b92366e4059afe7927d811.png']
+                'image_url': [IMAGE_URL_1, IMAGE_URL_2]
             }
         }
     ]
@@ -114,26 +104,14 @@ def test_google_image_to_text_instances(run_api):
         master.summon({case['name']: master.pack_parameters(**case['params'])})
 
     for name, instance in master.instances.items():
-        print(f'{name} = {instance}, {instance.parameters}')
-        if not isinstance(instance, GoogleImageToText):
-            judgment = False
-        if 'image_url' not in instance.parameters or not instance.parameters['image_url']:
-            judgment = False
+        judgment = verify_instance(instance, GoogleImageToText)
+        if judgment is False:
+            pytest.fail(f'{name} is not an expected instance.')
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            run_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        print('Responses')
-        for name, response in master.results.items():
-            print(f'{name} = {response}')
-            if not response:
-                judgment = False
-
-    print(f'Elapsed time: {master.elapsed_time} seconds')
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment

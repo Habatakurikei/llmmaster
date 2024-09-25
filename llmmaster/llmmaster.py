@@ -21,6 +21,7 @@ from .config import PROVIDERS_NEED_DUMMY_PROMPT
 from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import SUMMON_LIMIT
+from .config import TRIPO_KEY_NAME
 from .config import WAIT_FOR_STARTING
 from .audio_to_audio_models import ElevenLabsAudioIsolation
 from .audio_to_text_models import GoogleSpeechToText
@@ -54,6 +55,15 @@ from .text_to_text_models import GroqLLM
 from .text_to_text_models import MistralLLM
 from .text_to_text_models import OpenAILLM
 from .text_to_text_models import PerplexityLLM
+from .tripo_models import TripoTextTo3D
+from .tripo_models import TripoImageTo3D
+from .tripo_models import TripoMultiviewTo3D
+from .tripo_models import TripoRefineModel
+from .tripo_models import TripoAnimationPreRigCheck
+from .tripo_models import TripoAnimationRig
+from .tripo_models import TripoAnimationRetarget
+from .tripo_models import TripoStylization
+from .tripo_models import TripoConversion
 from .video_to_text_models import GoogleVideoToText
 
 
@@ -118,6 +128,24 @@ ACTIVE_MODELS = {
                    'key': MESHY_KEY_NAME},
     'pikapikapika_ttv': {'model': PikaPikaPikaGeneration,
                          'key': PIKAPIKAPIKA_KEY_NAME},
+    'tripo_tt3d': {'model': TripoTextTo3D,
+                   'key': TRIPO_KEY_NAME},
+    'tripo_it3d': {'model': TripoImageTo3D,
+                   'key': TRIPO_KEY_NAME},
+    'tripo_mv3d': {'model': TripoMultiviewTo3D,
+                   'key': TRIPO_KEY_NAME},
+    'tripo_refine': {'model': TripoRefineModel,
+                     'key': TRIPO_KEY_NAME},
+    'tripo_aprc': {'model': TripoAnimationPreRigCheck,
+                   'key': TRIPO_KEY_NAME},
+    'tripo_arig': {'model': TripoAnimationRig,
+                   'key': TRIPO_KEY_NAME},
+    'tripo_aretarget': {'model': TripoAnimationRetarget,
+                        'key': TRIPO_KEY_NAME},
+    'tripo_stylize': {'model': TripoStylization,
+                      'key': TRIPO_KEY_NAME},
+    'tripo_conversion': {'model': TripoConversion,
+                         'key': TRIPO_KEY_NAME},
     'lumaai_ttv': {'model': LumaDreamMachineTextToVideo,
                    'key': LUMAAI_KEY_NAME},
     'lumaai_itv': {'model': LumaDreamMachineImageToVideo,

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="llmmaster",
-    version="0.5.1",
+    version="0.6.0",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A unified interface for interacting with multiple LLMs and generative AIs.",
@@ -23,12 +23,11 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     install_requires=[
         "anthropic>=0.34.1",
         "google-generativeai>=0.7.2",

@@ -1,30 +1,31 @@
 import requests
 
 from .base_model import BaseModel
+from .config import PIKAPIKAPIKA_ASPECT_RATIO_LIST
 from .config import PIKAPIKAPIKA_BASE_EP
 from .config import PIKAPIKAPIKA_GENERATION_EP
+from .config import PIKAPIKAPIKA_MAX_FPS
+from .config import PIKAPIKAPIKA_RESULT_EP
+from .config import PIKAPIKAPIKA_STYLE_LIST
+from .config import REQUEST_OK
+from .config import WAIT_FOR_PIKAPIKAPIKA_RESULT
 # from .config import PIKAPIKAPIKA_LIPSYNC_EP
 # from .config import PIKAPIKAPIKA_ADJUST_EP
 # from .config import PIKAPIKAPIKA_EXTEND_EP
 # from .config import PIKAPIKAPIKA_UPSCALE_EP
-from .config import PIKAPIKAPIKA_RESULT_EP
-from .config import PIKAPIKAPIKA_ASPECT_RATIO_LIST
-from .config import PIKAPIKAPIKA_MAX_FPS
-from .config import PIKAPIKAPIKA_STYLE_LIST
-from .config import WAIT_FOR_PIKAPIKAPIKA_RESULT
-from .config import REQUEST_OK
 
 
 class PikaPikaPikaModelBase(BaseModel):
     '''
     Base model for PikaPikaPika.art API wrapper.
     PikaPikaPika.art provides:
-      1. Text-To-Video model (ttv)
+      1. Text-To-Video model (pikapikapika_ttv)
+    2024-09-20: stop development for the following models
       2. LipSync model (lipsync)
       3. Adjust model (adjust)
       4. Extend model (extend)
       5. Upscale model (upscale)
-    Commonize init and run for these models.
+    Commonize init and run for each model.
     Separately define _verify_arguments() due to different parameters.
     '''
     def __init__(self, **kwargs):
@@ -39,7 +40,7 @@ class PikaPikaPikaModelBase(BaseModel):
     def run(self):
         '''
         Note:
-        Return raw response of request.
+        Return json response of request.
         But when failed to generate, return value is given in str.
         Handle return value `answer` with care for different type
         in case of success and failure.
@@ -50,12 +51,11 @@ class PikaPikaPikaModelBase(BaseModel):
             response = requests.post(self.parameters['url'],
                                      headers=self.parameters['headers'],
                                      json=self.parameters['data'])
-
             json = response.json()
             response = self._fetch_result(id=json['job']['id'])
 
             if response.status_code == REQUEST_OK:
-                answer = response
+                answer = response.json()
             else:
                 answer += str(response.json())
 
@@ -69,14 +69,12 @@ class PikaPikaPikaModelBase(BaseModel):
         Common function to fetch result.
         '''
         answer = 'Generated result not found.'
-
         header = {'Authorization': f'Bearer {self.api_key}'}
-
-        ep = PIKAPIKAPIKA_BASE_EP + PIKAPIKAPIKA_RESULT_EP.format(id=id)
+        url = PIKAPIKAPIKA_BASE_EP + PIKAPIKAPIKA_RESULT_EP.format(id=id)
 
         flg = True
         while flg:
-            response = requests.request(method='GET', url=ep, headers=header)
+            response = requests.request(method='GET', url=url, headers=header)
             json = response.json()
             if json['job']['status'] != 'finished':
                 self._wait(WAIT_FOR_PIKAPIKAPIKA_RESULT)
@@ -94,13 +92,13 @@ class PikaPikaPikaGeneration(PikaPikaPikaModelBase):
     '''
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-        style: str
-        sfx: bool
-        frameRate: int
-        aspectRatio: str
-        camera: dict
-        parameters: dict
+        Expected parameters:
+          - style: str
+          - sfx: bool
+          - frameRate: int
+          - aspectRatio: str
+          - camera: dict
+          - parameters: dict
         '''
         parameters = kwargs
 

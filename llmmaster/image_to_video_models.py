@@ -5,16 +5,16 @@ import requests
 from .base_model import BaseModel
 from .config import MAX_SEED
 from .config import REQUEST_ACCEPTED
+from .config import REQUEST_OK
 from .config import STABLE_DIFFUSION_BASE_EP
 from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_DEFAULT
-from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_MIN
 from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_MAX
+from .config import STABLE_DIFFUSION_ITV_CFG_SCALE_MIN
 from .config import STABLE_DIFFUSION_ITV_MOTION_BUCKET_DEFAULT
-from .config import STABLE_DIFFUSION_ITV_MOTION_BUCKET_MIN
 from .config import STABLE_DIFFUSION_ITV_MOTION_BUCKET_MAX
+from .config import STABLE_DIFFUSION_ITV_MOTION_BUCKET_MIN
 from .config import STABLE_DIFFUSION_ITV_RESULT_EP
 from .config import STABLE_DIFFUSION_ITV_START_EP
-from .config import REQUEST_OK
 from .config import WAIT_FOR_ITV_RESULT
 
 
@@ -40,7 +40,6 @@ class StableDiffusionImageToVideo(BaseModel):
         '''
         Note:
         Stable Diffusion returns binary data of generated video in mp4 format.
-        LLMMaster returns requests.models.Response class directly.
         But when failed to generate, return value is given in str.
         Handle return value `answer` with care for different type
         in case of success and failure.
@@ -52,7 +51,6 @@ class StableDiffusionImageToVideo(BaseModel):
                                      headers=self.parameters['headers'],
                                      files=self.parameters['files'],
                                      data=self.parameters['data'])
-
             response = self._fetch_result(response.json().get('id'))
 
             if response.status_code == REQUEST_OK:
@@ -67,34 +65,27 @@ class StableDiffusionImageToVideo(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-          - cfg_scale (required): int,
-          - motion_bucket_id (required): int,
+        Expected parameters:
+          - cfg_scale (required): int
+          - motion_bucket_id (required): int
           - seed: int
         '''
         parameters = kwargs
 
-        endpoint = (STABLE_DIFFUSION_BASE_EP + '/' + kwargs['model'] +
-                    STABLE_DIFFUSION_ITV_START_EP)
-
-        parameters.update(url=endpoint)
-
-        endpoint = (STABLE_DIFFUSION_BASE_EP + '/' + kwargs['model'] +
-                    STABLE_DIFFUSION_ITV_RESULT_EP)
-
-        parameters.update(url_result=endpoint)
+        url_base = STABLE_DIFFUSION_BASE_EP + '/' + kwargs['model']
+        parameters.update(url=url_base + STABLE_DIFFUSION_ITV_START_EP)
+        parameters.update(url_result=url_base + STABLE_DIFFUSION_ITV_RESULT_EP)
 
         # headers
         headers = {'authorization': f'Bearer {self.api_key}'}
-
         parameters.update(headers=headers)
 
         # files
         if not os.path.isfile(kwargs['image']):
-            msg = f"'image' {kwargs['image']} is not a valid file"
+            msg = f"image is not a valid file: {kwargs['image']}"
             raise ValueError(msg)
         else:
-            with open(kwargs['image'], "rb") as f:
+            with open(kwargs['image'], 'rb') as f:
                 parameters.update(files={'image': f.read()})
 
         # body data
@@ -104,7 +95,7 @@ class StableDiffusionImageToVideo(BaseModel):
             data.update(cfg_scale=STABLE_DIFFUSION_ITV_CFG_SCALE_DEFAULT)
         else:
             cfg_scale = kwargs['cfg_scale']
-            if (isinstance(cfg_scale, int) and
+            if (isinstance(cfg_scale, float) and
                STABLE_DIFFUSION_ITV_CFG_SCALE_MIN <= cfg_scale and
                cfg_scale <= STABLE_DIFFUSION_ITV_CFG_SCALE_MAX):
                 data.update(cfg_scale=cfg_scale)
@@ -140,24 +131,18 @@ class StableDiffusionImageToVideo(BaseModel):
         Fetch result for image-to-video conversion
         '''
         answer = 'Generated file not found.'
-
-        ep = self.parameters['url_result'].replace('{id}', id)
-
-        headers_result = self.parameters['headers']
-        headers_result.update(accept='video/*')
+        url = self.parameters['url_result'].format(id=id)
+        headers = self.parameters['headers']
+        headers.update(accept='video/*')
 
         flg = True
-
         while flg:
             response = requests.request(method='GET',
-                                        url=ep,
-                                        headers=headers_result)
-
+                                        url=url,
+                                        headers=headers)
             if response.status_code == REQUEST_ACCEPTED:
                 self._wait(WAIT_FOR_ITV_RESULT)
-
             else:
                 answer = response
                 flg = False
-
         return answer

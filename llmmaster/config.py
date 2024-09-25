@@ -58,6 +58,16 @@ DEFAULT_MESHY_MODELS = {'meshy_tttx': 'dummy',
                         'meshy_ttvx': 'dummy',
                         'meshy_it3d': 'dummy'}
 
+DEFAULT_TRIPO_MODELS = {'tripo_tt3d': 'default',
+                        'tripo_it3d': 'default',
+                        'tripo_mv3d': 'default',
+                        'tripo_refine': 'default',
+                        'tripo_aprc': 'default',
+                        'tripo_arig': 'default',
+                        'tripo_aretarget': 'default',
+                        'tripo_stylize': 'default',
+                        'tripo_conversion': 'default'}
+
 DEFAULT_PIKAPIKAPIKA_MODELS = {'pikapikapika_ttv': 'dummy'}
 
 DEFAULT_LUMAAI_MODELS = {'lumaai_ttv': 'dummy',
@@ -77,6 +87,7 @@ def _full_default_list():
     full_list.update(DEFAULT_ATA_MODELS)
     full_list.update(DEFAULT_VTT_MODELS)
     full_list.update(DEFAULT_MESHY_MODELS)
+    full_list.update(DEFAULT_TRIPO_MODELS)
     full_list.update(DEFAULT_PIKAPIKAPIKA_MODELS)
     full_list.update(DEFAULT_LUMAAI_MODELS)
     return full_list
@@ -130,9 +141,9 @@ MESHY_TTVX_START_EP = '/v1/text-to-voxel'
 MESHY_IT3D_START_EP = '/v1/image-to-3d'
 
 TRIPO_BASE_EP = 'https://api.tripo3d.ai/v2/openapi'
-TRIPO_RESULT_EP = 'wss://api.tripo3d.ai/v2/openapi/task/watch/{tid}'
-TRIPO_UPLOAD_EP = '/upload'
+TRIPO_RESULT_EP = 'https://api.tripo3d.ai/v2/openapi/task/{task_id}'
 TRIPO_TASK_EP = '/task'
+TRIPO_UPLOAD_EP = '/upload'
 TRIPO_WALLET_EP = '/user/balance'
 
 PIKAPIKAPIKA_BASE_EP = 'https://api.pikapikapika.io/web'
@@ -150,7 +161,10 @@ WAIT_FOR_STARTING = 1.0
 # Dummy prompt settings
 PROVIDERS_NEED_DUMMY_PROMPT = ['openai_stt', 'stable_diffusion_itv',
                                'elevenlabs_aiso',
-                               'meshy_tttx', 'meshy_tt3d_refine', 'meshy_it3d']
+                               'meshy_tttx', 'meshy_tt3d_refine', 'meshy_it3d',
+                               'tripo_it3d', 'tripo_mv3d', 'tripo_refine',
+                               'tripo_aprc', 'tripo_arig', 'tripo_aretarget',
+                               'tripo_stylize', 'tripo_conversion']
 OPENAI_ITI_MODE_NEED_DUMMY_PROMPT = ['variations']
 SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
 
@@ -161,7 +175,7 @@ SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
 DEFAULT_TOKENS = 4096
 TEMPERATURE = 0.7
 TOP_P = 0.9
-TOP_K = 50
+TOP_K = 30
 
 ANTHROPIC_MODELS = ['claude-3-haiku-20240307',
                     'claude-3-sonnet-20240229',
@@ -172,8 +186,8 @@ CEREBRAS_MODELS = ['llama3.1-8b', 'llama3.1-70b']
 
 GOOGLE_MODELS = ['gemini-1.5-flash',
                  'gemini-1.5-pro',
-                 'gemini-1.5-flash-exp-0827',
-                 'gemini-1.5-pro-exp-0827']
+                 'gemini-1.5-flash-002',
+                 'gemini-1.5-pro-002']
 
 GROQ_MODELS = ['gemma-7b-it', 'gemma2-9b-it',
                'llama-3.1-70b-versatile', 'llama-3.1-8b-instant',
@@ -184,7 +198,8 @@ MISTRAL_MODELS = ['mistral-small-latest', 'mistral-medium-latest',
                   'mistral-large-latest', 'open-mistral-nemo',
                   'codestral-latest', 'mistral-embed']
 
-OPENAI_MODELS = ['gpt-4o-mini', 'gpt-4o', 'gpt-4o-2024-08-06']
+OPENAI_MODELS = ['gpt-4o-mini', 'gpt-4o', 'gpt-4o-2024-08-06',
+                 'o1-preview', 'o1-mini']
 
 PERPLEXITY_MODELS = ['llama-3.1-sonar-small-128k-online',
                      'llama-3.1-sonar-large-128k-online',
@@ -303,11 +318,13 @@ OPENAI_STT_DEFAULT_TIMESTAMP_GRANULARITIES = ['word', 'segment']
 ELEVENLABS_STS_MODELS = ['eleven_multilingual_sts_v2', 'eleven_english_sts_v2']
 
 # Video-To-Text settings
+GOOGLE_VTT_FAILED = 'FAILED'
+GOOGLE_VTT_IN_PROGRESS = 'PROCESSING'
 WAIT_FOR_GOOGLE_VTT_UPLOAD = 5.0
 WAIT_FOR_GOOGLE_VTT_TIMEOUT = 600.0
 
 # Meshy specific settings
-MESHY_TT3D_MODELS = ['meshy-3', 'meshy-3-turbo']
+MESHY_TT3D_MODELS = ['meshy-3', 'meshy-3-turbo', 'meshy-4']
 MESHY_TT3D_STYLES_LIST = ['realistic', 'cartoon', 'low-poly',
                           'sculpture', 'pbr']
 
@@ -320,18 +337,36 @@ MESHY_VOXEL_SHRINK_LIST = [8, 4, 2, 1]
 
 MESHY_TT3D_TEXTURE_RICHNESS_LIST = ['high', 'medium', 'low', 'none']
 
-MESHY_STATUS_EXPIRED = 'EXPIRED'
-MESHY_STATUS_FAILED = 'FAILED'
-MESHY_STATUS_IN_PROGRESS = 'IN_PROGRESS'
-MESHY_STATUS_PENDING = 'PENDING'
-MESHY_STATUS_SUCCEEDED = 'SUCCEEDED'
+MESHY_MODE_PREVIEW = 'preview'
+MESHY_MODE_REFINE = 'refine'
+
 MESHY_STATUS_FOR_RESULT = ['SUCCEEDED', 'FAILED', 'EXPIRED']
+MESHY_STATUS_IN_PROGRESS = ['IN_PROGRESS', 'PENDING']
 
 WAIT_FOR_MESHY_RESULT = 5.0
 
 # Tripo specific settings
 TRIPO_MODELS = ['default', 'v2.0-20240919', 'v1.4-20240625', 'v1.3-20240522']
 TRIPO_STATUS_IN_PROGRESS = ['running', 'queued']
+
+TRIPO_MODE_TT3D = 'text_to_model'
+TRIPO_MODE_IT3D = 'image_to_model'
+TRIPO_MODE_MV3D = 'multiview_to_model'
+TRIPO_MODE_REFINE = 'refine_model'
+TRIPO_MODE_APRC = 'animate_prerigcheck'
+TRIPO_MODE_ARIG = 'animate_rig'
+TRIPO_MODE_ARETARGET = 'animate_retarget'
+TRIPO_MODE_STYLIZE = 'stylize_model'
+TRIPO_MODE_CONVERSION = 'convert_model'
+
+TRIPO_MULTIVIEW_MODES = ['LEFT', 'RIGHT']
+TRIPO_ANIMATION_OUT_FORMAT = ['glb', 'fbx']
+TRIPO_ANIMATION_MODE = ['preset:walk', 'preset:run', 'preset:dive']
+TRIPO_STYLIZATION_STYLE = ['lego', 'voxel', 'voronoi', 'minecraft']
+TRIPO_CONVERSION_FORMAT = ['GLTF', 'USDZ', 'FBX', 'OBJ', 'STL']
+TRIPO_CONVERSION_TEXTURE = ['JPEG', 'BMP', 'DPX', 'HDR', 'OPEN_EXR',
+                            'PNG', 'TARGA', 'TIFF', 'WEBP']
+
 WAIT_FOR_TRIPO_RESULT = 5.0
 
 # PikaPikaPika.art specific settings

@@ -1,23 +1,22 @@
 import os
 import sys
-import json
+from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
+from conftest import execute_llmmaster
+from conftest import verify_instance
 from llmmaster.lumaai_models import LumaDreamMachineTextToVideo
 from llmmaster.lumaai_models import LumaDreamMachineImageToVideo
 from llmmaster.lumaai_models import LumaDreamMachineVideoToVideo
 from llmmaster import LLMMaster
 
 
-API_KEY = '''
-'''
-
-
-TEST_OUTPUT_PATH = 'test-outputs'
+# API_KEY = Path('api_key_pairs.txt').read_text(encoding='utf-8')
+API_KEY = ''
 
 
 @pytest.fixture
@@ -25,139 +24,85 @@ def run_api(request):
     return request.config.getoption("--run-api")
 
 
-def test_luma_text_to_video_instances(run_api):
+def test_luma_text_to_video(run_api):
     judgment = True
     master = LLMMaster()
 
-    prompt = 'A serene Japanese garden with a koi pond, cherry blossoms, and a traditional wooden bridge.'
-    params = master.pack_parameters(provider='lumaai_ttv',
+    key = 'lumaai_ttv'
+    prompt = 'A teenager beast master, in a robe and crown hat, '
+    prompt += 'smiling, swinging his wand, 3 cute monsters around, '
+    prompt += 'dancing, rainbow background, japanese cartoon style'
+    params = master.pack_parameters(provider=key,
                                     prompt=prompt,
-                                    aspect_ratio='4:3',
+                                    aspect_ratio='16:9',
                                     loop=True)
     master.set_api_keys(API_KEY)
-    master.summon({'luma_ttv': params})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['luma_ttv'].parameters}")
-    print(f"API Key = {master.instances['luma_ttv'].api_key}")
-
-    if not isinstance(master.instances['luma_ttv'], LumaDreamMachineTextToVideo):
-        judgment = False
+    judgment = verify_instance(master.instances[key],
+                               LumaDreamMachineTextToVideo)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        if not os.path.isdir(TEST_OUTPUT_PATH):
-            os.makedirs(TEST_OUTPUT_PATH)
-
-        print('Responses')
-        if isinstance(master.results['luma_ttv'], str):
-            pytest.fail(f"Failed to generate: {master.results['luma_ttv']}")
-        else:
-            print(f"Result = {json.dumps(master.results, indent=2)}")
-            filepath = os.path.join(TEST_OUTPUT_PATH, 'lumaai_ttv.json')
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(master.results, f, indent=2, ensure_ascii=False)
-            print(f'Saved as {filepath}')
-
-    print(f"Elapsed time in total (sec): {master.elapsed_time}")
-    master.dismiss()
+            pytest.fail(f"Test failed with error: {str(e)}")
 
     assert judgment
 
 
-def test_luma_image_to_video_instances(run_api):
+def test_luma_image_to_video(run_api):
     judgment = True
     master = LLMMaster()
 
-    prompt = 'The merlion spouts water to the sky.'
-    image_path = 'https://habatakurikei.com/wp-content/uploads/2018/06/cover-singapore-opt.jpg'
+    key = 'lumaai_itv'
+    prompt = 'The girl in the picture makes smile with her eyes closed.'
+    image_path = 'https://monju.ai/app/static/monju-logo.jpg'
 
-    params = master.pack_parameters(provider='lumaai_itv',
+    params = master.pack_parameters(provider=key,
                                     prompt=prompt,
                                     frame0=image_path)
     master.set_api_keys(API_KEY)
-    master.summon({'luma_itv': params})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['luma_itv'].parameters}")
-    print(f"API Key = {master.instances['luma_itv'].api_key}")
-
-    if not isinstance(master.instances['luma_itv'], LumaDreamMachineImageToVideo):
-        judgment = False
+    judgment = verify_instance(master.instances[key],
+                               LumaDreamMachineImageToVideo)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        if not os.path.isdir(TEST_OUTPUT_PATH):
-            os.makedirs(TEST_OUTPUT_PATH)
-
-        print('Responses')
-        if isinstance(master.results['luma_itv'], str):
-            pytest.fail(f"Failed to generate: {master.results['luma_itv']}")
-        else:
-            print(f"Result = {json.dumps(master.results, indent=2)}")
-            filepath = os.path.join(TEST_OUTPUT_PATH, 'lumaai_itv.json')
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(master.results, f, indent=2, ensure_ascii=False)
-            print(f'Saved as {filepath}')
-
-    print(f"Elapsed time in total (sec): {master.elapsed_time}")
-    master.dismiss()
+            pytest.fail(f"Test failed with error: {str(e)}")
 
     assert judgment
 
 
-def test_luma_video_to_video_instances(run_api):
+def test_luma_video_to_video(run_api):
     judgment = True
     master = LLMMaster()
 
-    prompt = 'The Kung Fu boy is playing with other characters. Japanese anime style, suitable for children.'
-    keyframes={
+    key = 'lumaai_vtv'
+    prompt = 'The Kung Fu boy is playing with other characters. '
+    prompt += 'Japanese anime style, suitable for children.'
+    keyframes = {
       "frame0": {
         "type": "generation",
         "id": "91cc1505-e362-4d17-8122-4e3e58ff85dc"
       }
     }
-    params = master.pack_parameters(provider='lumaai_vtv',
+    params = master.pack_parameters(provider=key,
                                     prompt=prompt,
                                     keyframes=keyframes)
     master.set_api_keys(API_KEY)
-    master.summon({'luma_vtv': params})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['luma_vtv'].parameters}")
-    print(f"API Key = {master.instances['luma_vtv'].api_key}")
-
-    if not isinstance(master.instances['luma_vtv'], LumaDreamMachineVideoToVideo):
-        judgment = False
+    judgment = verify_instance(master.instances[key],
+                               LumaDreamMachineVideoToVideo)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        if not os.path.isdir(TEST_OUTPUT_PATH):
-            os.makedirs(TEST_OUTPUT_PATH)
-
-        print('Responses')
-        if isinstance(master.results['luma_vtv'], str):
-            pytest.fail(f"Failed to generate: {master.results['luma_vtv']}")
-        else:
-            print(f"Result = {json.dumps(master.results, indent=2)}")
-            filepath = os.path.join(TEST_OUTPUT_PATH, 'lumaai_vtv.json')
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(master.results, f, indent=2, ensure_ascii=False)
-            print(f'Saved as {filepath}')
-
-    print(f"Elapsed time in total (sec): {master.elapsed_time}")
-    master.dismiss()
+            pytest.fail(f"Test failed with error: {str(e)}")
 
     assert judgment

@@ -46,7 +46,7 @@ entries = [
 for entry in entries:
     master.summon({entry['name']: master.pack_parameters(**entry['params'])})
 
-print(f'Start running LLMMaster...')
+print('Start running LLMMaster...')
 master.run()
 
 # Different type of response given by different

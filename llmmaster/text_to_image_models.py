@@ -5,12 +5,13 @@ from openai import OpenAI
 from openai.types.images_response import ImagesResponse
 
 from .base_model import BaseModel
-from .config import FLUX1_FAL_TTI_MODELS
 from .config import FLUX1_FAL_TTI_ASPECT_RATIO_LIST
+from .config import FLUX1_FAL_TTI_MODELS
 from .config import MAX_SEED
 from .config import OPENAI_TTI_DEFAULT_N
 from .config import OPENAI_TTI_QUALITY_LIST
 from .config import OPENAI_TTI_SIZE_LIST
+from .config import REQUEST_OK
 from .config import STABLE_DIFFUSION_BASE_EP
 from .config import STABLE_DIFFUSION_TTI_ASPECT_RATIO_LIST
 from .config import STABLE_DIFFUSION_TTI_EP
@@ -18,7 +19,6 @@ from .config import STABLE_DIFFUSION_TTI_MODELS
 from .config import STABLE_DIFFUSION_TTI_OUTPUT_FORMATS
 from .config import STABLE_DIFFUSION_TTI_STYLE_PRESET_LIST
 from .config import STABLE_DIFFUSION_VERSION
-from .config import REQUEST_OK
 from .config import WAIT_FOR_FLUX1_FAL_TTI_RESULT
 
 
@@ -68,16 +68,15 @@ class Flux1FalTextToImage(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected arguments:
-          - model
-          - prompt
-          - image_size
-          - num_inference_steps
-          - seed
-          - guidance_scale
-          - sync_mode
-          - num_images
-          - enable_safety_checker
+        Expected parameters:
+          - model: str
+          - image_size: str
+          - num_inference_steps: int
+          - seed: int
+          - guidance_scale: float
+          - sync_mode: bool
+          - num_images: int
+          - enable_safety_checker: bool
         '''
         parameters = kwargs
 
@@ -157,7 +156,7 @@ class OpenAITextToImage(BaseModel):
                 n=self.parameters['n'])
 
             if isinstance(response, ImagesResponse):
-                answer = response
+                answer = response.model_dump()
 
         except Exception as e:
             answer += str(e)
@@ -166,9 +165,11 @@ class OpenAITextToImage(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Overwrite from BaseModel for this particular model.
-        Set parameters of size, quality and n.
-        Note: n is fixed 1 for OpenAI due to stable image generation.
+        Expected parameters:
+          - size: str
+          - quality: str
+          - n: int
+        Note: n is fixed 1 for quality = 'hd'.
         '''
         parameters = kwargs
 
@@ -240,30 +241,33 @@ class StableDiffusionTextToImage(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Overwrite from BaseModel for this particular model.
-        Set parameters defined by the provider.
+        Expected parameters:
+          - output_format: str
+          - aspect_ratio: str
+          - negative_prompt: str
+          - seed: int
+          - style_preset: str
         '''
         parameters = {}
 
         # endpoint
-        endpoint = (STABLE_DIFFUSION_BASE_EP + '/' +
-                    STABLE_DIFFUSION_VERSION +
-                    STABLE_DIFFUSION_TTI_EP)
+        url = STABLE_DIFFUSION_BASE_EP + '/' + STABLE_DIFFUSION_VERSION + \
+            STABLE_DIFFUSION_TTI_EP
 
         if kwargs['model'] in STABLE_DIFFUSION_TTI_MODELS:
-            endpoint = endpoint + '/' + kwargs['model']
+            url = url + '/' + kwargs['model']
         else:
-            endpoint = endpoint + '/' + STABLE_DIFFUSION_TTI_MODELS[0]
+            url = url + '/' + STABLE_DIFFUSION_TTI_MODELS[0]
 
-        parameters.update(url=endpoint)
+        parameters.update(url=url)
 
         # headers
         headers = {'authorization': f'Bearer {self.api_key}'}
         headers.update(accept='image/*')
-
         parameters.update(headers=headers)
 
-        parameters.update(files={"none": ''})
+        # files
+        parameters.update(files={'none': ''})
 
         # body data
         data = {'prompt': kwargs['prompt']}

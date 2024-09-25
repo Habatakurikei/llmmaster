@@ -9,17 +9,13 @@ from .base_model import BaseModel
 from .config import DEFAULT_TOKENS
 from .config import PERPLEXITY_TTT_EP
 from .config import TEMPERATURE
-from .config import TOP_P
 from .config import TOP_K
+from .config import TOP_P
 
 
 class AnthropicLLM(BaseModel):
     '''
-    List of available models as of 2024-09-03:
-      - claude-3-5-sonnet-20240620
-      - claude-3-opus-20240229
-      - claude-3-sonnet-20240229
-      - claude-3-haiku-20240307
+    Anthropic, the provider of Claude.
     '''
     def __init__(self, **kwargs):
 
@@ -51,7 +47,7 @@ class AnthropicLLM(BaseModel):
                 message = response.content[0].text.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -61,9 +57,8 @@ class AnthropicLLM(BaseModel):
 
 class CerebrasLLM(BaseModel):
     '''
-    List of available models as of 2024-09-06:
-      - llama3.1-8b
-      - llama3.1-70b
+    Cerebras provides a dedicated chip for fast LLM inference.
+    Supporting Llama models.
     '''
     def __init__(self, **kwargs):
 
@@ -94,7 +89,7 @@ class CerebrasLLM(BaseModel):
                 message = response.choices[0].message.content.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -104,15 +99,8 @@ class CerebrasLLM(BaseModel):
 
 class GroqLLM(BaseModel):
     '''
-    List of available models as of 2024-09-03:
-      - gemma-7b-it
-      - gemma2-9b-it
-      - llama-3.1-70b-versatile
-      - llama-3.1-8b-instant
-      - llama3-70b-8192
-      - llama3-8b-8192
-      - llama3-8b-8192
-      - mixtral-8x7b-32768
+    Groq is a cloud-native provider of AI infrastructure.
+    Providing LPU (Language Processing Unit) for fast LLM inference.
     '''
     def __init__(self, **kwargs):
 
@@ -143,7 +131,7 @@ class GroqLLM(BaseModel):
                 message = response.choices[0].message.content.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -153,11 +141,7 @@ class GroqLLM(BaseModel):
 
 class GoogleLLM(BaseModel):
     '''
-    List of typical available models as of 2024-09-03:
-      - gemini-1.5-pro
-      - gemini-1.5-flash
-      - gemini-1.5-pro-exp-0827
-      - gemini-1.5-flash-exp-0827
+    Google, the provider of Gemini and Gemma.
     '''
     def __init__(self, **kwargs):
 
@@ -188,7 +172,7 @@ class GoogleLLM(BaseModel):
                 message = response.text.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -198,13 +182,7 @@ class GoogleLLM(BaseModel):
 
 class MistralLLM(BaseModel):
     '''
-    List of typical available models as of 2024-09-06:
-      - mistral-large-latest
-      - mistral-medium-latest
-      - mistral-small-latest
-      - open-mistral-nemo
-      - codestral-latest
-      - mistral-embed
+    Mistral is a French provider of LLM.
     '''
     def __init__(self, **kwargs):
 
@@ -235,7 +213,7 @@ class MistralLLM(BaseModel):
                 message = response.choices[0].message.content.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -245,10 +223,7 @@ class MistralLLM(BaseModel):
 
 class OpenAILLM(BaseModel):
     '''
-    List of typical available models as of 2024-09-03:
-      - gpt-4o
-      - gpt-4o-2024-08-06
-      - gpt-4o-mini
+    OpenAI, the provider of GPT.
     '''
     def __init__(self, **kwargs):
 
@@ -279,7 +254,7 @@ class OpenAILLM(BaseModel):
                 message = response.choices[0].message.content.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -289,11 +264,7 @@ class OpenAILLM(BaseModel):
 
 class PerplexityLLM(BaseModel):
     '''
-    Use OpenAI library according to Perplexity formal document.
-    List of available models as of 2024-09-03:
-      - llama-3.1-sonar-small-128k-online
-      - llama-3.1-sonar-large-128k-online
-      - llama-3.1-sonar-huge-128k-online
+    Perplexity provides a RAG-based LLM.
     '''
     def __init__(self, **kwargs):
 
@@ -324,7 +295,7 @@ class PerplexityLLM(BaseModel):
                 message = response.choices[0].message.content.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
@@ -334,11 +305,11 @@ class PerplexityLLM(BaseModel):
 
 def _verify_ttt_args(**kwargs):
     '''
-    Expected inputs:
-      - max_tokens: natural number between 1 and 4096 (in most providers)
-      - temperature: positive float between 0 and 1
-      - top_p: positive float between 0 and 1
-      - top_k: positive integer
+    Expected parameters:
+      - max_tokens: int, 4096 in most providers
+      - temperature: float, between 0 and 1
+      - top_p: float, between 0 and 1
+      - top_k: int, positive values
     '''
     parameters = kwargs
 

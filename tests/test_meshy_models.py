@@ -1,28 +1,38 @@
 import os
 import sys
-import requests
-from requests.models import Response
+from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
-from llmmaster.config import REQUEST_OK
-from llmmaster.meshy_models import MeshyTextToTexture
+from conftest import execute_llmmaster
+from conftest import verify_instance
+from llmmaster import LLMMaster
+from llmmaster.meshy_models import MeshyImageTo3D
 from llmmaster.meshy_models import MeshyTextTo3D
 from llmmaster.meshy_models import MeshyTextTo3DRefine
+from llmmaster.meshy_models import MeshyTextToTexture
 from llmmaster.meshy_models import MeshyTextToVoxel
-from llmmaster.meshy_models import MeshyImageTo3D
-from llmmaster import LLMMaster
 
 
-API_KEY = '''
-'''
+# API_KEY = Path('api_key_pairs.txt').read_text(encoding='utf-8')
+API_KEY = ''
 
-
-PROMPT ='A Japanese anime girl inspired by Akira Toriyama. Light blue hair, ponytail, pink dress, full body.'
-TEST_OUTPUT_PATH = 'test-outputs'
+NEGATIVE_PROMPT = 'ugly, low-resolution, multiple people'
+PROMPT = """
+age: 16;
+gender: female;
+height: 165cm;
+figure: slim build;
+hairstyle: light blue hair, ponytail;
+eye color: blue;
+cloths: pink dress; short sox; sneakers;
+accesories: hair band with pink ribbon, leather gloves;
+appearance features: nothing special;
+Japanese anime style; Single Person; Full body; Face Front; White background;
+"""
 
 
 @pytest.fixture
@@ -30,340 +40,139 @@ def run_api(request):
     return request.config.getoption("--run-api")
 
 
-def test_meshy_text_to_3d_instances(run_api):
-    '''
-    Comment/Uncomment API key handling from environment variable or constant above.
-    '''
+def test_meshy_text_to_3d(run_api):
     judgment = True
     master = LLMMaster()
 
     id = ''
-
-    meshy_tt3d_test = master.pack_parameters(provider='meshy_tt3d',
-                                             prompt=PROMPT,
-                                             art_style='cartoon',
-                                             negative_prompt='ugly, low resolution')
+    key = 'meshy_tt3d'
+    params = master.pack_parameters(provider=key,
+                                    prompt=PROMPT,
+                                    model='meshy-3-turbo',
+                                    art_style='cartoon',
+                                    negative_prompt=NEGATIVE_PROMPT,
+                                    seed=10)
+    # params = master.pack_parameters(provider=key,
+    #                                 prompt=PROMPT,
+    #                                 model='meshy-4',
+    #                                 art_style='realistic',
+    #                                 negative_prompt=NEGATIVE_PROMPT,
+    #                                 seed=10,
+    #                                 topology='quad',
+    #                                 target_polycount=100000)
     master.set_api_keys(API_KEY)
-    master.summon({'meshy_tt3d_test': meshy_tt3d_test})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['meshy_tt3d_test'].parameters}")
-    print(f"API Key = {master.instances['meshy_tt3d_test'].api_key}")
+    judgment = verify_instance(master.instances[key], MeshyTextTo3D)
 
-    if not isinstance(master.instances['meshy_tt3d_test'], MeshyTextTo3D):
-        judgment = False
-
-    # step 1 to make text-to-3d model
+    print('Step 1: Make text-to-3d model')
     if run_api:
-        print('Run API for Text-To-3D')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        print('Responses for Text-To-3D, getting id')
-        if not isinstance(master.results['meshy_tt3d_test'], Response):
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+        if 'id' in master.results[key]:
+            id = master.results[key]['id']
+            print(f"id = {id}")
 
-        else:
-            json_result = master.results['meshy_tt3d_test'].json()
-            print(f"json_result = {json_result}")
-            for key, value in json_result['model_urls'].items():
-                if value:
-                    res = requests.get(value)
-                    if res.status_code == REQUEST_OK:
-                        filename = f'meshy_tt3d_test.{key}'
-                        filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                        with open(filepath, 'wb') as f:
-                            f.write(res.content)
-                        print(f'Saved as {filepath}')
+    if run_api and id:
 
-            if 'thumbnail_url' in json_result and json_result['thumbnail_url']:
-                res = requests.get(json_result['thumbnail_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_tt3d_test_thumbnail.png'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
+        print('Step 2: Refine the model')
 
-            if 'video_url' in json_result and json_result['video_url']:
-                res = requests.get(json_result['video_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_it3d_test_video.mp4'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
-
-            if 'id' in json_result:
-                id = json_result['id']
-                print(f"id = {id}")
-
-    # step 2 to refine the model
-    if run_api and id != '':
-
-        print('Going to refine the model')
         master.dismiss()
-
-        meshy_tt3d_refine_test = master.pack_parameters(provider='meshy_tt3d_refine', preview_task_id=id)
+        key = 'meshy_tt3d_refine'
+        params = master.pack_parameters(provider=key,
+                                        preview_task_id=id,
+                                        texture_richness='high')
         master.set_api_keys(API_KEY)
-        master.summon({'meshy_tt3d_refine_test': meshy_tt3d_refine_test})
+        master.summon({key: params})
 
-        print(f"Parameters = {master.instances['meshy_tt3d_refine_test'].parameters}")
-
-        if not isinstance(master.instances['meshy_tt3d_refine_test'], MeshyTextTo3DRefine):
-            pytest.fail(f"Wrong type for MeshyTextTo3DRefine: {type(master.instances['meshy_tt3d_refine_test'])}")
-
-        print('Run API for Refine')
+        judgment = verify_instance(master.instances[key], MeshyTextTo3DRefine)
 
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        print('Responses for Refine')
-        if not isinstance(master.results['meshy_tt3d_refine_test'], Response):
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        else:
-            json_result = master.results['meshy_tt3d_refine_test'].json()
-            print(f"json_result = {json_result}")
-            for key, value in json_result['model_urls'].items():
-                if value:
-                    res = requests.get(value)
-                    if res.status_code == REQUEST_OK:
-                        filename = f'meshy_tt3d_test_refined.{key}'
-                        filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                        with open(filepath, 'wb') as f:
-                            f.write(res.content)
-                        print(f'Saved as {filepath}')
-
-            if 'thumbnail_url' in json_result and json_result['thumbnail_url']:
-                res = requests.get(json_result['thumbnail_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_tt3d_test_thumbnail_refined.png'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
-
-            if 'video_url' in json_result and json_result['video_url']:
-                res = requests.get(json_result['video_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_tt3d_test_video_refined.mp4'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
-
-    print(f"Elapsed time in total (sec): {master.elapsed_time}")
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment
 
 
-def test_meshy_text_to_texture_instances(run_api):
+def test_meshy_text_to_texture(run_api):
     judgment = True
     master = LLMMaster()
 
+    key = 'meshy_tttx'
     model_url = 'https://habatakurikei.com/dlfiles/zoltraak/model.glb'
     object_prompt = 'A girl in a pink dress with ponytail hair.'
     style_prompt = 'cherry blossum like kimono style outfit'
 
-    meshy_tttx_test = master.pack_parameters(provider='meshy_tttx',
-                                             model_url=model_url,
-                                             object_prompt=object_prompt,
-                                             style_prompt=style_prompt,
-                                             art_style='japanese-anime',
-                                             negative_prompt='ugly, low resolution',
-                                             resolution='1024')
+    params = master.pack_parameters(provider=key,
+                                    model_url=model_url,
+                                    object_prompt=object_prompt,
+                                    style_prompt=style_prompt,
+                                    enable_original_uv=True,
+                                    enable_pbr=True,
+                                    art_style='japanese-anime',
+                                    negative_prompt=NEGATIVE_PROMPT,
+                                    resolution='1024')
     master.set_api_keys(API_KEY)
-    master.summon({'meshy_tttx_test': meshy_tttx_test})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['meshy_tttx_test'].parameters}")
-
-    if not isinstance(master.instances['meshy_tttx_test'], MeshyTextToTexture):
-        judgment = False
+    judgment = verify_instance(master.instances[key], MeshyTextToTexture)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        if not os.path.isdir(TEST_OUTPUT_PATH):
-            os.makedirs(TEST_OUTPUT_PATH)
-
-        print('Responses')
-        if not isinstance(master.results['meshy_tttx_test'], Response):
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        else:
-            json_result = master.results['meshy_tttx_test'].json()
-            print(f"json_result = {json_result}")
-
-            for key, value in json_result['model_urls'].items():
-                if value:
-                    res = requests.get(value)
-                    if res.status_code == REQUEST_OK:
-                        filename = f'meshy_tttx_test.{key}'
-                        filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                        with open(filepath, 'wb') as f:
-                            f.write(res.content)
-                        print(f'Saved as {filepath}')
-
-            if 'thumbnail_url' in json_result and json_result['thumbnail_url']:
-                res = requests.get(json_result['thumbnail_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_tttx_test_thumbnail.png'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
-
-            if 'texture_urls' in json_result:
-                texture_urls = json_result['texture_urls']
-                for i, entry in enumerate(texture_urls):
-                    for key, value in entry.items():
-                        if value:
-                            res = requests.get(value)
-                            if res.status_code == REQUEST_OK:
-                                filename = f'meshy_tttx_test_texture_{i}_{key}.png'
-                                filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                                with open(filepath, 'wb') as f:
-                                    f.write(res.content)
-                                print(f'Saved as {filepath}')
-
-    print(f"Elapsed time (sec): {master.elapsed_time}")
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment
 
 
-def test_meshy_text_to_voxel_instances(run_api):
+def test_meshy_text_to_voxel(run_api):
     judgment = True
     master = LLMMaster()
 
-    meshy_ttvx_test = master.pack_parameters(provider='meshy_ttvx',
-                                             prompt=PROMPT,
-                                             negative_prompt='ugly, low resolution')
+    key = 'meshy_ttvx'
+    params = master.pack_parameters(provider=key,
+                                    prompt=PROMPT,
+                                    voxel_size_shrink_factor=8,
+                                    negative_prompt=NEGATIVE_PROMPT,
+                                    seed=10)
     master.set_api_keys(API_KEY)
-    master.summon({'meshy_ttvx_test': meshy_ttvx_test})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['meshy_ttvx_test'].parameters}")
-
-    if not isinstance(master.instances['meshy_ttvx_test'], MeshyTextToVoxel):
-        judgment = False
+    judgment = verify_instance(master.instances[key], MeshyTextToVoxel)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        if not os.path.isdir(TEST_OUTPUT_PATH):
-            os.makedirs(TEST_OUTPUT_PATH)
-
-        print('Responses')
-        if not isinstance(master.results['meshy_ttvx_test'], Response):
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        else:
-            json_result = master.results['meshy_ttvx_test'].json()
-            print(f"json_result = {json_result}")
-            for key, value in json_result['model_urls'].items():
-                if value:
-                    res = requests.get(value)
-                    if res.status_code == REQUEST_OK:
-                        filename = f'meshy_ttvx_test.{key}'
-                        filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                        with open(filepath, 'wb') as f:
-                            f.write(res.content)
-                        print(f'Saved as {filepath}')
-
-            if 'thumbnail_url' in json_result and json_result['thumbnail_url']:
-                res = requests.get(json_result['thumbnail_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_ttvx_test_thumbnail.png'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
-
-    print(f"Elapsed time (sec): {master.elapsed_time}")
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment
 
 
-def test_meshy_image_to_3d_instances(run_api):
+def test_meshy_image_to_3d(run_api):
     judgment = True
     master = LLMMaster()
 
-    image_url='https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png'
-
-    meshy_it3d_test = master.pack_parameters(provider='meshy_it3d',
-                                             image_url=image_url)
+    key = 'meshy_it3d'
+    # image_url = 'https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png'
+    image_url = 'https://monju.ai/app/static/dragon_girl_2.png'
+    params = master.pack_parameters(provider=key,
+                                    image_url=image_url,
+                                    enable_pbr=True)
     master.set_api_keys(API_KEY)
-    master.summon({'meshy_it3d_test': meshy_it3d_test})
+    master.summon({key: params})
 
-    print(f"Parameters = {master.instances['meshy_it3d_test'].parameters}")
-
-    if not isinstance(master.instances['meshy_it3d_test'], MeshyImageTo3D):
-        judgment = False
+    judgment = verify_instance(master.instances[key], MeshyImageTo3D)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            execute_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        if not os.path.isdir(TEST_OUTPUT_PATH):
-            os.makedirs(TEST_OUTPUT_PATH)
-
-        print('Responses')
-        if not isinstance(master.results['meshy_it3d_test'], Response):
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
-
-        else:
-            json_result = master.results['meshy_it3d_test'].json()
-            print(f"json_result = {json_result}")
-            for key, value in json_result['model_urls'].items():
-                if value:
-                    res = requests.get(value)
-                    if res.status_code == REQUEST_OK:
-                        filename = f'meshy_it3d_test.{key}'
-                        filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                        with open(filepath, 'wb') as f:
-                            f.write(res.content)
-                        print(f'Saved as {filepath}')
-
-            if 'thumbnail_url' in json_result and json_result['thumbnail_url']:
-                res = requests.get(json_result['thumbnail_url'])
-                if res.status_code == REQUEST_OK:
-                    filename = f'meshy_it3d_test_thumbnail.png'
-                    filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(res.content)
-                    print(f'Saved as {filepath}')
-
-            if 'texture_urls' in json_result:
-                texture_urls = json_result['texture_urls']
-                for i, entry in enumerate(texture_urls):
-                    for key, value in entry.items():
-                        if value:
-                            res = requests.get(value)
-                            if res.status_code == REQUEST_OK:
-                                filename = f'meshy_it3d_test_texture_{i}_{key}.png'
-                                filepath = os.path.join(TEST_OUTPUT_PATH, filename)
-                                with open(filepath, 'wb') as f:
-                                    f.write(res.content)
-                                print(f'Saved as {filepath}')
-
-    print(f"Elapsed time (sec): {master.elapsed_time}")
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment

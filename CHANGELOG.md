@@ -5,16 +5,37 @@
   - Midjourney API through ImaginePro
   - Adobe Firefly API not released for personal use
   - Ideogram API not released for personal use
+  - Leonardo AI API pending to be added
 - Text-To-Music models pending to be added
   - Mubert API for rather enterprise use
   - Suno API for rather enterprise use
 - Text-To-Video models pending to be added
-  - Runway API not released for public
+  - Runway API not released for public yet
 - Pending additional functions
-  - ElevenLabs using native RESTAPI like dubbing and cloning, etc.
+  - OpenAI and Stable Diffusion Image-To-Image for online file.
+  - ElevenLabs using native REST API like dubbing and cloning, etc.
   - Pika.art video extension, etc.
   - OpenAi structured output
   - Anthropic Claude cache
+  - SambaNova AI API
+  - Google VertexAI
+
+## [0.6.0] - 2024-09-27
+### Added
+- Tripo 3D modeling APIs
+  - `TripoTextTo3D`
+  - `TripoImageTo3D`
+  - `TripoMultiviewTo3D`
+  - `TripoRefineModel`
+  - `TripoAnimationPreRigCheck`
+  - `TripoAnimationRig`
+  - `TripoAnimationRetarget`
+  - `TripoStylization`
+  - `TripoConversion`
+### Changed
+- Changed output type to `dict` for some models, see `RESULTSTYPE.md` for details
+- Fully revised the pytest test functions
+- Requirement of Python version changed to 3.10 or later, 3.9 or earlier is no longer supported
 
 ## [0.5.1] - 2024-09-20
 ### Added

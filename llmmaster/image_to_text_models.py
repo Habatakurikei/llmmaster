@@ -45,23 +45,23 @@ class OpenAIImageToText(BaseModel):
                 message = response.choices[0].message.content.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs:
-          - image_url: list of url strings such as:
+        Expected parameters:
+          - image_url: list, source URLs
             image_url = ["https://example.com/image1.jpg",
                          "https://example.com/image2.jpg"]
-          - max_tokens: natural number between 1 and 4096 (in most providers)
-          - detail: this parameter is not supported for LLMMaster.
+          - max_tokens: int, between 1 and 4096 (in most providers)
+          - detail: this parameter is not supported in LLMMaster
         '''
         parameters = kwargs
 
         if 'image_url' not in kwargs:
-            msg = "'image_url' parameter is required with at least one URL."
+            msg = 'image_url parameter is required with at least one URL.'
             raise ValueError(msg)
 
         image_url = []
@@ -130,21 +130,22 @@ class GoogleImageToText(BaseModel):
                 message = response.text.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs are a list of url strings such as:
-        image_url = ["https://example.com/image1.jpg",
-                     "https://example.com/image2.jpg"]
+        Expected parameters:
+          - image_url: list, source URLs
+            image_url = ["https://example.com/image1.jpg",
+                         "https://example.com/image2.jpg"]
         For both local or online images are supported.
         '''
         parameters = kwargs
 
         if 'image_url' not in kwargs:
-            msg = "'image_url' parameter is required with at least one URL."
+            msg = 'image_url parameter is required with at least one URL.'
             raise ValueError(msg)
 
         return parameters

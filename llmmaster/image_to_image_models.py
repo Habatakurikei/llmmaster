@@ -90,17 +90,16 @@ class Flux1FalImageToImage(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected arguments:
-          - prompt
-          - image_url
-          - strength
-          - image_size
-          - num_inference_steps
-          - seed
-          - guidance_scale
-          - sync_mode
-          - num_images
-          - enable_safety_checker
+        Expected parameters:
+          - image_url: str
+          - strength: float
+          - image_size: str
+          - num_inference_steps: int
+          - seed: int
+          - guidance_scale: float
+          - sync_mode: bool
+          - num_images: int
+          - enable_safety_checker: bool
         '''
         parameters = kwargs
 
@@ -206,7 +205,7 @@ class OpenAIImageToImage(BaseModel):
                 raise Exception("Unexpected type of process selected.")
 
             if isinstance(response, ImagesResponse):
-                answer = response
+                answer = response.model_dump()
 
         except Exception as e:
             answer += str(e)
@@ -215,8 +214,8 @@ class OpenAIImageToImage(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs:
-          - mode (required): either 'edits' or 'variations'
+        Expected parameters:
+          - mode (required): str, either 'edits' or 'variations'
           - image (required): str, path to image file (PNG only)
           - mask: str, path to mask file (PNG only)
           - n: int, number of images to generate
@@ -327,12 +326,12 @@ class StableDiffusionImageToImage(BaseModel):
         self.response = answer
 
     def _verify_arguments(self, **kwargs):
-        """
-        Expected inputs:
+        '''
+        Expected parameters:
           - model (required): str, model name, fixed v2beta
           - image (required): str, path to image file
           - for rest of arguments, see each function by mode
-        """
+        '''
         parameters = {}
 
         # header for REST API
@@ -414,7 +413,7 @@ class StableDiffusionImageToImage(BaseModel):
     # parameter check function for individual case
     def _verify_upscale_conservative_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - creativity: float, creativity value
           - negative_prompt: str, negative prompt
           - seed: int, seed value
@@ -455,7 +454,7 @@ class StableDiffusionImageToImage(BaseModel):
 
     def _verify_upscale_creative_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - creativity: float, creativity value
           - negative_prompt: str, negative prompt
           - seed: int, seed value
@@ -501,7 +500,7 @@ class StableDiffusionImageToImage(BaseModel):
 
     def _verify_erase_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - mask: str, path to mask file
           - grow_mask: int, grow mask value
           - seed: int, seed value
@@ -544,7 +543,7 @@ class StableDiffusionImageToImage(BaseModel):
 
     def _verify_inpaint_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - mask: str, path to mask file
           - grow_mask: int, grow mask value
           - negative_prompt: str, negative prompt
@@ -591,7 +590,7 @@ class StableDiffusionImageToImage(BaseModel):
 
     def _verify_outpaint_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - left: int, left value
           - right: int, right value
           - up: int, up value
@@ -660,7 +659,7 @@ class StableDiffusionImageToImage(BaseModel):
 
     def _verify_search_and_replace_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - search_prompt (required): str, search prompt
           - negative_prompt: str, negative prompt
           - grow_mask: int, grow mask value
@@ -707,7 +706,7 @@ class StableDiffusionImageToImage(BaseModel):
 
     def _verify_remove_background_args(self, **kwargs):
         '''
-        Expected options:
+        Expected parameters:
           - output_format: str, output format
         '''
         parameters = kwargs

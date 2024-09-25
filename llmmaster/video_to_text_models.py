@@ -1,6 +1,8 @@
 import google.generativeai as genai
 
 from .base_model import BaseModel
+from .config import GOOGLE_VTT_FAILED
+from .config import GOOGLE_VTT_IN_PROGRESS
 from .config import WAIT_FOR_GOOGLE_VTT_TIMEOUT
 from .config import WAIT_FOR_GOOGLE_VTT_UPLOAD
 
@@ -23,7 +25,7 @@ class GoogleVideoToText(BaseModel):
 
     def run(self):
 
-        message = 'Video description not generated.'
+        message = 'Valid text not generated. '
 
         try:
             genai.configure(api_key=self.api_key)
@@ -41,20 +43,20 @@ class GoogleVideoToText(BaseModel):
                 message = response.text.strip()
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs:
-        video_file = "/path/to/local/video2.mp4"
+        Expected parameters:
+          - video_file: str, path to local file
         '''
         parameters = kwargs
 
         if 'video_file' not in kwargs:
-            msg = "'video_file' parameter is required with "
-            msg += "at least one valid file path."
+            msg = 'video_file parameter is required with '
+            msg += 'at least one valid file path.'
             raise ValueError(msg)
 
         return parameters
@@ -63,11 +65,11 @@ class GoogleVideoToText(BaseModel):
 
         video_file = genai.upload_file(path=self.parameters['video_file'])
 
-        while video_file.state.name == 'PROCESSING':
+        while video_file.state.name == GOOGLE_VTT_IN_PROGRESS:
             self._wait(WAIT_FOR_GOOGLE_VTT_UPLOAD)
             video_file = genai.get_file(video_file.name)
 
-        if video_file.state.name == 'FAILED':
+        if video_file.state.name == GOOGLE_VTT_FAILED:
             raise ValueError('Failed to upload video file.')
 
         return video_file

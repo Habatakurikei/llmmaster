@@ -9,21 +9,20 @@ from elevenlabs.client import ElevenLabs
 from openai import OpenAI
 
 from .base_model import BaseModel
-from .config import ELEVENLABS_TTS_MODELS
-from .config import ELEVENLABS_DEFAULT_VOICE_ID
-from .config import ELEVENLABS_DEFAULT_STABILITY
-from .config import ELEVENLABS_DEFAULT_SIMILARITY
 from .config import ELEVENLABS_DEFAULT_PROMPT_INFLUENCE
-from .config import OPENAI_TTS_RESPONSE_FORMAT_LIST
-from .config import OPENAI_TTS_VOICE_OPTIONS
+from .config import ELEVENLABS_DEFAULT_SIMILARITY
+from .config import ELEVENLABS_DEFAULT_STABILITY
+from .config import ELEVENLABS_DEFAULT_VOICE_ID
 from .config import OPENAI_TTS_DEFAULT_SPEED
 from .config import OPENAI_TTS_MAX_SPEED
 from .config import OPENAI_TTS_MIN_SPEED
+from .config import OPENAI_TTS_RESPONSE_FORMAT_LIST
+from .config import OPENAI_TTS_VOICE_OPTIONS
+from .config import REQUEST_OK
 from .config import VOICEVOX_BASE_EP
+from .config import VOICEVOX_DEFAULT_VOICE_ID
 from .config import VOICEVOX_QUERY_EP
 from .config import VOICEVOX_SYNTHESIS_EP
-from .config import VOICEVOX_DEFAULT_VOICE_ID
-from .config import REQUEST_OK
 
 
 class OpenAITextToSpeech(BaseModel):
@@ -75,11 +74,10 @@ class OpenAITextToSpeech(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs (common):
-          - input = prompt
+        Expected parameters:
           - voice: str
           - response_format: str
-          - speed: float between 0.25 and 4.0
+          - speed: float, between 0.25 and 4.0
         '''
         parameters = kwargs
 
@@ -152,24 +150,14 @@ class ElevenLabsTextToSpeech(BaseModel):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs:
-          - model_id: str
-          - language_code: str
-          - voice_settings: VoiceSettings class
-          - seed: int
-          - previous_text: str
-          - next_text: str
-          - pronunciation_dictionary_locators: list
-          - previous_request_ids: list
-          - next_request_ids: list
+        Expected parameters:
+          - voice_id: str
+          - stability: float
+          - similarity_boost: float
+          - style: int
+          - user_speaker_boost: bool
         '''
         parameters = kwargs
-
-        # model
-        if kwargs['model'] in ELEVENLABS_TTS_MODELS:
-            pass
-        else:
-            parameters.update(model=ELEVENLABS_TTS_MODELS[0])
 
         # voice_id
         if 'voice_id' in kwargs and isinstance(kwargs['voice_id'], str):
@@ -254,12 +242,11 @@ class ElevenLabsTextToSoundEffect(BaseModel):
         self.response = answer
 
     def _verify_arguments(self, **kwargs):
-        """
-        Verify and process arguments for Voicevox Text-to-Speech.
-        Expected inputs:
-          - duration_seconds: int/float
+        '''
+        Expected parameters:
+          - duration_seconds: float
           - prompt_influence: float
-        """
+        '''
         parameters = kwargs
 
         if 'duration_seconds' in kwargs:
@@ -278,7 +265,8 @@ class ElevenLabsTextToSoundEffect(BaseModel):
 
 class VoicevoxTextToSpeech(BaseModel):
     '''
-    Voicevox Text-to-Speech model
+    Voicevox Text-to-Speech model.
+    Make voicevox engine active before using this model.
     '''
     def __init__(self, **kwargs):
 
@@ -309,19 +297,18 @@ class VoicevoxTextToSpeech(BaseModel):
             if res_query.status_code == REQUEST_OK:
                 answer = self._query_to_speech(res_query.text)
             else:
-                answer += f'Error: {res_query.text}'
+                answer += res_query.text
 
         except Exception as e:
-            answer += f'Error: {str(e)}'
+            answer += str(e)
 
         self.response = answer
 
     def _verify_arguments(self, **kwargs):
-        """
-        Verify and process arguments for Voicevox Text-to-Speech.
-        Expected inputs:
+        '''
+        Expected parameters:
           - speaker: int
-        """
+        '''
         parameters = kwargs
 
         params = {'text': kwargs['prompt']}

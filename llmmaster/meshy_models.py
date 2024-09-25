@@ -3,16 +3,18 @@ import requests
 from .base_model import BaseModel
 from .config import MESHY_BASE_EP
 from .config import MESHY_IT3D_START_EP
-from .config import MESHY_TT3D_START_EP
-from .config import MESHY_TTTX_START_EP
-from .config import MESHY_TTVX_START_EP
+from .config import MESHY_MODE_PREVIEW
+from .config import MESHY_MODE_REFINE
+from .config import MESHY_STATUS_IN_PROGRESS
 from .config import MESHY_TT3D_MODELS
+from .config import MESHY_TT3D_START_EP
 from .config import MESHY_TT3D_STYLES_LIST
 from .config import MESHY_TT3D_TEXTURE_RICHNESS_LIST
 from .config import MESHY_TTTX_RESOLUTION_LIST
+from .config import MESHY_TTTX_START_EP
 from .config import MESHY_TTTX_STYLES_LIST
+from .config import MESHY_TTVX_START_EP
 from .config import MESHY_VOXEL_SHRINK_LIST
-from .config import MESHY_STATUS_FOR_RESULT
 from .config import REQUEST_OK
 from .config import WAIT_FOR_MESHY_RESULT
 
@@ -21,11 +23,11 @@ class MeshyModelBase(BaseModel):
     '''
     Base model for Meshy API wrapper.
     Meshy provides:
-      1. Text-To-Texture model (tttx)
-      2. Text-To-3D model (tt3d)
-      3. Text-To-3D refine (tt3dr)
-      4. Text-To-Voxel model (ttvx)
-      5. Image-To-3D model (it3d)
+      1. Text-To-Texture model (meshy_tttx)
+      2. Text-To-3D model (meshy_tt3d)
+      3. Text-To-3D refine (meshy_tt3d_refine)
+      4. Text-To-Voxel model (meshy_ttvx)
+      5. Image-To-3D model (meshy_it3d)
     Commonize init and run for these models.
     Separately define _verify_arguments() due to different parameters.
     '''
@@ -41,7 +43,7 @@ class MeshyModelBase(BaseModel):
     def run(self):
         '''
         Note:
-        Return raw response of request.
+        Return json response of requests.
         But when failed to generate, return value is given in str.
         Handle return value `answer` with care for different type
         in case of success and failure.
@@ -56,7 +58,7 @@ class MeshyModelBase(BaseModel):
             response = self._fetch_result(response.json().get('result'))
 
             if response.status_code == REQUEST_OK:
-                answer = response
+                answer = response.json()
             else:
                 answer += str(response.json())
 
@@ -70,18 +72,16 @@ class MeshyModelBase(BaseModel):
         Common function to fetch result.
         '''
         answer = 'Generated model not found.'
-
         header = {'Authorization': f'Bearer {self.api_key}'}
-        ep = self.parameters['url'] + f'/{id}'
+        url = self.parameters['url'] + f'/{id}'
 
         flg = True
-
         while flg:
             response = requests.request(method='GET',
-                                        url=ep,
+                                        url=url,
                                         headers=header)
-
-            if response.json().get('status') not in MESHY_STATUS_FOR_RESULT:
+            # print(response.json().get('status'))
+            if response.json().get('status') in MESHY_STATUS_IN_PROGRESS:
                 self._wait(WAIT_FOR_MESHY_RESULT)
             else:
                 answer = response
@@ -89,57 +89,62 @@ class MeshyModelBase(BaseModel):
 
         return answer
 
+    def _generation_headers(self):
+        '''
+        Common headers for generation.
+        '''
+        headers = {'Authorization': f'Bearer {self.api_key}',
+                   'Content-Type': 'application/json'}
+        return headers
+
 
 class MeshyTextToTexture(MeshyModelBase):
     '''
-    Output format:
     This model does not require prompt.
     '''
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-          ai_model: str
-          art_style: str
-          negative_prompt: str
-          seed: int
+        Expected parameters:
+          - model_url: str
+          - object_prompt: str
+          - style_prompt: str
+          - enable_original_uv: bool
+          - negative_prompt: str
+          - enable_pbr: bool
+          - resolution: str
+          - art_style: str
         '''
         parameters = kwargs
 
-        endpoint = MESHY_BASE_EP + MESHY_TTTX_START_EP
-        parameters.update(url=endpoint)
-
-        # headers
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-
-        parameters.update(headers=headers)
+        parameters.update(url=MESHY_BASE_EP+MESHY_TTTX_START_EP)
+        parameters.update(headers=self._generation_headers())
 
         # body data
         data = {}
 
         # model_url
         if 'model_url' not in kwargs:
-            raise ValueError('"model_url" not given.')
+            raise ValueError('model_url not given.')
         elif not isinstance(kwargs['model_url'], str):
-            msg = '"model_url" type not str.'
+            msg = 'model_url type not str.'
             raise ValueError(msg)
         else:
             data.update(model_url=kwargs['model_url'])
 
         # object_prompt
         if 'object_prompt' not in kwargs:
-            raise ValueError('"object_prompt" not given.')
+            raise ValueError('object_prompt not given.')
         elif not isinstance(kwargs['object_prompt'], str):
-            msg = '"object_prompt" type not str.'
+            msg = 'object_prompt type not str.'
             raise ValueError(msg)
         else:
             data.update(object_prompt=kwargs['object_prompt'])
 
         # style_prompt
         if 'style_prompt' not in kwargs:
-            raise ValueError('"style_prompt" not given.')
+            raise ValueError('style_prompt not given.')
         elif not isinstance(kwargs['style_prompt'], str):
-            msg = '"style_prompt" type not str.'
+            msg = 'style_prompt type not str.'
             raise ValueError(msg)
         else:
             data.update(style_prompt=kwargs['style_prompt'])
@@ -179,26 +184,22 @@ class MeshyTextTo3D(MeshyModelBase):
     '''
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-          ai_model: str
-          art_style: str
-          negative_prompt: str
-          seed: int
+        Expected parameters:
+          - ai_model: str
+          - art_style: str
+          - negative_prompt: str
+          - seed: int
+          - topology (only for meshy-4): str
+          - target_polycount (only for meshy-4): int
         '''
         parameters = kwargs
 
-        endpoint = MESHY_BASE_EP + MESHY_TT3D_START_EP
-        parameters.update(url=endpoint)
-
-        # headers
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-
-        parameters.update(headers=headers)
+        parameters.update(url=MESHY_BASE_EP+MESHY_TT3D_START_EP)
+        parameters.update(headers=self._generation_headers())
 
         # body data
         data = {}
-        data.update(mode='preview')
+        data.update(mode=MESHY_MODE_PREVIEW)
         data.update(prompt=kwargs['prompt'])
 
         # ai_model
@@ -219,6 +220,15 @@ class MeshyTextTo3D(MeshyModelBase):
         if ('seed' in kwargs and isinstance(kwargs['seed'], int)):
             data.update(seed=kwargs['seed'])
 
+        # topology
+        if 'topology' in kwargs and isinstance(kwargs['topology'], str):
+            data.update(topology=kwargs['topology'])
+
+        # target_polycount
+        if ('target_polycount' in kwargs and
+           isinstance(kwargs['target_polycount'], int)):
+            data.update(target_polycount=kwargs['target_polycount'])
+
         parameters.update(data=data)
 
         return parameters
@@ -230,30 +240,24 @@ class MeshyTextTo3DRefine(MeshyModelBase):
     '''
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-          mode (required): 'refine' fixed
-          preview_task_id (required): str
-          texture_richness: str
+        Expected parameters:
+          - mode (required): str, fixed 'refine'
+          - preview_task_id (required): str
+          - texture_richness: str
         '''
         parameters = kwargs
 
-        endpoint = MESHY_BASE_EP + MESHY_TT3D_START_EP
-        parameters.update(url=endpoint)
-
-        # headers
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-
-        parameters.update(headers=headers)
+        parameters.update(url=MESHY_BASE_EP+MESHY_TT3D_START_EP)
+        parameters.update(headers=self._generation_headers())
 
         # body data
         data = {}
-        data.update(mode='refine')
+        data.update(mode=MESHY_MODE_REFINE)
 
         if 'preview_task_id' not in kwargs:
-            raise ValueError('"preview_task_id" not given.')
+            raise ValueError('preview_task_id not given.')
         elif not isinstance(kwargs['preview_task_id'], str):
-            msg = '"preview_task_id" type not str.'
+            msg = 'preview_task_id type must be str.'
             raise ValueError(msg)
         else:
             data.update(preview_task_id=kwargs['preview_task_id'])
@@ -273,21 +277,15 @@ class MeshyTextToVoxel(MeshyModelBase):
     '''
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-          voxel_size_shrink_factor (required): int
-          negative_prompt: str
-          seed: int
+        Expected parameters:
+          - voxel_size_shrink_factor (required): int
+          - negative_prompt: str
+          - seed: int
         '''
         parameters = kwargs
 
-        endpoint = MESHY_BASE_EP + MESHY_TTVX_START_EP
-        parameters.update(url=endpoint)
-
-        # headers
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-
-        parameters.update(headers=headers)
+        parameters.update(url=MESHY_BASE_EP+MESHY_TTVX_START_EP)
+        parameters.update(headers=self._generation_headers())
 
         # body data
         data = {}
@@ -321,24 +319,18 @@ class MeshyImageTo3D(MeshyModelBase):
     Acceptable formats: jpg, jpeg and png
     Output format: glb, fbx and usdz
     This model does not require prompt.
+    Note: unable to refine it3d model with id.
     '''
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-          voxel_size_shrink_factor (required): int
-          negative_prompt: str
-          seed: int
+        Expected parameters:
+          - image_url (required): str
+          - enable_pbr: bool
         '''
         parameters = kwargs
 
-        endpoint = MESHY_BASE_EP + MESHY_IT3D_START_EP
-        parameters.update(url=endpoint)
-
-        # headers
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-
-        parameters.update(headers=headers)
+        parameters.update(url=MESHY_BASE_EP+MESHY_IT3D_START_EP)
+        parameters.update(headers=self._generation_headers())
 
         # body data
         data = {}

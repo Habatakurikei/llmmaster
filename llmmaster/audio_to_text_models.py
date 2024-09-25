@@ -46,7 +46,7 @@ class OpenAISpeechToText(BaseModel):
         Handle return value `answer` with care for different type in case of
         success and failure. Also differ from `response_format`.
         '''
-        answer = 'Valid text not generated.'
+        answer = 'Valid text not generated. '
 
         try:
             client = OpenAI(api_key=self.api_key)
@@ -80,25 +80,26 @@ class OpenAISpeechToText(BaseModel):
                     temperature=self.parameters['temperature'],
                     language=self.parameters['language'])
 
-            if response:
-                # print(f'OpenAI Audio-to-Text: response = {response}')
+            if isinstance(response, str):
                 answer = response
+            else:
+                answer = response.model_dump()
 
         except Exception as e:
-            answer = str(e)
+            answer += str(e)
 
         self.response = answer
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs (common):
-          - mode: either transcriptions or translations
-          - file: local audio file to process
-          - response_format: json, text, srt, verbose_json, or vtt
-          - temperature: positive float between 0 and 1
-        Expected inputs (only for transcripts):
-          - language: ISO 639-1 format like 'en'
-          - timestamp_granularities: ["word"] or ["segment"] or both in list
+        Expected parameters:
+          - mode: str, either transcriptions or translations
+          - file: str, local audio file to process
+          - response_format: str, json, text, srt, verbose_json, or vtt
+          - temperature: float, between 0 and 1
+        Expected parameters (only for transcripts):
+          - language: str, ISO 639-1 format like 'en'
+          - timestamp_granularities: list, ["word"] or ["segment"] or both
         '''
         parameters = kwargs
 
@@ -139,11 +140,8 @@ class OpenAISpeechToText(BaseModel):
 
 class GoogleSpeechToText(BaseModel):
     '''
-    List of typical available models as of 2024-07-24:
-      - gemini-1.5-pro
-      - gemini-1.5-flash
-      - gemini-1.0-pro
     Acceptable formats: wav, mp3, aiff, aac, ogg and flac
+    Gemini series support this function.
     This model supports transcription, description, summary and answering
     question for uploaded sound file by setting prompt.
     '''
@@ -159,7 +157,7 @@ class GoogleSpeechToText(BaseModel):
 
     def run(self):
 
-        message = 'Valid text not generated.'
+        message = 'Valid text not generated. '
 
         try:
             genai.configure(api_key=self.api_key)
@@ -177,23 +175,22 @@ class GoogleSpeechToText(BaseModel):
             genai.delete_file(audio_file.name)
 
         except Exception as e:
-            message = str(e)
+            message += str(e)
 
         self.response = message
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected inputs:
-        audio_file: local path to file.
+        Expected parameters:
+          - audio_file: str, local audio file to process
         '''
         parameters = kwargs
 
         if 'audio_file' not in kwargs:
-            msg = "'audio_file' parameter is required with at least one path."
+            msg = 'audio_file parameter is required with at least one path.'
             raise ValueError(msg)
-
         elif not os.path.isfile(kwargs['audio_file']):
-            msg = "'audio_file' is not a valid file."
+            msg = f"audio_file is not a valid file: {kwargs['audio_file']}"
             raise ValueError(msg)
 
         return parameters

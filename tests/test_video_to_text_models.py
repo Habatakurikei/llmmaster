@@ -1,22 +1,20 @@
 import os
 import sys
+from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../llmmaster'))
 
 import pytest
 
-from llmmaster.video_to_text_models import GoogleVideoToText
+from conftest import run_llmmaster
+from conftest import verify_instance
 from llmmaster import LLMMaster
+from llmmaster.video_to_text_models import GoogleVideoToText
 
 
-API_KEY = '''
-'''
-
-
-INSTANCE_CLASSES = {
-    'google': GoogleVideoToText
-}
+# API_KEY = Path('api_key_pairs.txt').read_text(encoding='utf-8')
+API_KEY = ''
 
 
 @pytest.fixture
@@ -28,31 +26,21 @@ def test_google_vtt(run_api):
     judgment = True
     master = LLMMaster()
 
-    google_vtt_test = master.pack_parameters(provider='google_vtt',
-                                             prompt='Describe attached video.',
-                                             video_file='test-inputs/test_video.mp4')
+    key = 'google_vtt'
+    file_path = 'test-inputs/test_video.mp4'
+    params = master.pack_parameters(provider=key,
+                                    model='gemini-1.5-flash',
+                                    prompt='Describe attached video.',
+                                    video_file=file_path)
     master.set_api_keys(API_KEY)
-    master.summon({'google_vtt_test': google_vtt_test})
+    master.summon({key: params})
 
-    for key, value in master.instances.items():
-        print(f'{key} = {value.parameters}')
-        if not isinstance(value, GoogleVideoToText):
-            judgment = False
+    judgment = verify_instance(master.instances[key], GoogleVideoToText)
 
     if run_api:
-        print('Run API')
         try:
-            master.run()
+            run_llmmaster(master)
         except Exception as e:
-            pytest.fail(f"An error occurred during API calls: {str(e)}")
+            pytest.fail(f"Test failed with error: {str(e)}")
 
-        print('Responses')
-        for key, value in master.results.items():
-            print(f'{key} = {value}')
-            if not value:
-                judgment = False
-
-    print(f'Elapsed time: {master.elapsed_time} seconds')
-    master.dismiss()
-
-    assert judgment is True
+    assert judgment

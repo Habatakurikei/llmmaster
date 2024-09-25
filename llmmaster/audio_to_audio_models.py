@@ -45,11 +45,10 @@ class ElevenLabsAudioIsolation(BaseModel):
         self.response = answer
 
     def _verify_arguments(self, **kwargs):
-        """
-        Verify and process arguments for Voicevox Text-to-Speech.
-        Expected inputs:
-          - audio: file path to original audio
-        """
+        '''
+        Expected parameters:
+          - audio: str, local file path to original audio
+        '''
         parameters = kwargs
 
         if 'audio' in kwargs and os.path.isfile(kwargs['audio']):

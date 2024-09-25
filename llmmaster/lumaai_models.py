@@ -12,9 +12,9 @@ class LumaDreamMachineBase(BaseModel):
     '''
     Base model for Luma AI API wrapper.
     Luma AI provides:
-      1. Text-To-Video model (ttv)
-      2. Image-To-Video model (itv)
-      3. Video-To-Video model (vtv)
+      1. Text-To-Video model (lumaai_ttv)
+      2. Image-To-Video model (lumaai_itv)
+      3. Video-To-Video model (lumaai_vtv)
     Commonize init and run for these models.
     Separately define _verify_arguments() due to different parameters.
     '''
@@ -80,9 +80,9 @@ class LumaDreamMachineTextToVideo(LumaDreamMachineBase):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-        aspect_ratio: str
-        loop: bool
+        Expected parameters:
+          - aspect_ratio: str
+          - loop: bool
         '''
         parameters = kwargs
 
@@ -132,9 +132,9 @@ class LumaDreamMachineImageToVideo(LumaDreamMachineBase):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-        frame0: URL of image for the start frame
-        frame1: URL of image for the end frame
+        Expected parameters:
+          - frame0: str, URL of image for the start frame
+          - frame1: str, URL of image for the end frame
         '''
         parameters = kwargs
 
@@ -185,9 +185,9 @@ class LumaDreamMachineVideoToVideo(LumaDreamMachineBase):
 
     def _verify_arguments(self, **kwargs):
         '''
-        Expected options:
-        frame0: URL of image or video for the start frame
-        frame1: URL of image or video for the end frame
+        Expected parameters:
+          - frame0: str, URL of image or video for the start frame
+          - frame1: str, URL of image or video for the end frame
         '''
         parameters = kwargs
 
