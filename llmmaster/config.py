@@ -15,6 +15,7 @@ MISTRAL_KEY_NAME = 'MISTRAL_API_KEY'
 OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
 PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
+RUNWAY_KEY_NAME = 'RUNWAY_API_KEY'
 STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
 TRIPO_KEY_NAME = 'TRIPO_API_KEY'
 
@@ -43,7 +44,8 @@ DEFAULT_ITI_MODELS = {'flux1_fal_iti': 'fal-ai/flux/dev/image-to-image',
                       'openai_iti': 'dall-e-2',
                       'stable_diffusion_iti': 'v2beta'}
 
-DEFAULT_ITV_MODELS = {'stable_diffusion_itv': 'v2beta'}
+DEFAULT_ITV_MODELS = {'stable_diffusion_itv': 'v2beta',
+                      'runway_itv': 'gen3a_turbo'}
 
 DEFAULT_ATT_MODELS = {'google_stt': 'gemini-1.5-flash',
                       'openai_stt': 'whisper-1'}
@@ -99,15 +101,33 @@ FULL_DEFAULT_MODELS = _full_default_list()
 REQUEST_ACCEPTED = 202
 REQUEST_OK = 200
 
-PERPLEXITY_TTT_EP = 'https://api.perplexity.ai'
-
 ADOBE_FIREFLY_TOKEN_PRE_EP = 'https://ims-na1.adobelogin.com/ims/token/v3?'
 ADOBE_FIREFLY_TOKEN_POST_EP = '&grant_type=client_credentials&scope=openid,' \
     + 'AdobeID,firefly_enterprise,firefly_api,ff_apis'
 ADOBE_FIREFLY_TTI_EP_BASE = 'https://firefly-api.adobe.io/'
 ADOBE_FIREFLY_TTI_EP_GENERATE = '/images/generate'
 
-STABLE_DIFFUSION_VERSION = 'v2beta'
+MESHY_BASE_EP = 'https://api.meshy.ai'
+
+MESHY_TTTX_START_EP = '/v1/text-to-texture'
+MESHY_TT3D_START_EP = '/v2/text-to-3d'
+MESHY_TTVX_START_EP = '/v1/text-to-voxel'
+MESHY_IT3D_START_EP = '/v1/image-to-3d'
+
+PERPLEXITY_TTT_EP = 'https://api.perplexity.ai'
+
+PIKAPIKAPIKA_BASE_EP = 'https://api.pikapikapika.io/web'
+PIKAPIKAPIKA_GENERATION_EP = '/generate'
+PIKAPIKAPIKA_LIPSYNC_EP = '/lipSync'
+PIKAPIKAPIKA_ADJUST_EP = '/adjust'
+PIKAPIKAPIKA_EXTEND_EP = '/extend'
+PIKAPIKAPIKA_UPSCALE_EP = '/upscale'
+PIKAPIKAPIKA_RESULT_EP = '/jobs/{id}'
+
+RUNWAY_BASE_EP = 'https://api.dev.runwayml.com'
+RUNWAY_IMAGE_TO_VIDEO_EP = '/v1/image_to_video'
+RUNWAY_RESULT_EP = '/v1/tasks/{id}'
+
 STABLE_DIFFUSION_BASE_EP = 'https://api.stability.ai'
 
 STABLE_DIFFUSION_TTI_EP = '/stable-image/generate'
@@ -133,28 +153,13 @@ STABLE_DIFFUSION_ITV_VERSION = 'v2beta'
 STABLE_DIFFUSION_ITV_START_EP = '/image-to-video'
 STABLE_DIFFUSION_ITV_RESULT_EP = '/image-to-video/result/{id}'
 
-MESHY_BASE_EP = 'https://api.meshy.ai'
-
-MESHY_TTTX_START_EP = '/v1/text-to-texture'
-MESHY_TT3D_START_EP = '/v2/text-to-3d'
-MESHY_TTVX_START_EP = '/v1/text-to-voxel'
-MESHY_IT3D_START_EP = '/v1/image-to-3d'
-
 TRIPO_BASE_EP = 'https://api.tripo3d.ai/v2/openapi'
 TRIPO_RESULT_EP = 'https://api.tripo3d.ai/v2/openapi/task/{task_id}'
 TRIPO_TASK_EP = '/task'
 TRIPO_UPLOAD_EP = '/upload'
 TRIPO_WALLET_EP = '/user/balance'
 
-PIKAPIKAPIKA_BASE_EP = 'https://api.pikapikapika.io/web'
-PIKAPIKAPIKA_GENERATION_EP = '/generate'
-PIKAPIKAPIKA_LIPSYNC_EP = '/lipSync'
-PIKAPIKAPIKA_ADJUST_EP = '/adjust'
-PIKAPIKAPIKA_EXTEND_EP = '/extend'
-PIKAPIKAPIKA_UPSCALE_EP = '/upscale'
-PIKAPIKAPIKA_RESULT_EP = '/jobs/{id}'
-
-# settings for summon
+# Settings for summon
 SUMMON_LIMIT = 100
 WAIT_FOR_STARTING = 1.0
 
@@ -226,6 +231,8 @@ OPENAI_TTI_SIZE_LIST = ['1024x1024', '1024x1792', '1792x1024',
 OPENAI_TTI_QUALITY_LIST = ['hd', 'standard']
 OPENAI_TTI_DEFAULT_N = 1
 OPENAI_TTI_MAX_N = 10
+
+STABLE_DIFFUSION_VERSION = 'v2beta'
 
 STABLE_DIFFUSION_TTI_MODELS = ['ultra', 'core']
 STABLE_DIFFUSION_TTI_OUTPUT_FORMATS = ['png', 'jpeg', 'webp']
@@ -380,3 +387,10 @@ WAIT_FOR_PIKAPIKAPIKA_RESULT = 5.0
 LUMAAI_ASPECT_RATIO_LIST = ['16:9', '4:3']
 LUMAAI_STATUS_IN_PROGRESS = ['queued', 'dreaming']
 WAIT_FOR_LUMAI_RESULT = 5.0
+
+# Runway specific settings
+RUNWAY_ASPECT_RATIO_LIST = ['16:9', '9:16']
+RUNWAY_DURATION_LIST = [5, 10]
+RUNWAY_STATUS_IN_PROGRESS = ['PENDING', 'THROTTLED', 'RUNNING']
+RUNWAY_VERSION = '2024-09-13'
+WAIT_FOR_RUNWAY_RESULT = 5.0

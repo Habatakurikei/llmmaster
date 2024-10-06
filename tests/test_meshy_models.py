@@ -159,8 +159,8 @@ def test_meshy_image_to_3d(run_api):
     master = LLMMaster()
 
     key = 'meshy_it3d'
-    # image_url = 'https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png'
-    image_url = 'https://monju.ai/app/static/dragon_girl_2.png'
+    image_url = 'https://assets.st-note.com/img/1725449361-rjBEAFQSfC6oecXxh718RndG.png'
+    # image_url = 'https://monju.ai/app/static/dragon_girl_2.png'
     params = master.pack_parameters(provider=key,
                                     image_url=image_url,
                                     enable_pbr=True)

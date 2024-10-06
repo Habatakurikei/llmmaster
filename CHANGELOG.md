@@ -9,8 +9,6 @@
 - Text-To-Music models pending to be added
   - Mubert API for rather enterprise use
   - Suno API for rather enterprise use
-- Text-To-Video models pending to be added
-  - Runway API not released for public yet
 - Pending additional functions
   - OpenAI and Stable Diffusion Image-To-Image for online file.
   - ElevenLabs using native REST API like dubbing and cloning, etc.
@@ -19,6 +17,11 @@
   - Anthropic Claude cache
   - SambaNova AI API
   - Google VertexAI
+
+## [0.7.0] - 2024-10-06
+### Added
+- Runway video models
+  - `RunwayImageToVideo`
 
 ## [0.6.0] - 2024-09-27
 ### Added

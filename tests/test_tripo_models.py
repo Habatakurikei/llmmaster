@@ -70,7 +70,7 @@ def test_tripo_image_to_3d(run_api):
     master = LLMMaster()
 
     key = 'tripo_it3d'
-    image_url = 'test-inputs/dragon_girl_2.png'
+    image_url = 'test-inputs/elf_girl_1.png'
     params = master.pack_parameters(provider=key,
                                     file=image_url)
     master.set_api_keys(API_KEY)

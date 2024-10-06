@@ -18,6 +18,7 @@ from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
 from .config import PIKAPIKAPIKA_KEY_NAME
 from .config import PROVIDERS_NEED_DUMMY_PROMPT
+from .config import RUNWAY_KEY_NAME
 from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
 from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import SUMMON_LIMIT
@@ -41,6 +42,7 @@ from .meshy_models import MeshyTextTo3DRefine
 from .meshy_models import MeshyTextToTexture
 from .meshy_models import MeshyTextToVoxel
 from .pikapikapika_models import PikaPikaPikaGeneration
+from .runway_models import RunwayImageToVideo
 from .text_to_audio_models import ElevenLabsTextToSoundEffect
 from .text_to_audio_models import ElevenLabsTextToSpeech
 from .text_to_audio_models import OpenAITextToSpeech
@@ -128,6 +130,8 @@ ACTIVE_MODELS = {
                    'key': MESHY_KEY_NAME},
     'pikapikapika_ttv': {'model': PikaPikaPikaGeneration,
                          'key': PIKAPIKAPIKA_KEY_NAME},
+    'runway_itv': {'model': RunwayImageToVideo,
+                   'key': RUNWAY_KEY_NAME},
     'tripo_tt3d': {'model': TripoTextTo3D,
                    'key': TRIPO_KEY_NAME},
     'tripo_it3d': {'model': TripoImageTo3D,

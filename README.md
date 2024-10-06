@@ -34,8 +34,8 @@ Use highlighted word for `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `openai`, `perplexity` | `flux1_fal_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `openai_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv`, `lumaai_ttv` |
-| Image | `google_itt`, `openai_itt` | `flux1_fal_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv`, `lumaai_itv` |
+| Text | `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `openai`, `perplexity` | `flux1_fal_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `openai_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv`, `lumaai_ttv`, `runway_ttv` |
+| Image | `google_itt`, `openai_itt` | `flux1_fal_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv`, `lumaai_itv`, `runway_itv` |
 | Audio | `google_stt`, `openai_stt` | NA | `elevenlabs_aiso` | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv` |
 
@@ -77,6 +77,7 @@ And the list below represents the models that are supported by each provider. Se
 ### Image-to-Video Models
 - Stable Diffusion (`v2beta`)
 - Luma Dream Machine (`dummy`)
+- Runway (`gen3a_turbo`)
 
 ### Audio(Speech)-to-Text Models
 - OpenAI (`whisper-1`)
@@ -155,6 +156,7 @@ export MISTRAL_API_KEY="your_mistral_key"
 export OPENAI_API_KEY="your_openai_key"
 export PERPLEXITY_API_KEY="your_perplexity_key"
 export PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
+export RUNWAY_API_KEY="your_runway_key"
 export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 export TRIPO_API_KEY="your_tripo_key"
 ```
@@ -175,6 +177,7 @@ SET MISTRAL_API_KEY=your_mistral_key
 SET OPENAI_API_KEY=your_openai_key
 SET PERPLEXITY_API_KEY=your_perplexity_key
 SET PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
+SET RUNWAY_API_KEY=your_runway_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 SET TRIPO_API_KEY=your_tripo_key
 ```
@@ -195,6 +198,7 @@ $env:MISTRAL_API_KEY="your_mistral_key"
 $env:OPENAI_API_KEY="your_openai_key"
 $env:PERPLEXITY_API_KEY="your_perplexity_key"
 $env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
+$env:RUNWAY_API_KEY="your_runway_key"
 $env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 $env:TRIPO_API_KEY="your_tripo_key"
 ```
@@ -244,7 +248,7 @@ master = LLMMaster()
 
 # Configure LLM instance
 master.summon({
-    "openai_instance": llmmaster.pack_parameters(
+    "openai_instance": master.pack_parameters(
         provider="openai",
         model="gpt-4o-mini",
         prompt="Hello, how are you?",
@@ -293,7 +297,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  2 Using **multiple Text-to-Text** LLMs simultaneously
+  2. Using **multiple Text-to-Text** LLMs simultaneously
 
 ```python
 from pathlib import Path
@@ -672,6 +676,7 @@ from llmmaster import LLMMaster
 
 local_image = '/home/user/test_image.png'
 image_url = 'https://example.com/image-1.jpg'
+prompt = 'The girl makes smiling with her eyes closed.'
 
 master = LLMMaster()
 master.summon({
@@ -681,8 +686,13 @@ master.summon({
     ),
     "lumaai": master.pack_parameters(
         provider='lumaai_itv',
-        prompt='Make smiling',
+        prompt=prompt,
         frame0=image_url
+    ),
+    "runway": master.pack_parameters(
+        provider='runway_itv',
+        prompt=prompt,
+        promptImage=image_url
     )
 })
 
@@ -701,6 +711,13 @@ if 'assets' in response:
     res = requests.get(response['assets']['video'])
     if res.status_code == 200:
         with open("lumaai_itv.mp4", "wb") as f:
+            f.write(res.content)
+
+response = master.results["runway"]
+if 'output' in response:
+    res = requests.get(response['output'][0])
+    if res.status_code == 200:
+        with open("runway_itv.mp4", "wb") as f:
             f.write(res.content)
 
 print(f"Elapsed time: {master.elapsed_time} seconds")
