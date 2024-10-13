@@ -88,3 +88,7 @@ Remarks:
 - LumaDreamMachineTextToVideo: dict = LumaAI.Generation
 - LumaDreamMachineImageToVideo: dict = LumaAI.Generation
 - LumaDreamMachineVideoToVideo: dict = LumaAI.Generation
+
+## Skybox
+- SkyboxTextToPanorama: dict = requests.models.Response with text content
+- SkyboxPanoramaToImageVideo: dict = requests.models.Response with text content

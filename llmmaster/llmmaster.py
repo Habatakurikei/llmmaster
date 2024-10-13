@@ -20,6 +20,7 @@ from .config import PIKAPIKAPIKA_KEY_NAME
 from .config import PROVIDERS_NEED_DUMMY_PROMPT
 from .config import RUNWAY_KEY_NAME
 from .config import SD_ITI_MODE_NEED_DUMMY_PROMPT
+from .config import SKYBOX_KEY_NAME
 from .config import STABLE_DIFFUSION_KEY_NAME
 from .config import SUMMON_LIMIT
 from .config import TRIPO_KEY_NAME
@@ -43,6 +44,8 @@ from .meshy_models import MeshyTextToTexture
 from .meshy_models import MeshyTextToVoxel
 from .pikapikapika_models import PikaPikaPikaGeneration
 from .runway_models import RunwayImageToVideo
+from .skybox_models import SkyboxPanoramaToImageVideo
+from .skybox_models import SkyboxTextToPanorama
 from .text_to_audio_models import ElevenLabsTextToSoundEffect
 from .text_to_audio_models import ElevenLabsTextToSpeech
 from .text_to_audio_models import OpenAITextToSpeech
@@ -155,7 +158,11 @@ ACTIVE_MODELS = {
     'lumaai_itv': {'model': LumaDreamMachineImageToVideo,
                    'key': LUMAAI_KEY_NAME},
     'lumaai_vtv': {'model': LumaDreamMachineVideoToVideo,
-                   'key': LUMAAI_KEY_NAME}
+                   'key': LUMAAI_KEY_NAME},
+    'skybox_ttp': {'model': SkyboxTextToPanorama,
+                   'key': SKYBOX_KEY_NAME},
+    'skybox_ptiv': {'model': SkyboxPanoramaToImageVideo,
+                    'key': SKYBOX_KEY_NAME}
 }
 
 
@@ -404,6 +411,8 @@ class LLMInstanceCreator():
           - provider = meshy_it3d
         - ElevenLabsAudioIsolation
           - provider = elevenlabs_aiso
+        - SkyboxPanoramaToImageVideo
+          - provider = skybox_ptiv
         '''
         answer = False
 

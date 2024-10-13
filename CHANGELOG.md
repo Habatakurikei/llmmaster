@@ -18,6 +18,12 @@
   - SambaNova AI API
   - Google VertexAI
 
+## [0.8.0] - 2024-10-13
+### Added
+- Skybox models
+  - `SkyboxTextToPanorama`
+  - `SkyboxPanoramaToImageVideo` (export function)
+
 ## [0.7.0] - 2024-10-06
 ### Added
 - Runway video models

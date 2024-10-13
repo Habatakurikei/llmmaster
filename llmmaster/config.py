@@ -16,6 +16,7 @@ OPENAI_KEY_NAME = 'OPENAI_API_KEY'
 PERPLEXITY_KEY_NAME = 'PERPLEXITY_API_KEY'
 PIKAPIKAPIKA_KEY_NAME = 'PIKAPIKAPIKA_API_KEY'
 RUNWAY_KEY_NAME = 'RUNWAY_API_KEY'
+SKYBOX_KEY_NAME = 'SKYBOX_API_KEY'
 STABLE_DIFFUSION_KEY_NAME = 'STABLE_DIFFUSION_API_KEY'
 TRIPO_KEY_NAME = 'TRIPO_API_KEY'
 
@@ -76,6 +77,9 @@ DEFAULT_LUMAAI_MODELS = {'lumaai_ttv': 'dummy',
                          'lumaai_itv': 'dummy',
                          'lumaai_vtv': 'dummy'}
 
+DEFAULT_SKYBOX_MODELS = {'skybox_ttp': 'dummy',
+                         'skybox_ptiv': 'dummy'}
+
 
 def _full_default_list():
     full_list = {}
@@ -92,6 +96,7 @@ def _full_default_list():
     full_list.update(DEFAULT_TRIPO_MODELS)
     full_list.update(DEFAULT_PIKAPIKAPIKA_MODELS)
     full_list.update(DEFAULT_LUMAAI_MODELS)
+    full_list.update(DEFAULT_SKYBOX_MODELS)
     return full_list
 
 
@@ -127,6 +132,13 @@ PIKAPIKAPIKA_RESULT_EP = '/jobs/{id}'
 RUNWAY_BASE_EP = 'https://api.dev.runwayml.com'
 RUNWAY_IMAGE_TO_VIDEO_EP = '/v1/image_to_video'
 RUNWAY_RESULT_EP = '/v1/tasks/{id}'
+
+SKYBOX_BASE_EP = 'https://backend.blockadelabs.com/api/v1'
+
+SKYBOX_EXPORT_EP = '/skybox/export'
+SKYBOX_EXPORT_RESULT_EP = '/skybox/export/{id}'
+SKYBOX_GENERATION_EP = '/skybox'
+SKYBOX_GENERATION_RESULT_EP = '/imagine/requests/{id}'
 
 STABLE_DIFFUSION_BASE_EP = 'https://api.stability.ai'
 
@@ -169,7 +181,8 @@ PROVIDERS_NEED_DUMMY_PROMPT = ['openai_stt', 'stable_diffusion_itv',
                                'meshy_tttx', 'meshy_tt3d_refine', 'meshy_it3d',
                                'tripo_it3d', 'tripo_mv3d', 'tripo_refine',
                                'tripo_aprc', 'tripo_arig', 'tripo_aretarget',
-                               'tripo_stylize', 'tripo_conversion']
+                               'tripo_stylize', 'tripo_conversion',
+                               'skybox_ptiv']
 OPENAI_ITI_MODE_NEED_DUMMY_PROMPT = ['variations']
 SD_ITI_MODE_NEED_DUMMY_PROMPT = ['erase', 'outpaint', 'remove_background']
 
@@ -394,3 +407,8 @@ RUNWAY_DURATION_LIST = [5, 10]
 RUNWAY_STATUS_IN_PROGRESS = ['PENDING', 'THROTTLED', 'RUNNING']
 RUNWAY_VERSION = '2024-09-13'
 WAIT_FOR_RUNWAY_RESULT = 5.0
+
+# Skybox specific settings
+SKYBOX_STATUS_IN_PROGRESS = ['pending', 'dispatched', 'processing']
+SKYBOX_STATUS_RESULT = ['complete', 'abort', 'error']
+WAIT_FOR_SKYBOX_RESULT = 5.0

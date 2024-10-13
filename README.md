@@ -24,9 +24,11 @@ This is a Python library that provides a unified interface for interacting with 
 
 LLM Master respects multi-modal approach. There are many generative AI models that can be used for different purposes.
 
-There are 2 categories in LLM Master: major data formats and 3D models.
+There are 3 categories in LLM Master: major data formats, 3D models, and Panorama models.
 
-  1. **Major Data Formats**
+More models will be supported soon!
+
+1. **Major Data Formats**
 
 The table below represents various conversion capabilities between different media types (text, image, audio/speech and video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
@@ -98,7 +100,7 @@ The `model` parameter is optional. If you do not specify the model, the default 
 
 **Important:** You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
 
-  2. **3D Models**
+2. **3D Models**
 
 From ver. 0.2.2, LLM Master supports 3D models thanks to Meshy API. Here are the list of supported functions defined as class:
 
@@ -120,7 +122,14 @@ From ver. 0.6.0, LLM Master also supports Tripo 3D modeling API. The following c
 - TripoStylization: `tripo_stylize`
 - TripoConversion: `tripo_conversion`
 
-More models will be supported soon!
+3. **Panorama Models**
+
+Are you not satisfied with just generating images and 3D models? From ver. 0.8.0, LLM Master supports Skybox API that generates 360-degree panoramic images and videos.
+
+The following classes and provider keys are available:
+
+- SkyboxTextToPanorama: `skybox_ttp`
+- SkyboxPanoramaToImageVideo: `skybox_ptiv` (export function)
 
 ## Installation
 
@@ -157,6 +166,7 @@ export OPENAI_API_KEY="your_openai_key"
 export PERPLEXITY_API_KEY="your_perplexity_key"
 export PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 export RUNWAY_API_KEY="your_runway_key"
+export SKYBOX_API_KEY="your_skybox_key"
 export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 export TRIPO_API_KEY="your_tripo_key"
 ```
@@ -178,6 +188,7 @@ SET OPENAI_API_KEY=your_openai_key
 SET PERPLEXITY_API_KEY=your_perplexity_key
 SET PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
 SET RUNWAY_API_KEY=your_runway_key
+SET SKYBOX_API_KEY=your_skybox_key
 SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
 SET TRIPO_API_KEY=your_tripo_key
 ```
@@ -199,6 +210,7 @@ $env:OPENAI_API_KEY="your_openai_key"
 $env:PERPLEXITY_API_KEY="your_perplexity_key"
 $env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
 $env:RUNWAY_API_KEY="your_runway_key"
+$env:SKYBOX_API_KEY="your_skybox_key"
 $env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
 $env:TRIPO_API_KEY="your_tripo_key"
 ```
@@ -977,6 +989,50 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
+
+  15. Using **Panorama Models** (Skybox)
+
+```python
+import requests
+from llmmaster import LLMMaster
+
+key = 'skybox_ttp'
+negative_prompt = 'ugly, dirty, low resolution'
+prompt = 'A Japanese temple, surrounded by mountains, with cherry blossoms.'
+
+master = LLMMaster()
+master.summon({
+    key: master.pack_parameters(
+        provider=key,
+        prompt=prompt,
+        skybox_style_id=138,
+        negative_text=negative_prompt
+    )
+})
+
+print('Run master')
+master.run()
+
+print('Responses')
+response = master.results[key]
+
+# Download images generated
+if 'request' in response:
+    res = requests.get(response['request']['file_url'])
+    if res.status_code == 200:
+        with open(f"{key}_view.jpg", 'wb') as f:
+            f.write(res.content)
+
+    res = requests.get(response['request']['thumb_url'])
+    if res.status_code == 200:
+        with open(f"{key}_thumb.jpg", 'wb') as f:
+            f.write(res.content)
+
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
 
 ## Applications
 - [Zoltraak Klein](https://github.com/Habatakurikei/zoltraakklein): [Zoltraak](https://github.com/dai-motoki/zoltraak) is a framework of digital content plant, generating texts/codes, images, speeches and videos. LLMMaster is core interface for external AI services.
