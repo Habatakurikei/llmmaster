@@ -1,14 +1,8 @@
-import requests
-from pathlib import Path
+import os
 
-from .base_model import BaseModel
-from .config import REQUEST_OK
-from .config import TRIPO_ANIMATION_MODE
-from .config import TRIPO_ANIMATION_OUT_FORMAT
+from requests.models import Response
+
 from .config import TRIPO_BASE_EP
-from .config import TRIPO_CONVERSION_FORMAT
-from .config import TRIPO_CONVERSION_TEXTURE
-from .config import TRIPO_MODELS
 from .config import TRIPO_MODE_APRC
 from .config import TRIPO_MODE_ARETARGET
 from .config import TRIPO_MODE_ARIG
@@ -17,484 +11,527 @@ from .config import TRIPO_MODE_IT3D
 from .config import TRIPO_MODE_MV3D
 from .config import TRIPO_MODE_REFINE
 from .config import TRIPO_MODE_STYLIZE
+from .config import TRIPO_MODE_TEXTURE
 from .config import TRIPO_MODE_TT3D
-from .config import TRIPO_MULTIVIEW_MODES
 from .config import TRIPO_RESULT_EP
 from .config import TRIPO_STATUS_IN_PROGRESS
-from .config import TRIPO_STYLIZATION_STYLE
 from .config import TRIPO_TASK_EP
-from .config import TRIPO_UPLOAD_EP
 from .config import WAIT_FOR_TRIPO_RESULT
+from .root_model import RootModel
+from .utils import tripo_image_input
 
 
-class TripoModelBase(BaseModel):
-    '''
+class TripoBase(RootModel):
+    """
     Base model for Tripo API wrapper.
     Tripo provides:
       1. text_to_model (tripo_tt3d)
       2. image_to_model (tripo_it3d)
       3. multiview_to_model (tripo_mv3d)
-      4. refine_model (tripo_refine)
-      5. animate_prerigcheck (tripo_aprc)
-      6. animate_rig (tripo_arig)
-      7. animate_retarget (tripo_aretarget)
-      8. stylize_model (tripo_stylization)
-      9. convert_model (tripo_conversion)
-    Commonize init and run for these models.
-    Separately define _verify_arguments() due to different parameters.
-    '''
-    def __init__(self, **kwargs):
+      4. texture_model (tripo_texture)
+      5. refine_model (tripo_refine)
+      6. animate_prerigcheck (tripo_aprc)
+      7. animate_rig (tripo_arig)
+      8. animate_retarget (tripo_aretarget)
+      9. stylize_model (tripo_stylization)
+      10. convert_model (tripo_conversion)
+    """
 
+    def __init__(self, **kwargs) -> None:
         try:
             super().__init__(**kwargs)
-
         except Exception as e:
-            msg = 'Error while verifying specific parameters for Tripo'
+            msg = "Exception received in TripoBase"
             raise Exception(msg) from e
 
-    def run(self):
-        '''
-        Note:
-        Return json-convereted response of request in dictionary.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid model not generated. '
-
-        try:
-            response = requests.post(self.parameters['url'],
-                                     headers=self.parameters['headers'],
-                                     json=self.parameters['data'])
+    def run(self) -> None:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        response = self._call_rest_api(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
+        if isinstance(response, Response):
             response_json = response.json()
-            response = self._fetch_result(response_json['data']['task_id'])
+            response = self._fetch_result(
+                url=(
+                    TRIPO_BASE_EP +
+                    TRIPO_RESULT_EP.format(
+                        task_id=response_json["data"]["task_id"]
+                    )
+                ),
+                wait_time=WAIT_FOR_TRIPO_RESULT
+            )
 
-            if response.status_code == REQUEST_OK:
-                answer = response.json()
-            else:
-                answer += str(response.json())
+        self.response = (
+            response.json() if isinstance(response, Response) else response
+        )
 
-        except Exception as e:
-            answer += str(e)
-
-        self.response = answer
-
-    def _fetch_result(self, id=''):
-        '''
-        Common function to fetch result.
-        '''
-        answer = 'Generated model not found.'
-        header = {'Authorization': f'Bearer {self.api_key}'}
-        url = TRIPO_RESULT_EP.format(task_id=id)
-
-        flg = True
-        while flg:
-            response = requests.request(method='GET',
-                                        url=url,
-                                        headers=header)
-            response_json = response.json()
-            if response_json['data']['status'] in TRIPO_STATUS_IN_PROGRESS:
-                self._wait(WAIT_FOR_TRIPO_RESULT)
-            else:
-                answer = response
-                flg = False
-        return answer
-
-    def _generation_headers(self):
-        '''
-        Common headers for generation.
-        '''
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-        return headers
-
-    def _file_option(self, file_path: str = ''):
-        '''
-        Upload file to Tripo and get file token in dictionary for generation.
-        '''
-        to_load = Path(file_path)
-        if not to_load.exists():
-            ValueError(f'Image file not found: {file_path}')
-
-        ext = to_load.suffix.replace('.', '')
-        ext = 'jpeg' if ext == 'jpg' else ext
-
-        url = TRIPO_BASE_EP + TRIPO_UPLOAD_EP
-        headers = {'Authorization': f'Bearer {self.api_key}'}
-
-        with open(file_path, 'rb') as fp:
-            files = {'file': (file_path, fp, f'image/{ext}')}
-            response = requests.post(url, headers=headers, files=files)
-
+    def _is_task_ongoing(self, response: Response) -> bool:
         response_json = response.json()
-        token = response_json['data']['image_token']
-
-        return {'type': ext, 'file_token': token}
+        return response_json["data"]["status"] in TRIPO_STATUS_IN_PROGRESS
 
 
-class TripoTextTo3D(TripoModelBase):
-    '''
-    Output format: TBC
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - model_version: str
+class TripoTextTo3D(TripoBase):
+    """
+    Text-To-3D
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - model_version: str of model
           - negative_prompt: str
-          - text_seed: int
-          - model_seed: int
-        '''
-        parameters = kwargs
-
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(type=TRIPO_MODE_TT3D)
-        data.update(prompt=kwargs['prompt'])
-
-        # model_version
-        if ('model_version' in kwargs and
-           kwargs['model_version'] in TRIPO_MODELS):
-            data.update(model_version=kwargs['model_version'])
-
-        # negative_prompt
-        if ('negative_prompt' in kwargs and
-           isinstance(kwargs['negative_prompt'], str)):
-            data.update(negative_prompt=kwargs['negative_prompt'])
-
-        # text_seed
-        if 'text_seed' in kwargs and isinstance(kwargs['text_seed'], int):
-            data.update(text_seed=kwargs['text_seed'])
-
-        # model_seed
-        if 'model_seed' in kwargs and isinstance(kwargs['model_seed'], int):
-            data.update(model_seed=kwargs['model_seed'])
-
-        parameters.update(data=data)
-
-        return parameters
-
-
-class TripoImageTo3D(TripoModelBase):
-    '''
-    Output format: TBC
-    Important: this model does not require prompt.
-    '''
-    def run(self):
-        '''
-        Upload image file before generating.
-        '''
-        self.parameters['data'].update(
-            file=self._file_option(self.parameters['file']))
-        super().run()
-
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - file: path to local image file, used in _file_option()
-          - model_version: str
-          - model_seed: int
-        Options only for model_version == v2.0-20240919
+          - image_seed: int to determine process
+          - model_seed: int to determine geometry
+        Additional optional parameters:
           - face_limit: int
-          - texture: bool
-          - pbr: bool
+          - texture: bool, to enable texture
+          - pbr: bool, to enable pbr
           - texture_seed: int
-        '''
+          - texture_quality: str, detailed, standard
+          - auto_size: bool, True to make realistic size
+          - style: str, define style
+          - quad: bool, True to make quad mesh output
+        """
+        body = {
+            "type": TRIPO_MODE_TT3D,
+            "model_version": self.parameters["model"],
+            "prompt": self.parameters["prompt"]
+        }
+
+        if "negative_prompt" in self.parameters:
+            body["negative_prompt"] = self.parameters["negative_prompt"]
+
+        if "image_seed" in self.parameters:
+            body["image_seed"] = self.parameters["image_seed"]
+
+        if "model_seed" in self.parameters:
+            body["model_seed"] = self.parameters["model_seed"]
+
+        if "face_limit" in self.parameters:
+            body["face_limit"] = self.parameters["face_limit"]
+
+        if "texture" in self.parameters:
+            body["texture"] = self.parameters["texture"]
+
+        if "pbr" in self.parameters:
+            body["pbr"] = self.parameters["pbr"]
+
+        if "texture_seed" in self.parameters:
+            body["texture_seed"] = self.parameters["texture_seed"]
+
+        if "texture_quality" in self.parameters:
+            body["texture_quality"] = self.parameters["texture_quality"]
+
+        if "auto_size" in self.parameters:
+            body["auto_size"] = self.parameters["auto_size"]
+
+        if "style" in self.parameters:
+            body["style"] = self.parameters["style"]
+
+        if "quad" in self.parameters:
+            body["quad"] = self.parameters["quad"]
+
+        return body
+
+
+class TripoImageTo3D(TripoBase):
+    """
+    Image-To-3D
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - model_version: str of model
+          - file (required): image input
+          - model_seed: int to determine geometry
+        Additional optional parameters:
+          - face_limit: int
+          - texture: bool, to enable texture
+          - pbr: bool, to enable pbr
+          - texture_seed: int
+          - texture_quality: str, detailed, standard
+          - auto_size: bool, True to make realistic size
+          - style: str, define style
+          - quad: bool, True to make quad mesh output
+          - texture_alignment: original_image or geometry
+          - orientation: align_image or default
+        """
+        body = {
+            "type": TRIPO_MODE_IT3D,
+            "model_version": self.parameters["model"],
+            "file": tripo_image_input(
+                image_path=self.parameters["file"],
+                api_key=self.api_key
+            )
+        }
+
+        if "model_seed" in self.parameters:
+            body["model_seed"] = self.parameters["model_seed"]
+
+        if "face_limit" in self.parameters:
+            body["face_limit"] = self.parameters["face_limit"]
+
+        if "texture" in self.parameters:
+            body["texture"] = self.parameters["texture"]
+
+        if "pbr" in self.parameters:
+            body["pbr"] = self.parameters["pbr"]
+
+        if "texture_seed" in self.parameters:
+            body["texture_seed"] = self.parameters["texture_seed"]
+
+        if "texture_quality" in self.parameters:
+            body["texture_quality"] = self.parameters["texture_quality"]
+
+        if "auto_size" in self.parameters:
+            body["auto_size"] = self.parameters["auto_size"]
+
+        if "style" in self.parameters:
+            body["style"] = self.parameters["style"]
+
+        if "quad" in self.parameters:
+            body["quad"] = self.parameters["quad"]
+
+        if "texture_alignment" in self.parameters:
+            body["texture_alignment"] = self.parameters["texture_alignment"]
+
+        if "orientation" in self.parameters:
+            body["orientation"] = self.parameters["orientation"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - file
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(type=TRIPO_MODE_IT3D)
-
-        # model_version
-        if ('model_version' in kwargs and
-           kwargs['model_version'] in TRIPO_MODELS):
-            data.update(model_version=kwargs['model_version'])
-
-        # model_seed
-        if 'model_seed' in kwargs and isinstance(kwargs['model_seed'], int):
-            data.update(model_seed=kwargs['model_seed'])
-
-        # face_limit
-        if 'face_limit' in kwargs and isinstance(kwargs['face_limit'], int):
-            data.update(face_limit=kwargs['face_limit'])
-
-        # texture
-        if 'texture' in kwargs and isinstance(kwargs['texture'], bool):
-            data.update(texture=kwargs['texture'])
-
-        # pbr
-        if 'pbr' in kwargs and isinstance(kwargs['pbr'], bool):
-            data.update(pbr=kwargs['pbr'])
-
-        # texture_seed
-        if ('texture_seed' in kwargs and
-           isinstance(kwargs['texture_seed'], int)):
-            data.update(texture_seed=kwargs['texture_seed'])
-
-        parameters.update(data=data)
+        if "file" not in kwargs or not os.path.isfile(kwargs["file"]):
+            msg = "parameter `file` is not given or not a valid file"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoMultiviewTo3D(TripoModelBase):
-    '''
-    Output format: TBC
-    Important: this model does not require prompt.
-    '''
-    def run(self):
-        '''
-        Upload image file before generating.
-        '''
-        files = []
-        for entry in self.parameters['files']:
-            files.append(self._file_option(entry))
-        self.parameters['data'].update(files=files)
-        super().run()
+class TripoMultiviewTo3D(TripoBase):
+    """
+    Multiview-To-3D
+    """
 
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - files: path to 3 image files (front, side, back), _file_option()
-          - mode: LEFT or RIGHT in str
-          - model_version: str
-          - orthographic_projection: bool
-          - model_seed: int
-        '''
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - model_version: str of model
+          - files (required): list of dict - front, left, back, right
+        Additional optional parameters:
+          - face_limit: int
+          - texture: bool, to enable texture
+          - pbr: bool, to enable pbr
+          - texture_seed: int
+          - texture_alignment: original_image or geometry
+          - texture_quality: str, detailed, standard
+          - auto_size: bool, True to make realistic size
+          - orientation: align_image or default
+          - quad: bool, True to make quad mesh output
+        """
+        body = {
+            "type": TRIPO_MODE_MV3D,
+            "model_version": self.parameters["model"],
+            "files": []
+        }
+
+        for file in self.parameters["files"]:
+            body["files"].append(tripo_image_input(
+                image_path=file,
+                api_key=self.api_key
+            ))
+
+        if "face_limit" in self.parameters:
+            body["face_limit"] = self.parameters["face_limit"]
+
+        if "texture" in self.parameters:
+            body["texture"] = self.parameters["texture"]
+
+        if "pbr" in self.parameters:
+            body["pbr"] = self.parameters["pbr"]
+
+        if "texture_seed" in self.parameters:
+            body["texture_seed"] = self.parameters["texture_seed"]
+
+        if "texture_alignment" in self.parameters:
+            body["texture_alignment"] = self.parameters["texture_alignment"]
+
+        if "texture_quality" in self.parameters:
+            body["texture_quality"] = self.parameters["texture_quality"]
+
+        if "auto_size" in self.parameters:
+            body["auto_size"] = self.parameters["auto_size"]
+
+        if "orientation" in self.parameters:
+            body["orientation"] = self.parameters["orientation"]
+
+        if "quad" in self.parameters:
+            body["quad"] = self.parameters["quad"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - files
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(type=TRIPO_MODE_MV3D)
-
-        # mode
-        if 'mode' in kwargs and kwargs['mode'] in TRIPO_MULTIVIEW_MODES:
-            data.update(mode=kwargs['mode'])
-        else:
-            data.update(mode=TRIPO_MULTIVIEW_MODES[0])
-
-        # model_version
-        if ('model_version' in kwargs and
-           kwargs['model_version'] in TRIPO_MODELS):
-            data.update(model_version=kwargs['model_version'])
-
-        # orthographic_projection
-        if ('orthographic_projection' in kwargs and
-           isinstance(kwargs['orthographic_projection'], bool)):
-            data.update(
-                orthographic_projection=kwargs['orthographic_projection'])
-
-        # model_seed
-        if 'model_seed' in kwargs and isinstance(kwargs['model_seed'], int):
-            data.update(model_seed=kwargs['model_seed'])
-
-        parameters.update(data=data)
+        if "files" not in kwargs or not isinstance(kwargs["files"], list):
+            msg = "parameter `files` is not given or not a list"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoRefineModel(TripoModelBase):
-    '''
-    Output format: TBC
-    Important: this model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - draft_model_task_id: str
-        '''
+class TripoTextureModel(TripoBase):
+    """
+    Texture Model from original generated by Tripo
+    Note: model_id should be made by model_version>=v2.0-20240919.
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - original_model_task_id (required): str
+          - texture: bool, to enable texture
+          - pbr: bool, to enable pbr
+          - texture_seed: int
+          - texture_alignment: original_image or geometry
+          - texture_quality: str, detailed, standard`
+        """
+        body = {
+            "type": TRIPO_MODE_TEXTURE,
+            "model_version": self.parameters["model"],
+            "original_model_task_id": self.parameters[
+                "original_model_task_id"
+            ]
+        }
+
+        if "texture" in self.parameters:
+            body["texture"] = self.parameters["texture"]
+
+        if "pbr" in self.parameters:
+            body["pbr"] = self.parameters["pbr"]
+
+        if "texture_seed" in self.parameters:
+            body["texture_seed"] = self.parameters["texture_seed"]
+
+        if "texture_alignment" in self.parameters:
+            body["texture_alignment"] = self.parameters["texture_alignment"]
+
+        if "texture_quality" in self.parameters:
+            body["texture_quality"] = self.parameters["texture_quality"]
+
+        return body
+
+
+class TripoRefineModel(TripoBase):
+    """
+    Refine Model from draft generated by Tripo
+    Note: models of model_version>=v2.0-20240919 for refine is not suppoted.
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - draft_model_task_id (required): str
+        """
+        body = {
+            "type": TRIPO_MODE_REFINE,
+            "draft_model_task_id": self.parameters["draft_model_task_id"]
+        }
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - draft_model_task_id
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(type=TRIPO_MODE_REFINE)
-        if ('draft_model_task_id' in kwargs and
-           isinstance(kwargs['draft_model_task_id'], str)):
-            data.update(draft_model_task_id=kwargs['draft_model_task_id'])
-        else:
-            ValueError('draft_model_task_id is required.')
-
-        parameters.update(data=data)
+        if "draft_model_task_id" not in kwargs:
+            msg = "parameter `draft_model_task_id` is not given"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoAnimationPreRigCheck(TripoModelBase):
-    '''
-    Output format: TBC
-    Important: this model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - original_model_task_id: str
-        '''
+class TripoAnimationPreRigCheck(TripoBase):
+    """
+    Animation Pre Rig Check
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - original_model_task_id (required): str
+        """
+        return {
+            "type": TRIPO_MODE_APRC,
+            "original_model_task_id": self.parameters[
+                "original_model_task_id"
+            ]
+        }
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - original_model_task_id
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(type=TRIPO_MODE_APRC)
-        if ('original_model_task_id' in kwargs and
-           isinstance(kwargs['original_model_task_id'], str)):
-            data.update(
-                original_model_task_id=kwargs['original_model_task_id'])
-        else:
-            ValueError('original_model_task_id is required.')
-
-        parameters.update(data=data)
+        if "original_model_task_id" not in kwargs:
+            msg = "parameter `original_model_task_id` is not given"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoAnimationRig(TripoModelBase):
-    '''
-    Output format: glb or fbx
-    Important: this model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - original_model_task_id: str
+class TripoAnimationRig(TripoBase):
+    """
+    Animation Rig
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - original_model_task_id (required): str
           - out_format: glb or fbx in str
-        '''
+        """
+        body = {
+            "type": TRIPO_MODE_ARIG,
+            "original_model_task_id": self.parameters[
+                "original_model_task_id"
+            ]
+        }
+
+        if "out_format" in self.parameters:
+            body["out_format"] = self.parameters["out_format"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - original_model_task_id
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-
-        data.update(type=TRIPO_MODE_ARIG)
-        if ('original_model_task_id' in kwargs and
-           isinstance(kwargs['original_model_task_id'], str)):
-            data.update(
-                original_model_task_id=kwargs['original_model_task_id'])
-        else:
-            ValueError('original_model_task_id is required.')
-
-        if ('out_format' in kwargs and
-           kwargs['out_format'] in TRIPO_ANIMATION_OUT_FORMAT):
-            data.update(out_format=kwargs['out_format'])
-
-        parameters.update(data=data)
+        if "original_model_task_id" not in kwargs:
+            msg = "parameter `original_model_task_id` is not given"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoAnimationRetarget(TripoModelBase):
-    '''
-    Output format: glb or fbx
-    Important: this model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - original_model_task_id: str
+class TripoAnimationRetarget(TripoBase):
+    """
+    Animation Retarget
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - original_model_task_id (required): str
+          - animation (required): str
           - out_format: glb or fbx in str
           - bake_animation: bool
-          - animation: str
-        '''
+        """
+        body = {
+            "type": TRIPO_MODE_ARETARGET,
+            "original_model_task_id": self.parameters[
+                "original_model_task_id"
+            ],
+            "animation": self.parameters["animation"]
+        }
+
+        if "out_format" in self.parameters:
+            body["out_format"] = self.parameters["out_format"]
+
+        if "bake_animation" in self.parameters:
+            body["bake_animation"] = self.parameters["bake_animation"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - original_model_task_id
+          - animation
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
+        if "original_model_task_id" not in kwargs:
+            msg = "parameter `original_model_task_id` is not given"
+            raise ValueError(msg)
 
-        # body data
-        data = {}
-
-        data.update(type=TRIPO_MODE_ARETARGET)
-        if ('original_model_task_id' in kwargs and
-           isinstance(kwargs['original_model_task_id'], str)):
-            data.update(
-                original_model_task_id=kwargs['original_model_task_id'])
-        else:
-            ValueError('original_model_task_id is required.')
-
-        if ('animation' in kwargs and
-           kwargs['animation'] in TRIPO_ANIMATION_MODE):
-            data.update(animation=kwargs['animation'])
-        else:
-            data.update(animation=TRIPO_ANIMATION_MODE[0])
-
-        if ('out_format' in kwargs and
-           kwargs['out_format'] in TRIPO_ANIMATION_OUT_FORMAT):
-            data.update(out_format=kwargs['out_format'])
-
-        if ('bake_animation' in kwargs and
-           isinstance(kwargs['bake_animation'], bool)):
-            data.update(bake_animation=kwargs['bake_animation'])
-
-        parameters.update(data=data)
+        if "animation" not in kwargs:
+            msg = "parameter `animation` is not given"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoStylization(TripoModelBase):
-    '''
-    Output format: TBC
-    Important: this model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - original_model_task_id: str
-          - style: str
+class TripoStylization(TripoBase):
+    """
+    Stylization
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - original_model_task_id (required): str
+          - style (required): str
           - block_size: int (for only minecraft)
-        '''
+        """
+        body = {
+            "type": TRIPO_MODE_STYLIZE,
+            "original_model_task_id": self.parameters[
+                "original_model_task_id"
+            ],
+            "style": self.parameters["style"]
+        }
+
+        if "block_size" in self.parameters:
+            body["block_size"] = self.parameters["block_size"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - original_model_task_id
+          - style
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
+        if "original_model_task_id" not in kwargs:
+            msg = "parameter `original_model_task_id` is not given"
+            raise ValueError(msg)
 
-        # body data
-        data = {}
-
-        data.update(type=TRIPO_MODE_STYLIZE)
-        if ('original_model_task_id' in kwargs and
-           isinstance(kwargs['original_model_task_id'], str)):
-            data.update(
-                original_model_task_id=kwargs['original_model_task_id'])
-        else:
-            ValueError('original_model_task_id is required.')
-
-        if 'style' in kwargs and kwargs['style'] in TRIPO_STYLIZATION_STYLE:
-            data.update(style=kwargs['style'])
-        else:
-            data.update(style=TRIPO_STYLIZATION_STYLE[0])
-
-        if 'block_size' in kwargs and isinstance(kwargs['block_size'], int):
-            data.update(block_size=kwargs['block_size'])
-
-        parameters.update(data=data)
+        if "style" not in kwargs:
+            msg = "parameter `style` is not given"
+            raise ValueError(msg)
 
         return parameters
 
 
-class TripoConversion(TripoModelBase):
-    '''
-    Output format: TBC
-    Important: this model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - original_model_task_id: str
-          - format: str
+class TripoConversion(TripoBase):
+    """
+    Conversion
+    """
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - original_model_task_id (required): str
+          - format (required): str
           - quad: bool
           - force_symmetry: bool
           - face_limit: int
@@ -504,64 +541,62 @@ class TripoConversion(TripoModelBase):
           - texture_format: str
           - pivot_to_center_bottom: bool
           - scale_factor: int
-        '''
+        """
+        body = {
+            "type": TRIPO_MODE_CONVERSION,
+            "original_model_task_id": self.parameters[
+                "original_model_task_id"
+            ],
+            "format": self.parameters["format"]
+        }
+
+        if "quad" in self.parameters:
+            body["quad"] = self.parameters["quad"]
+
+        if "force_symmetry" in self.parameters:
+            body["force_symmetry"] = self.parameters["force_symmetry"]
+
+        if "face_limit" in self.parameters:
+            body["face_limit"] = self.parameters["face_limit"]
+
+        if "flatten_bottom" in self.parameters:
+            body["flatten_bottom"] = self.parameters["flatten_bottom"]
+
+        if "flatten_bottom_threshold" in self.parameters:
+            body["flatten_bottom_threshold"] = self.parameters[
+                "flatten_bottom_threshold"
+            ]
+
+        if "texture_size" in self.parameters:
+            body["texture_size"] = self.parameters["texture_size"]
+
+        if "texture_format" in self.parameters:
+            body["texture_format"] = self.parameters["texture_format"]
+
+        if "pivot_to_center_bottom" in self.parameters:
+            body["pivot_to_center_bottom"] = self.parameters[
+                "pivot_to_center_bottom"
+            ]
+
+        if "scale_factor" in self.parameters:
+            body["scale_factor"] = self.parameters["scale_factor"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - original_model_task_id
+          - format
+        """
         parameters = kwargs
 
-        parameters.update(url=TRIPO_BASE_EP+TRIPO_TASK_EP)
-        parameters.update(headers=self._generation_headers())
+        if "original_model_task_id" not in kwargs:
+            msg = "parameter `original_model_task_id` is not given"
+            raise ValueError(msg)
 
-        # body data
-        data = {}
-
-        data.update(type=TRIPO_MODE_CONVERSION)
-        if ('original_model_task_id' in kwargs and
-           isinstance(kwargs['original_model_task_id'], str)):
-            data.update(
-                original_model_task_id=kwargs['original_model_task_id'])
-        else:
-            ValueError('original_model_task_id is required.')
-
-        if 'format' in kwargs and kwargs['format'] in TRIPO_CONVERSION_FORMAT:
-            data.update(format=kwargs['format'])
-        else:
-            data.update(format=TRIPO_CONVERSION_FORMAT[0])
-
-        if 'quad' in kwargs and isinstance(kwargs['quad'], bool):
-            data.update(quad=kwargs['quad'])
-
-        if ('force_symmetry' in kwargs and
-           isinstance(kwargs['force_symmetry'], bool)):
-            data.update(force_symmetry=kwargs['force_symmetry'])
-
-        if 'face_limit' in kwargs and isinstance(kwargs['face_limit'], int):
-            data.update(face_limit=kwargs['face_limit'])
-
-        if ('flatten_bottom' in kwargs and
-           isinstance(kwargs['flatten_bottom '], bool)):
-            data.update(flatten_bottom=kwargs['flatten_bottom'])
-
-        if ('flatten_bottom_threshold' in kwargs and
-           isinstance(kwargs['flatten_bottom_threshold'], float)):
-            data.update(
-                flatten_bottom_threshold=kwargs['flatten_bottom_threshold'])
-
-        if ('texture_size' in kwargs and
-           isinstance(kwargs['texture_size'], int)):
-            data.update(texture_size=kwargs['texture_size'])
-
-        if ('texture_format' in kwargs and
-           kwargs['texture_format'] in TRIPO_CONVERSION_TEXTURE):
-            data.update(texture_format=kwargs['texture_format'])
-
-        if ('pivot_to_center_bottom' in kwargs and
-           isinstance(kwargs['pivot_to_center_bottom'], bool)):
-            data.update(
-                pivot_to_center_bottom=kwargs['pivot_to_center_bottom'])
-
-        if ('scale_factor' in kwargs and
-           isinstance(kwargs['scale_factor'], int)):
-            data.update(scale_factor=kwargs['scale_factor'])
-
-        parameters.update(data=data)
+        if "format" not in kwargs:
+            msg = "parameter `format` is not given"
+            raise ValueError(msg)
 
         return parameters

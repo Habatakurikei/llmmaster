@@ -1,8 +1,5 @@
-import requests
-from PIL import Image
+from requests.models import Response
 
-from .base_model import BaseModel
-from .config import REQUEST_OK
 from .config import SKYBOX_BASE_EP
 from .config import SKYBOX_EXPORT_EP
 from .config import SKYBOX_EXPORT_RESULT_EP
@@ -10,246 +7,159 @@ from .config import SKYBOX_GENERATION_EP
 from .config import SKYBOX_GENERATION_RESULT_EP
 from .config import SKYBOX_STATUS_IN_PROGRESS
 from .config import WAIT_FOR_SKYBOX_RESULT
+from .config import X_API_KEY
+from .root_model import RootModel
 
 
-class SkyboxBase(BaseModel):
-    '''
+class SkyboxBase(RootModel):
+    """
     Base model for Skybox API wrapper.
     Skybox provides:
-      1. Text-To-Panorama model (skybox_ttp)
-      2. Panorama-To-Image/Video model (skybox_ptiv)
-    Commonize init and run for these models.
-    Separately define _verify_arguments() due to different parameters.
-    '''
-    def __init__(self, **kwargs):
+      1. text_to_panorama (skybox_ttp)
+      2. panorama_to_image/video (skybox_ptiv)
+    Note: officially panorama_to_image/video is called export.
+    """
 
+    def __init__(self, **kwargs) -> None:
         try:
             super().__init__(**kwargs)
-
         except Exception as e:
-            msg = 'Error while verifying specific parameters for Skybox'
+            msg = "Exception received in SkyboxBase"
             raise Exception(msg) from e
 
-    def run(self):
-        '''
-        Implement run method for each model of sub-class.
-        '''
-        pass
+    def _call_llm(self, request_url: str = '', result_url: str = '') -> any:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        response = self._call_rest_api(url=request_url)
+        if isinstance(response, Response):
+            response = self._fetch_result(
+                url=result_url.format(id=response.json().get("id")),
+                wait_time=WAIT_FOR_SKYBOX_RESULT
+            )
+        return response.json() if isinstance(response, Response) else response
 
-    def _fetch_result(self, id=''):
-        '''
-        Implement fetch result method for each model of sub-class.
-        '''
-        pass
-
-    def _common_headers(self):
-        '''
-        Common headers for generation and result fetching.
-        '''
-        headers = {'x-api-key': self.api_key}
-        return headers
+    def _config_headers(self) -> None:
+        self.auth_header = X_API_KEY
+        self.auth_prefix = ''
 
 
 class SkyboxTextToPanorama(SkyboxBase):
-    '''
-    Text-To-Panorama model
-    '''
+    """
+    Text-To-Panorama
+    """
+
     def run(self):
-        '''
-        Note:
-        Return json of response request.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid model not generated. '
+        self.response = self._call_llm(
+            request_url=f"{SKYBOX_BASE_EP}{SKYBOX_GENERATION_EP}",
+            result_url=f"{SKYBOX_BASE_EP}{SKYBOX_GENERATION_RESULT_EP}"
+        )
 
-        try:
-            response = requests.post(self.parameters['url'],
-                                     headers=self.parameters['headers'],
-                                     data=self.parameters['data'])
-            response = self._fetch_result(id=response.json().get('id'))
+    def _body(self):
+        """
+        Specific parameters:
+          - skybox_style_id (required): int
+          - negative_text: str
+          - enhance_prompt: bool
+          - seed: int
+          - remix_imagine_id: int
+          - control_image: binary/base64/url
+          - control_model: str
+          - webhook_url: str
+        Note: prompt must be less than 2000 characters.
+        """
+        body = {
+            "prompt": self.parameters["prompt"],
+            "skybox_style_id": self.parameters["skybox_style_id"]
+        }
 
-            if response.status_code == REQUEST_OK:
-                answer = response.json()
-            else:
-                answer += str(response.json())
+        if "negative_text" in self.parameters:
+            body["negative_text"] = self.parameters["negative_text"]
 
-        except Exception as e:
-            answer += str(e)
+        if "enhance_prompt" in self.parameters:
+            body["enhance_prompt"] = self.parameters["enhance_prompt"]
 
-        self.response = answer
+        if "seed" in self.parameters:
+            body["seed"] = self.parameters["seed"]
 
-    def _fetch_result(self, id=''):
-        '''
-        Common function to fetch result.
-        '''
-        answer = 'Generated model not found.'
+        if "remix_imagine_id" in self.parameters:
+            body["remix_imagine_id"] = self.parameters["remix_imagine_id"]
 
-        header = self._common_headers()
-        url = SKYBOX_BASE_EP + SKYBOX_GENERATION_RESULT_EP.format(id=id)
+        if "control_image" in self.parameters:
+            body["control_image"] = self.parameters["control_image"]
 
-        flg = True
-        while flg:
-            response = requests.request(method='GET',
-                                        url=url,
-                                        headers=header)
-            res_json = response.json().get('request')
-            # print(res_json['status'])
-            if (response.status_code == REQUEST_OK and
-               res_json['status'] in SKYBOX_STATUS_IN_PROGRESS):
-                self._wait(WAIT_FOR_SKYBOX_RESULT)
-            else:
-                answer = response
-                flg = False
+        if "control_model" in self.parameters:
+            body["control_model"] = self.parameters["control_model"]
 
-        return answer
+        if "webhook_url" in self.parameters:
+            body["webhook_url"] = self.parameters["webhook_url"]
 
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          skybox_style_id (required): int
-          prompt (required): str
-          negative_text: str
-          enhance_prompt: bool
-          seed: int
-          remix_imagine_id: int
-          control_image: binary/base64/url
-          control_model: str
-          webhook_url: str
-        '''
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - skybox_style_id
+        """
         parameters = kwargs
 
-        parameters.update(url=SKYBOX_BASE_EP+SKYBOX_GENERATION_EP)
-        parameters.update(headers=self._common_headers())
-
-        # body data
-        data = {'prompt': kwargs['prompt']}
-
-        if 'skybox_style_id' not in kwargs:
-            msg = 'skybox_style_id is required.'
+        if "skybox_style_id" not in kwargs:
+            msg = "parameter `skybox_style_id` is required"
             raise ValueError(msg)
-        data['skybox_style_id'] = kwargs['skybox_style_id']
-
-        if 'negative_text' in kwargs:
-            data['negative_text'] = kwargs['negative_text']
-
-        if ('enhance_prompt' in kwargs and
-           isinstance(kwargs['enhance_prompt'], bool)):
-            data['enhance_prompt'] = kwargs['enhance_prompt']
-
-        if 'seed' in kwargs and isinstance(kwargs['seed'], int):
-            data['seed'] = kwargs['seed']
-
-        if ('remix_imagine_id' in kwargs and
-           isinstance(kwargs['remix_imagine_id'], int)):
-            data['remix_imagine_id'] = kwargs['remix_imagine_id']
-
-        if 'control_image' not in kwargs:
-            pass
-        elif isinstance(kwargs['control_image'], str):
-            if kwargs['control_image'].startswith(('http://', 'https://')):
-                data['control_image'] = kwargs['control_image']
-            else:
-                data['control_image'] = Image.open(kwargs['control_image'])
-
-        if 'control_model' in kwargs:
-            data['control_model'] = kwargs['control_model']
-
-        if 'webhook_url' in kwargs:
-            data['webhook_url'] = kwargs['webhook_url']
-
-        parameters.update(data=data)
 
         return parameters
+
+    def _is_task_ongoing(self, response: Response) -> bool:
+        response_json = response.json()
+        return response_json["request"]["status"] in SKYBOX_STATUS_IN_PROGRESS
 
 
 class SkyboxPanoramaToImageVideo(SkyboxBase):
-    '''
-    Panorama-To-Image/Video model
-    '''
+    """
+    Panorama-To-Image/Video (export)
+    """
+
     def run(self):
-        '''
-        Note:
-        Return json of response request.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid output not generated. '
+        self.response = self._call_llm(
+            request_url=f"{SKYBOX_BASE_EP}{SKYBOX_EXPORT_EP}",
+            result_url=f"{SKYBOX_BASE_EP}{SKYBOX_EXPORT_RESULT_EP}"
+        )
 
-        try:
-            response = requests.post(self.parameters['url'],
-                                     headers=self.parameters['headers'],
-                                     data=self.parameters['data'])
-            response = self._fetch_result(id=response.json().get('id'))
-
-            if response.status_code == REQUEST_OK:
-                answer = response.json()
-            else:
-                answer += str(response.json())
-
-        except Exception as e:
-            answer += str(e)
-
-        self.response = answer
-
-    def _fetch_result(self, id=''):
-        '''
-        Common function to fetch result.
-        '''
-        answer = 'Generated model not found.'
-
-        header = self._common_headers()
-        url = SKYBOX_BASE_EP + SKYBOX_EXPORT_RESULT_EP.format(id=id)
-
-        flg = True
-        while flg:
-            response = requests.request(method='GET',
-                                        url=url,
-                                        headers=header)
-            res_json = response.json()
-            # print(res_json['status'])
-            if (response.status_code == REQUEST_OK and
-               res_json['status'] in SKYBOX_STATUS_IN_PROGRESS):
-                self._wait(WAIT_FOR_SKYBOX_RESULT)
-            else:
-                answer = response
-                flg = False
-
-        return answer
-
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          skybox_id (required): str
-          type_id (required): int
+    def _body(self):
+        """
+        Specific parameters:
+          - skybox_id (required): str
+          - type_id (required): int
             1: jpg, 2: png, 3: cube map,
             4: HDRI HDR, 5: HDRI EXR, 6: depth map,
             7: mp4 landscape, 8: mp4 portrait, 9: mp4 square
-          webhook_url: str
-        '''
+          - webhook_url: str
+        """
+        body = {
+            "skybox_id": self.parameters["skybox_id"],
+            "type_id": self.parameters["type_id"]
+        }
+
+        if "webhook_url" in self.parameters:
+            body["webhook_url"] = self.parameters["webhook_url"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - skybox_id
+          - type_id
+        """
         parameters = kwargs
 
-        parameters.update(url=SKYBOX_BASE_EP+SKYBOX_EXPORT_EP)
-        parameters.update(headers=self._common_headers())
-
-        # body data
-        data = {}
-
-        if 'skybox_id' not in kwargs:
-            msg = 'skybox_id is required.'
+        if "skybox_id" not in kwargs:
+            msg = "parameter `skybox_id` is required"
             raise ValueError(msg)
-        data['skybox_id'] = kwargs['skybox_id']
 
-        if 'type_id' not in kwargs or not isinstance(kwargs['type_id'], int):
-            msg = 'type_id is required and must be int.'
+        if "type_id" not in kwargs:
+            msg = "parameter `type_id` is required"
             raise ValueError(msg)
-        data['type_id'] = kwargs['type_id']
-
-        if 'webhook_url' in kwargs:
-            data['webhook_url'] = kwargs['webhook_url']
-
-        parameters.update(data=data)
 
         return parameters
+
+    def _is_task_ongoing(self, response: Response) -> bool:
+        return response.json().get("status") in SKYBOX_STATUS_IN_PROGRESS

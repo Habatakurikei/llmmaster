@@ -1,14 +1,2 @@
-anthropic
-google-generativeai
-groq
-openai
-pillow
-elevenlabs
-cerebras_cloud_sdk
-mistralai
-fal-client
-lumaai
-flake8
-pytest
-setuptools
-twine
+requests
+requests-toolbelt

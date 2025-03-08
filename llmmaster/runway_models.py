@@ -1,149 +1,114 @@
-import requests
+from requests.models import Response
 
-from .base_model import BaseModel
-from .config import REQUEST_OK
-from .config import RUNWAY_ASPECT_RATIO_LIST
 from .config import RUNWAY_BASE_EP
-from .config import RUNWAY_DURATION_LIST
-from .config import RUNWAY_IMAGE_TO_VIDEO_EP
+from .config import RUNWAY_ITV_EP
 from .config import RUNWAY_RESULT_EP
 from .config import RUNWAY_STATUS_IN_PROGRESS
 from .config import RUNWAY_VERSION
 from .config import WAIT_FOR_RUNWAY_RESULT
+from .root_model import RootModel
 
 
-class RunwayBase(BaseModel):
-    '''
+class RunwayBase(RootModel):
+    """
     Base model for Runway API wrapper.
     Runway provides:
       1. Image-To-Video model (runway_itv)
     Commonize init and run for these models.
     Separately define _verify_arguments() due to different parameters.
-    '''
-    def __init__(self, **kwargs):
+    """
 
+    def __init__(self, **kwargs) -> None:
         try:
             super().__init__(**kwargs)
-
         except Exception as e:
-            msg = 'Error while verifying specific parameters for Runway'
+            msg = "Exception received in RunwayBase"
             raise Exception(msg) from e
 
-    def run(self):
-        '''
-        Implement run method for each model of sub-class.
-        '''
-        pass
+    def _call_llm(self, url: str = '') -> any:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        response = self._call_rest_api(url=url)
+        if isinstance(response, Response):
+            response = self._fetch_result(
+                url=(
+                    RUNWAY_BASE_EP +
+                    RUNWAY_RESULT_EP.format(id=response.json().get("id"))
+                ),
+                wait_time=WAIT_FOR_RUNWAY_RESULT
+            )
+        return response.json() if isinstance(response, Response) else response
 
-    def _fetch_result(self, id=''):
-        '''
-        Common function to fetch result.
-        '''
-        answer = 'Generated model not found.'
+    def _config_headers(self) -> None:
+        self.extra_headers = {"X-Runway-Version": RUNWAY_VERSION}
 
-        header = self._common_headers()
-        url = RUNWAY_BASE_EP + RUNWAY_RESULT_EP.format(id=id)
+    def _is_task_ongoing(self, response: Response) -> bool:
+        return response.json().get("status") in RUNWAY_STATUS_IN_PROGRESS
 
-        flg = True
-        while flg:
-            response = requests.request(method='GET',
-                                        url=url,
-                                        headers=header)
-            # print(response.json().get('status'))
-            if (response.status_code == REQUEST_OK and
-               response.json().get('status') in RUNWAY_STATUS_IN_PROGRESS):
-                self._wait(WAIT_FOR_RUNWAY_RESULT)
-            else:
-                answer = response
-                flg = False
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - x_runway_version
+        """
+        parameters = kwargs
 
-        return answer
+        if "x_runway_version" not in kwargs:
+            parameters["x_runway_version"] = RUNWAY_VERSION
 
-    def _common_headers(self):
-        '''
-        Common headers for generation and result fetching.
-        '''
-        headers = {'Authorization': f'Bearer {self.api_key}'}
-        headers.update({'X-Runway-Version': RUNWAY_VERSION})
-        return headers
+        return parameters
 
 
 class RunwayImageToVideo(RunwayBase):
-    '''
-    Image-To-Video model
-    Important: input accepts JPG, PNG or WebP format with up to 16MB.
-    '''
-    def run(self):
-        '''
-        Note:
-        Return json of response request.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid video not generated. '
+    """
+    Image-To-Video
+    """
 
-        try:
-            response = requests.post(self.parameters['url'],
-                                     headers=self.parameters['headers'],
-                                     json=self.parameters['data'])
-            response = self._fetch_result(response.json().get('id'))
+    def run(self) -> None:
+        self.response = self._call_llm(url=f"{RUNWAY_BASE_EP}{RUNWAY_ITV_EP}")
 
-            if response.status_code == REQUEST_OK:
-                answer = response.json()
-            else:
-                answer += str(response.json())
-
-        except Exception as e:
-            answer += str(e)
-
-        self.response = answer
-
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - promptImage (required): str
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - promptImage (required): str or list of dict
+          - model (required): str
           - promptText: str
           - seed: int
           - watermark: bool
           - duration: int (5 or 10)
-          - ratio: str (16:9 or 9:16)
-        '''
-        parameters = kwargs
+          - ratio: str
+        """
+        body = {
+            "model": self.parameters["model"],
+            "promptImage": self.parameters["promptImage"]
+        }
 
-        parameters.update(url=RUNWAY_BASE_EP+RUNWAY_IMAGE_TO_VIDEO_EP)
-        parameters.update(headers=self._common_headers())
-        parameters['headers'].update({'Content-Type': 'application/json'})
+        if "prompt" in self.parameters:
+            body["promptText"] = self.parameters["prompt"]
+        elif "promptText" in self.parameters:
+            body["promptText"] = self.parameters["promptText"]
 
-        # body data
-        data = {'promptText': kwargs['prompt'],
-                'model': kwargs['model']}
+        if "seed" in self.parameters:
+            body["seed"] = self.parameters["seed"]
 
-        # promptImage
-        if 'promptImage' not in kwargs:
-            raise ValueError('promptImage not given.')
-        elif not isinstance(kwargs['promptImage'], str):
-            msg = 'promptImage type not str.'
+        if "watermark" in self.parameters:
+            body["watermark"] = self.parameters["watermark"]
+
+        if "duration" in self.parameters:
+            body["duration"] = self.parameters["duration"]
+
+        if "ratio" in self.parameters:
+            body["ratio"] = self.parameters["ratio"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - promptImage
+        """
+        parameters = super()._verify_arguments(**kwargs)
+
+        if "promptImage" not in kwargs:
+            msg = "parameter `promptImage` is required"
             raise ValueError(msg)
-        else:
-            data.update(promptImage=kwargs['promptImage'])
-
-        # seed
-        if 'seed' in kwargs and isinstance(kwargs['seed'], int):
-            data.update(seed=kwargs['seed'])
-
-        # watermark
-        if 'watermark' in kwargs and isinstance(kwargs['watermark'], bool):
-            data.update(watermark=kwargs['watermark'])
-
-        # duration
-        if 'duration' in kwargs and kwargs['duration'] in RUNWAY_DURATION_LIST:
-            data.update(duration=kwargs['duration'])
-
-        # ratio
-        if 'ratio' in kwargs and kwargs['ratio'] in RUNWAY_ASPECT_RATIO_LIST:
-            data.update(ratio=kwargs['ratio'])
-
-        parameters.update(data=data)
 
         return parameters

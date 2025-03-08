@@ -1,199 +1,211 @@
-import json
+from requests.models import Response
 
-from lumaai import LumaAI
-
-from .base_model import BaseModel
-from .config import LUMAAI_ASPECT_RATIO_LIST
+from .config import LUMAAI_BASE_EP
+from .config import LUMAAI_ITI_EP
+from .config import LUMAAI_ITV_EP
+from .config import LUMAAI_RESULT_EP
 from .config import LUMAAI_STATUS_IN_PROGRESS
+from .config import LUMAAI_TTI_EP
+from .config import LUMAAI_TTV_EP
+from .config import LUMAAI_VTV_EP
 from .config import WAIT_FOR_LUMAI_RESULT
+from .root_model import RootModel
 
 
-class LumaDreamMachineBase(BaseModel):
-    '''
+class LumaAIBase(RootModel):
+    """
     Base model for Luma AI API wrapper.
     Luma AI provides:
-      1. Text-To-Video model (lumaai_ttv)
-      2. Image-To-Video model (lumaai_itv)
-      3. Video-To-Video model (lumaai_vtv)
-    Commonize init and run for these models.
-    Separately define _verify_arguments() due to different parameters.
-    '''
-    def __init__(self, **kwargs):
+      1. Text-To-Image (lumaai_tti)
+      2. Image-To-Image (lumaai_iti)
+      3. Text-To-Video (lumaai_ttv)
+      4. Image-To-Video (lumaai_itv)
+      5. Video-To-Video (lumaai_vtv)
+    Only online images and videos are acceptable for input.
+    """
 
+    def __init__(self, **kwargs) -> None:
         try:
             super().__init__(**kwargs)
-
         except Exception as e:
-            msg = 'Error while verifying specific parameters for Luma AI'
+            msg = "Exception received in LumaAIBase"
             raise Exception(msg) from e
 
-    def run(self):
-        '''
-        Implement run method for each model of sub-class.
-        '''
-        pass
+    def _call_llm(self, url: str) -> any:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        response = self._call_rest_api(url=LUMAAI_BASE_EP+url)
+        if isinstance(response, Response):
+            fetch_url = LUMAAI_BASE_EP + LUMAAI_RESULT_EP.format(
+                id=response.json().get("id")
+            )
+            response = self._fetch_result(
+                url=fetch_url,
+                wait_time=WAIT_FOR_LUMAI_RESULT
+            )
+        return response.json() if isinstance(response, Response) else response
 
-    def _fetch_result(self, instance: LumaAI, id: str):
-        '''
-        Fetch result from LumaAI instance.
-        '''
-        answer = ''
-        flg = True
-        while flg:
-            status = instance.generations.get(id=id)
-            if status.state in LUMAAI_STATUS_IN_PROGRESS:
-                self._wait(WAIT_FOR_LUMAI_RESULT)
-            else:
-                answer = json.loads(status.json())
-                flg = False
-        return answer
+    def _config_headers(self) -> None:
+        self.extra_headers = {"Accept": "application/json"}
+
+    def _body(self) -> dict:
+        return {
+            "prompt": self.parameters["prompt"],
+            "model": self.parameters["model"]
+        }
+
+    def _is_task_ongoing(self, response: Response) -> bool:
+        return response.json().get("state") in LUMAAI_STATUS_IN_PROGRESS
 
 
-class LumaDreamMachineTextToVideo(LumaDreamMachineBase):
-    '''
-    Text-To-Video model
-    '''
-    def run(self):
-        '''
-        Note:
-        Return json of response Generation class defined in LumaAI.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid video not generated. '
+class LumaAITextToImage(LumaAIBase):
+    """
+    Text-To-Image
+    """
 
-        try:
-            client = LumaAI(auth_token=self.api_key)
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_TTI_EP)
 
-            response = client.generations.create(
-                prompt=self.parameters['prompt'],
-                loop=self.parameters['loop'],
-                aspect_ratio=self.parameters['aspect_ratio'])
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - aspect_ratio: str
+        """
+        body = super()._body()
 
-            answer = self._fetch_result(instance=client, id=response.id)
+        if "aspect_ratio" in self.parameters:
+            body["aspect_ratio"] = self.parameters["aspect_ratio"]
 
-        except Exception as e:
-            answer += str(e)
+        return body
 
-        self.response = answer
 
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
+class LumaAIImageToImage(LumaAIBase):
+    """
+    Image-To-Image
+    """
+
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_ITI_EP)
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - image_ref: list of dict
+          - style_ref: list of dict
+          - character_ref: list of dict
+          - modify_image_ref: list of dict
+        """
+        body = super()._body()
+
+        if "image_ref" in self.parameters:
+            body["image_ref"] = self.parameters["image_ref"]
+
+        if "style_ref" in self.parameters:
+            body["style_ref"] = self.parameters["style_ref"]
+
+        if "character_ref" in self.parameters:
+            body["character_ref"] = self.parameters["character_ref"]
+
+        if "modify_image_ref" in self.parameters:
+            body["modify_image_ref"] = self.parameters["modify_image_ref"]
+
+        return body
+
+
+class LumaAITextToVideo(LumaAIBase):
+    """
+    Text-To-Video
+    """
+
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_TTV_EP)
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
           - aspect_ratio: str
           - loop: bool
-        '''
-        parameters = kwargs
+          - resolution: str, 720p
+          - duration: str, 5s/9s
+        """
+        body = super()._body()
 
-        if 'loop' in kwargs and isinstance(kwargs['loop'], bool):
-            pass
-        else:
-            parameters.update(loop=False)
+        if "aspect_ratio" in self.parameters:
+            body["aspect_ratio"] = self.parameters["aspect_ratio"]
 
-        if ('aspect_ratio' in kwargs and
-           isinstance(kwargs['aspect_ratio'], str) and
-           kwargs['aspect_ratio'] in LUMAAI_ASPECT_RATIO_LIST):
-            pass
-        else:
-            parameters.update(aspect_ratio=LUMAAI_ASPECT_RATIO_LIST[0])
+        if "loop" in self.parameters:
+            body["loop"] = self.parameters["loop"]
 
-        return parameters
+        if "resolution" in self.parameters:
+            body["resolution"] = self.parameters["resolution"]
 
+        if "duration" in self.parameters:
+            body["duration"] = self.parameters["duration"]
 
-class LumaDreamMachineImageToVideo(LumaDreamMachineBase):
-    '''
-    Image-To-Video model
-    Important: input accepts only JPG, not PNG.
-    '''
-    def run(self):
-        '''
-        Note:
-        Return json of response Generation class defined in LumaAI.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid video not generated. '
-
-        try:
-            client = LumaAI(auth_token=self.api_key)
-
-            response = client.generations.create(
-                prompt=self.parameters['prompt'],
-                keyframes=self.parameters['keyframes'])
-
-            answer = self._fetch_result(instance=client, id=response.id)
-
-        except Exception as e:
-            answer += str(e)
-
-        self.response = answer
-
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - frame0: str, URL of image for the start frame
-          - frame1: str, URL of image for the end frame
-        '''
-        parameters = kwargs
-
-        keyframes = {}
-        if 'frame0' in kwargs and isinstance(kwargs['frame0'], str):
-            keyframes.update(frame0={
-                'type': 'image',
-                'url': self._sanitize_url(kwargs['frame0'])
-            })
-        if 'frame1' in kwargs and isinstance(kwargs['frame1'], str):
-            keyframes.update(frame1={
-                'type': 'image',
-                'url': self._sanitize_url(kwargs['frame1'])
-            })
-
-        parameters.update(keyframes=keyframes)
-        return parameters
+        return body
 
 
-class LumaDreamMachineVideoToVideo(LumaDreamMachineBase):
-    '''
-    Video-To-Video model
-    Important: image input is acceptable but only JPG, not PNG.
-    '''
-    def run(self):
-        '''
-        Note:
-        Return json of response Generation class defined in LumaAI.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid video not generated. '
+class LumaAIImageToVideo(LumaAIBase):
+    """
+    Image-To-Video
+    """
 
-        try:
-            client = LumaAI(auth_token=self.api_key)
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_ITV_EP)
 
-            response = client.generations.create(
-                prompt=self.parameters['prompt'],
-                keyframes=self.parameters['keyframes'])
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - aspect_ratio: str
+          - loop: bool
+          - keyframes: dict of frame0 and frame1
+        """
+        body = super()._body()
 
-            answer = self._fetch_result(instance=client, id=response.id)
+        if "aspect_ratio" in self.parameters:
+            body["aspect_ratio"] = self.parameters["aspect_ratio"]
 
-        except Exception as e:
-            answer += str(e)
+        if "loop" in self.parameters:
+            body["loop"] = self.parameters["loop"]
 
-        self.response = answer
+        if "keyframes" in self.parameters:
+            body["keyframes"] = self.parameters["keyframes"]
 
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - frame0: str, URL of image or video for the start frame
-          - frame1: str, URL of image or video for the end frame
-        '''
-        parameters = kwargs
+        return body
 
-        if 'keyframes' in kwargs and isinstance(kwargs['keyframes'], dict):
-            pass
-        else:
-            parameters.update(keyframes={})
 
-        return parameters
+class LumaAIVideoToVideo(LumaAIBase):
+    """
+    Video-To-Video
+    Extension (forward/backward) and Interpolation
+    """
+
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_VTV_EP)
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - aspect_ratio: str
+          - loop: bool
+          - resolution: str, 720p
+          - duration: str, 5s/9s
+          - keyframes: dict of frame0 and frame1
+        """
+        body = super()._body()
+
+        if "aspect_ratio" in self.parameters:
+            body["aspect_ratio"] = self.parameters["aspect_ratio"]
+
+        if "loop" in self.parameters:
+            body["loop"] = self.parameters["loop"]
+
+        if "resolution" in self.parameters:
+            body["resolution"] = self.parameters["resolution"]
+
+        if "duration" in self.parameters:
+            body["duration"] = self.parameters["duration"]
+
+        if "keyframes" in self.parameters:
+            body["keyframes"] = self.parameters["keyframes"]
+
+        return body

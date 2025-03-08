@@ -1,353 +1,323 @@
-import requests
+from requests.models import Response
 
-from .base_model import BaseModel
 from .config import MESHY_BASE_EP
-from .config import MESHY_IT3D_START_EP
+from .config import MESHY_IT3D_EP
 from .config import MESHY_MODE_PREVIEW
 from .config import MESHY_MODE_REFINE
+from .config import MESHY_REMESH_EP
 from .config import MESHY_STATUS_IN_PROGRESS
-from .config import MESHY_TT3D_MODELS
-from .config import MESHY_TT3D_START_EP
-from .config import MESHY_TT3D_STYLES_LIST
-from .config import MESHY_TT3D_TEXTURE_RICHNESS_LIST
-from .config import MESHY_TTTX_RESOLUTION_LIST
-from .config import MESHY_TTTX_START_EP
-from .config import MESHY_TTTX_STYLES_LIST
-from .config import MESHY_TTVX_START_EP
-from .config import MESHY_VOXEL_SHRINK_LIST
-from .config import REQUEST_OK
+from .config import MESHY_TT3D_EP
+from .config import MESHY_TTTX_EP
 from .config import WAIT_FOR_MESHY_RESULT
+from .root_model import RootModel
+from .utils import meshy_image_input
 
 
-class MeshyModelBase(BaseModel):
-    '''
+class MeshyBase(RootModel):
+    """
     Base model for Meshy API wrapper.
     Meshy provides:
-      1. Text-To-Texture model (meshy_tttx)
-      2. Text-To-3D model (meshy_tt3d)
-      3. Text-To-3D refine (meshy_tt3d_refine)
-      4. Text-To-Voxel model (meshy_ttvx)
-      5. Image-To-3D model (meshy_it3d)
-    Commonize init and run for these models.
-    Separately define _verify_arguments() due to different parameters.
-    '''
-    def __init__(self, **kwargs):
+      1. Text-To-3D model (meshy_tt3d)
+      2. Text-To-3D refine (meshy_tt3d_refine)
+      3. Image-To-3D model (meshy_it3d)
+      4. Remesh model (meshy_remesh)
+      5. Text-To-Texture model (meshy_tttx)
+    2025-02-04: Text-To-Voxel model (meshy_ttvx) is deprecated.
+    """
 
+    def __init__(self, **kwargs) -> None:
         try:
             super().__init__(**kwargs)
-
         except Exception as e:
-            msg = 'Error while verifying specific parameters for Meshy'
+            msg = "Exception received in MeshyBase"
             raise Exception(msg) from e
 
-    def run(self):
-        '''
-        Note:
-        Return json response of requests.
-        But when failed to generate, return value is given in str.
-        Handle return value `answer` with care for different type
-        in case of success and failure.
-        '''
-        answer = 'Valid model not generated. '
+    def _call_llm(self, url: str = '') -> any:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        response = self._call_rest_api(url=url)
+        if isinstance(response, Response):
+            response = self._fetch_result(
+                url=f"{url}/{response.json().get('result')}",
+                wait_time=WAIT_FOR_MESHY_RESULT
+            )
+        return response.json() if isinstance(response, Response) else response
 
-        try:
-            response = requests.post(self.parameters['url'],
-                                     headers=self.parameters['headers'],
-                                     json=self.parameters['data'])
-
-            response = self._fetch_result(response.json().get('result'))
-
-            if response.status_code == REQUEST_OK:
-                answer = response.json()
-            else:
-                answer += str(response.json())
-
-        except Exception as e:
-            answer += str(e)
-
-        self.response = answer
-
-    def _fetch_result(self, id=''):
-        '''
-        Common function to fetch result.
-        '''
-        answer = 'Generated model not found.'
-        header = {'Authorization': f'Bearer {self.api_key}'}
-        url = self.parameters['url'] + f'/{id}'
-
-        flg = True
-        while flg:
-            response = requests.request(method='GET',
-                                        url=url,
-                                        headers=header)
-            # print(response.json().get('status'))
-            if response.json().get('status') in MESHY_STATUS_IN_PROGRESS:
-                self._wait(WAIT_FOR_MESHY_RESULT)
-            else:
-                answer = response
-                flg = False
-
-        return answer
-
-    def _generation_headers(self):
-        '''
-        Common headers for generation.
-        '''
-        headers = {'Authorization': f'Bearer {self.api_key}',
-                   'Content-Type': 'application/json'}
-        return headers
+    def _is_task_ongoing(self, response: Response) -> bool:
+        return response.json().get("status") in MESHY_STATUS_IN_PROGRESS
 
 
-class MeshyTextToTexture(MeshyModelBase):
-    '''
-    This model does not require prompt.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - model_url: str
-          - object_prompt: str
-          - style_prompt: str
-          - enable_original_uv: bool
-          - negative_prompt: str
-          - enable_pbr: bool
-          - resolution: str
+class MeshyTextTo3D(MeshyBase):
+    """
+    Text-To-3D
+    2025-02-04: renamed as preview mode
+    """
+
+    def run(self) -> None:
+        self.response = self._call_llm(url=f"{MESHY_BASE_EP}{MESHY_TT3D_EP}")
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - mode (required): `preview`
           - art_style: str
-        '''
-        parameters = kwargs
-
-        parameters.update(url=MESHY_BASE_EP+MESHY_TTTX_START_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-
-        # model_url
-        if 'model_url' not in kwargs:
-            raise ValueError('model_url not given.')
-        elif not isinstance(kwargs['model_url'], str):
-            msg = 'model_url type not str.'
-            raise ValueError(msg)
-        else:
-            data.update(model_url=kwargs['model_url'])
-
-        # object_prompt
-        if 'object_prompt' not in kwargs:
-            raise ValueError('object_prompt not given.')
-        elif not isinstance(kwargs['object_prompt'], str):
-            msg = 'object_prompt type not str.'
-            raise ValueError(msg)
-        else:
-            data.update(object_prompt=kwargs['object_prompt'])
-
-        # style_prompt
-        if 'style_prompt' not in kwargs:
-            raise ValueError('style_prompt not given.')
-        elif not isinstance(kwargs['style_prompt'], str):
-            msg = 'style_prompt type not str.'
-            raise ValueError(msg)
-        else:
-            data.update(style_prompt=kwargs['style_prompt'])
-
-        # enable_original_uv
-        if ('enable_original_uv' in kwargs and
-           isinstance(kwargs['enable_original_uv'], bool)):
-            data.update(enable_original_uv=kwargs['enable_original_uv'])
-
-        # negative_prompt
-        if ('negative_prompt' in kwargs and
-           isinstance(kwargs['negative_prompt'], str)):
-            data.update(negative_prompt=kwargs['negative_prompt'])
-
-        # enable_pbr
-        if 'enable_pbr' in kwargs and isinstance(kwargs['enable_pbr'], bool):
-            data.update(enable_pbr=kwargs['enable_pbr'])
-
-        # resolution
-        if ('resolution' in kwargs and
-           kwargs['resolution'] in MESHY_TTTX_RESOLUTION_LIST):
-            data.update(resolution=kwargs['resolution'])
-
-        # art_style
-        if ('art_style' in kwargs and
-           kwargs['art_style'] in MESHY_TTTX_STYLES_LIST):
-            data.update(art_style=kwargs['art_style'])
-
-        parameters.update(data=data)
-
-        return parameters
-
-
-class MeshyTextTo3D(MeshyModelBase):
-    '''
-    Output format: glb, fbx, usdz, obj and mtl
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - ai_model: str
-          - art_style: str
-          - negative_prompt: str
           - seed: int
+          - ai_model: str
           - topology (only for meshy-4): str
           - target_polycount (only for meshy-4): int
-        '''
-        parameters = kwargs
+          - should_remesh: bool
+          - symmetry_mode: off/on/auto
+        """
+        body = {
+            "mode": MESHY_MODE_PREVIEW,
+            "prompt": self.parameters["prompt"]
+        }
 
-        parameters.update(url=MESHY_BASE_EP+MESHY_TT3D_START_EP)
-        parameters.update(headers=self._generation_headers())
+        if "art_style" in self.parameters:
+            body["art_style"] = self.parameters["art_style"]
 
-        # body data
-        data = {}
-        data.update(mode=MESHY_MODE_PREVIEW)
-        data.update(prompt=kwargs['prompt'])
+        if "seed" in self.parameters:
+            body["seed"] = self.parameters["seed"]
 
-        # ai_model
-        if 'model' in kwargs and kwargs['model'] in MESHY_TT3D_MODELS:
-            data.update(ai_model=kwargs['model'])
+        # support legacy model parameter
+        if "ai_model" in self.parameters:
+            body["ai_model"] = self.parameters["ai_model"]
+        elif self.parameters.get("model") != "dummy":
+            body["ai_model"] = self.parameters["model"]
 
-        # art_style
-        if ('art_style' in kwargs and
-           kwargs['art_style'] in MESHY_TT3D_STYLES_LIST):
-            data.update(art_style=kwargs['art_style'])
+        if "topology" in self.parameters:
+            body["topology"] = self.parameters["topology"]
 
-        # negative_prompt
-        if ('negative_prompt' in kwargs and
-           isinstance(kwargs['negative_prompt'], str)):
-            data.update(negative_prompt=kwargs['negative_prompt'])
+        if "target_polycount" in self.parameters:
+            body["target_polycount"] = self.parameters["target_polycount"]
 
-        # seed
-        if ('seed' in kwargs and isinstance(kwargs['seed'], int)):
-            data.update(seed=kwargs['seed'])
+        if "should_remesh" in self.parameters:
+            body["should_remesh"] = self.parameters["should_remesh"]
 
-        # topology
-        if 'topology' in kwargs and isinstance(kwargs['topology'], str):
-            data.update(topology=kwargs['topology'])
+        if "symmetry_mode" in self.parameters:
+            body["symmetry_mode"] = self.parameters["symmetry_mode"]
 
-        # target_polycount
-        if ('target_polycount' in kwargs and
-           isinstance(kwargs['target_polycount'], int)):
-            data.update(target_polycount=kwargs['target_polycount'])
-
-        parameters.update(data=data)
-
-        return parameters
+        return body
 
 
-class MeshyTextTo3DRefine(MeshyModelBase):
-    '''
+class MeshyTextTo3DRefine(MeshyBase):
+    """
+    Text-To-3D Refine
     Use this class after made base model with MeshyTextTo3D.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - mode (required): str, fixed 'refine'
+    """
+
+    def run(self) -> None:
+        self.response = self._call_llm(url=f"{MESHY_BASE_EP}{MESHY_TT3D_EP}")
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - mode (required): `refine`
           - preview_task_id (required): str
-          - texture_richness: str
-        '''
-        parameters = kwargs
-
-        parameters.update(url=MESHY_BASE_EP+MESHY_TT3D_START_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(mode=MESHY_MODE_REFINE)
-
-        if 'preview_task_id' not in kwargs:
-            raise ValueError('preview_task_id not given.')
-        elif not isinstance(kwargs['preview_task_id'], str):
-            msg = 'preview_task_id type must be str.'
-            raise ValueError(msg)
-        else:
-            data.update(preview_task_id=kwargs['preview_task_id'])
-
-        if ('texture_richness' in kwargs and
-           kwargs['texture_richness'] in MESHY_TT3D_TEXTURE_RICHNESS_LIST):
-            data.update(texture_richness=kwargs['texture_richness'])
-
-        parameters.update(data=data)
-
-        return parameters
-
-
-class MeshyTextToVoxel(MeshyModelBase):
-    '''
-    Output format: glb and vox
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - voxel_size_shrink_factor (required): int
-          - negative_prompt: str
-          - seed: int
-        '''
-        parameters = kwargs
-
-        parameters.update(url=MESHY_BASE_EP+MESHY_TTVX_START_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-        data.update(prompt=kwargs['prompt'])
-
-        # voxel_size_shrink_factor
-        if ('voxel_size_shrink_factor' in kwargs and
-           kwargs['voxel_size_shrink_factor'] in MESHY_VOXEL_SHRINK_LIST):
-            buff = kwargs['voxel_size_shrink_factor']
-        else:
-            buff = MESHY_VOXEL_SHRINK_LIST[0]
-
-        data.update(voxel_size_shrink_factor=buff)
-
-        # negative_prompt
-        if ('negative_prompt' in kwargs and
-           isinstance(kwargs['negative_prompt'], str)):
-            data.update(negative_prompt=kwargs['negative_prompt'])
-
-        # seed
-        if ('seed' in kwargs and isinstance(kwargs['seed'], int)):
-            data.update(seed=kwargs['seed'])
-
-        parameters.update(data=data)
-
-        return parameters
-
-
-class MeshyImageTo3D(MeshyModelBase):
-    '''
-    Acceptable formats: jpg, jpeg and png
-    Output format: glb, fbx and usdz
-    This model does not require prompt.
-    Note: unable to refine it3d model with id.
-    '''
-    def _verify_arguments(self, **kwargs):
-        '''
-        Expected parameters:
-          - image_url (required): str
           - enable_pbr: bool
-        '''
+        """
+        body = {
+            "mode": MESHY_MODE_REFINE,
+            "preview_task_id": self.parameters["preview_task_id"],
+        }
+
+        if "enable_pbr" in self.parameters:
+            body["enable_pbr"] = self.parameters["enable_pbr"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - preview_task_id
+        """
         parameters = kwargs
 
-        parameters.update(url=MESHY_BASE_EP+MESHY_IT3D_START_EP)
-        parameters.update(headers=self._generation_headers())
-
-        # body data
-        data = {}
-
-        # image_url
-        if 'image_url' not in kwargs:
-            raise ValueError('"image_url" not given.')
-        elif not isinstance(kwargs['image_url'], str):
-            msg = f'"image_url" type not str but {type(kwargs["image_url"])}.'
+        if "preview_task_id" not in kwargs:
+            msg = "parameter `preview_task_id` is required"
             raise ValueError(msg)
-        else:
-            data.update(image_url=kwargs['image_url'])
 
-        # enable_pbr
-        if 'enable_pbr' in kwargs and isinstance(kwargs['enable_pbr'], bool):
-            data.update(enable_pbr=kwargs['enable_pbr'])
+        return parameters
 
-        parameters.update(data=data)
+
+class MeshyImageTo3D(MeshyBase):
+    """
+    Image-To-3D
+    Acceptable input file types: jpg, jpeg and png
+    Both local file path and online URLs are supported
+    """
+
+    def run(self) -> None:
+        self.response = self._call_llm(url=f"{MESHY_BASE_EP}{MESHY_IT3D_EP}")
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - image_url (required): source image path
+          - ai_model: str
+          - topology (only for meshy-4): str
+          - target_polycount (only for meshy-4): int
+          - should_remesh: bool
+          - enable_pbr: bool
+          - should_texture: bool
+          - symmetry_mode: off/on/auto
+        """
+        body = {"image_url": meshy_image_input(self.parameters["image_url"])}
+
+        # support legacy model parameter
+        if "ai_model" in self.parameters:
+            body["ai_model"] = self.parameters["ai_model"]
+        elif self.parameters.get("model") != "dummy":
+            body["ai_model"] = self.parameters["model"]
+
+        if "topology" in self.parameters:
+            body["topology"] = self.parameters["topology"]
+
+        if "target_polycount" in self.parameters:
+            body["target_polycount"] = self.parameters["target_polycount"]
+
+        if "should_remesh" in self.parameters:
+            body["should_remesh"] = self.parameters["should_remesh"]
+
+        if "enable_pbr" in self.parameters:
+            body["enable_pbr"] = self.parameters["enable_pbr"]
+
+        if "should_texture" in self.parameters:
+            body["should_texture"] = self.parameters["should_texture"]
+
+        if "symmetry_mode" in self.parameters:
+            body["symmetry_mode"] = self.parameters["symmetry_mode"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - image_url
+        """
+        parameters = kwargs
+
+        if "image_url" not in kwargs:
+            msg = "parameter `image_url` is required"
+            raise ValueError(msg)
+
+        return parameters
+
+
+class MeshyRemeshModel(MeshyBase):
+    """
+    Remesh model
+    """
+
+    def run(self) -> None:
+        self.response = self._call_llm(url=f"{MESHY_BASE_EP}{MESHY_REMESH_EP}")
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - input_task_id (required): str
+          - target_formats: list of str from glb, fbx, obj, usdz, blend, stl
+          - topology: str
+          - target_polycount: int
+          - resize_height: float
+          - origin_at: str
+        """
+        body = {
+            "input_task_id": self.parameters["input_task_id"],
+        }
+
+        if "target_formats" in self.parameters:
+            body["target_formats"] = self.parameters["target_formats"]
+
+        if "topology" in self.parameters:
+            body["topology"] = self.parameters["topology"]
+
+        if "target_polycount" in self.parameters:
+            body["target_polycount"] = self.parameters["target_polycount"]
+
+        if "resize_height" in self.parameters:
+            body["resize_height"] = self.parameters["resize_height"]
+
+        if "origin_at" in self.parameters:
+            body["origin_at"] = self.parameters["origin_at"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - input_task_id
+        """
+        parameters = kwargs
+
+        if "input_task_id" not in kwargs:
+            msg = "parameter `input_task_id` is required"
+            raise ValueError(msg)
+
+        return parameters
+
+
+class MeshyTextToTexture(MeshyBase):
+    """
+    Text-To-Texture
+    """
+
+    def run(self) -> None:
+        self.response = self._call_llm(url=f"{MESHY_BASE_EP}{MESHY_TTTX_EP}")
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - model_url (required): str
+          - object_prompt (required): str
+          - style_prompt (required): str
+          - enable_original_uv: bool
+          - enable_pbr: bool
+          - resolution: str, 1024/2048/4096
+          - negative_prompt: str
+          - art_style: str
+        """
+        body = {
+            "model_url": self.parameters["model_url"],
+            "object_prompt": self.parameters["object_prompt"],
+            "style_prompt": self.parameters["style_prompt"],
+        }
+
+        if "enable_original_uv" in self.parameters:
+            body["enable_original_uv"] = self.parameters["enable_original_uv"]
+
+        if "enable_pbr" in self.parameters:
+            body["enable_pbr"] = self.parameters["enable_pbr"]
+
+        if "resolution" in self.parameters:
+            body["resolution"] = self.parameters["resolution"]
+
+        if "negative_prompt" in self.parameters:
+            body["negative_prompt"] = self.parameters["negative_prompt"]
+
+        if "art_style" in self.parameters:
+            body["art_style"] = self.parameters["art_style"]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - model_url
+          - object_prompt
+          - style_prompt
+        """
+        parameters = kwargs
+
+        if "model_url" not in kwargs:
+            msg = "parameter `model_url` is required"
+            raise ValueError(msg)
+
+        if "object_prompt" not in kwargs:
+            msg = "parameter `object_prompt` is required"
+            raise ValueError(msg)
+
+        if "style_prompt" not in kwargs:
+            msg = "parameter `style_prompt` is required"
+            raise ValueError(msg)
 
         return parameters

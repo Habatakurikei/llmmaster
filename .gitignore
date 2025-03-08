@@ -1,5 +1,6 @@
 # LLMMaster test files
 api_key_pairs.txt
+debug_response.txt
 test-inputs
 test-outputs
 

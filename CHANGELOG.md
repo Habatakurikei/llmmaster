@@ -1,22 +1,58 @@
 # LLMMaster Changelog
 
+## [Unsupported]
+- Realtime API services
+- Multiple turns in LLM chat thread
+- Anthropic Claude prompt cache
+
 ## [Unreleased]
-- Text-To-Image models pending to be added
+- Image models pending to be added
   - Midjourney API through ImaginePro
-  - Adobe Firefly API not released for personal use
-  - Ideogram API not released for personal use
-  - Leonardo AI API pending to be added
-- Text-To-Music models pending to be added
-  - Mubert API for rather enterprise use
-  - Suno API for rather enterprise use
-- Pending additional functions
-  - OpenAI and Stable Diffusion Image-To-Image for online file.
-  - ElevenLabs using native REST API like dubbing and cloning, etc.
-  - Pika.art video extension, etc.
-  - OpenAi structured output
-  - Anthropic Claude cache
-  - SambaNova AI API
+  - Adobe Firefly not released for personal use
+  - Ideogram not released for personal use
+  - Leonardo AI
+  - Recraft
+- Music models pending to be added
+  - Mubert for rather enterprise use
+  - Suno for rather enterprise use
+- Other providers/models to be added
+  - Tool calling for LLMs
+  - Agent in MistralAI
   - Google VertexAI
+  - Rodin 3D
+  - Hailuo
+  - Niji Voice
+
+## [1.0.0] - 2025-03-08
+### Changed
+- Reviewed all the models to use native REST API
+- Reviewed to follow PEP8 style guide
+- Renamed `BaseModel` to `RootModel` to avoid pydantic class name conflict
+- Python files restructured based on provider, not function-based
+- Unified output of Text-To-Text models to `dict`
+- Unified test style
+- Renamed `LLMInstanceCreator` to `InstanceCreator`
+- Simplified dummy prompt verification in `InstanceCreator` class
+- Changed `SUMMON_LIMIT` to 150 from 100
+### Added
+- `utils.py` for commonly used functions
+- `LLMBase` class as common Text-To-Text model
+- `MultipartFormdataModel` for multipart/form-data payload
+- `SpeechToTextBase` inherited from `MultipartFormdataModel` for Speech-To-Text models
+- `DeepSeekLLM`
+- `SambaNovaLLM`
+- `XAILLM` (Grok)
+- Image-To-Text for `AnthropicLLM`, `GroqLLM`, `MistralLLM`
+- Speech-To-Text for `GroqLLM`
+- Audio questioning and answering to `OpenAILLM`
+- Reasoning/Thinking models in `OpenAILLM`, `AnthropicLLM` and other providers can be used
+- Google Web Search to `GoogleLLM`
+- 3D modeling of Stable Diffusion `StableDiffusionImageTo3D`
+- Image generation to Luma AI `LumaAITextToImage`, `LumaAIImageToImage`
+- Voice models to ElevenLabs `ElevenLabsVoiceDesign`, `ElevenLabsVoiceChanger` and `ElevenLabsDub`
+### Removed
+- `pikapikapika_models.py`
+- `_is_dummy_prompt_required()` in `LLMInstanceCreator` class
 
 ## [0.8.0] - 2024-10-13
 ### Added
@@ -68,8 +104,8 @@
 
 ## [0.4.1] - 2024-09-06
 ### Added
-- CerebrasLLM class
-- MistralLLM class
+- `CerebrasLLM` class
+- `MistralLLM` class
 
 ## [0.4.0] - 2024-09-04
 ### Added

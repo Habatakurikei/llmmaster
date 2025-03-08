@@ -16,91 +16,33 @@ This is a Python library that provides a unified interface for interacting with 
 - Concurrent execution of multiple LLMs and multimedia generative AI models
 - Thread-based execution for improved performance
 - Customizable generation parameters
-  - Required parameters: `provider` and `prompt`
-  - Optional parameters: `model` and particular parameters for different model
-  - **Exception:** `prompt` is not required for some dedicated models. Follow the instructions released by provider.
 
 ## Supported LLM Providers and Models
 
 LLM Master respects multi-modal approach. There are many generative AI models that can be used for different purposes.
 
-There are 3 categories in LLM Master: major data formats, 3D models, and Panorama models.
+There are 3 categories in LLM Master: major data formats, 3D models, and panorama models.
 
 More models will be supported soon!
 
-1. **Major Data Formats**
+### Major Data Formats
 
 The table below represents various conversion capabilities between different media types (text, image, audio/speech and video). Some conversions are available, some are pending or coming soon, and others are marked as not applicable (NA) at the moment.
 
-Use highlighted word for `provider` to make `LLMMaster` instance.
+Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `anthropic`, `cerebras`, `google`, `groq`, `mistral`, `openai`, `perplexity` | `flux1_fal_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `openai_tts`, `voicevox_tts`, google_tta (pending) | `pikapikapika_ttv`, `lumaai_ttv`, `runway_ttv` |
-| Image | `google_itt`, `openai_itt` | `flux1_fal_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `stable_diffusion_itv`, `lumaai_itv`, `runway_itv` |
-| Audio | `google_stt`, `openai_stt` | NA | `elevenlabs_aiso` | NA |
+| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (audio output), `openai_tts`, `voicevox_tts` | `lumaai_ttv` |
+| Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `lumaai_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
+| Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv` |
 
-And the list below represents the models that are supported by each provider. See each provider's documentation for full list.
+**Important:**
+  - You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
+  - `pikapikapika_ttv` was deprecated and removed at v1.0.0.
 
-### Text-to-Text Models (typical)
-- Anthropic (`claude-3-haiku-20240307`)
-- Cerebras (`llama3.1-8b`)
-- Google (`gemini-1.5-flash`)
-- Groq (`llama-3.1-8b-instant`)
-- MistralAI (`mistral-small-latest`)
-- OpenAI (`gpt-4o-mini`)
-- Perplexity (`llama-3.1-sonar-small-128k-online`)
-
-### Text-to-Image Models
-- Flux.1 via fal (`fal-ai/flux/dev`)
-- OpenAI (`dall-e-3`)
-- Stable Diffusion (`core`)
-
-### Text-to-Audio (Speech) Models
-- ElevenLabs Speech (`eleven_multilingual_v2`)
-- ElevenLabs Sound Effect (`dummy`)
-- OpenAI (`tts-1`)
-- Voicevox (`dummy`)
-
-### Text-to-Video Models
-- Luma Dream Machine (`dummy`)
-- Pika.art (`dummy`)
-
-### Image-to-Text Models
-- OpenAI (`gpt-4o`)
-- Google (`gemini-1.5-flash`)
-
-### Image-to-Image Models
-- Flux.1 via fal (`fal-ai/flux/dev/image-to-image`)
-- OpenAI (`dall-e-2`)
-- Stable Diffusion (`v2beta`)
-
-### Image-to-Video Models
-- Stable Diffusion (`v2beta`)
-- Luma Dream Machine (`dummy`)
-- Runway (`gen3a_turbo`)
-
-### Audio(Speech)-to-Text Models
-- OpenAI (`whisper-1`)
-- Google (`gemini-1.5-flash`)
-
-### Audio-to-Audio Models
-- ElevenLabs Audio Isolation (`dummy`)
-
-### Video-to-Text Models (typical)
-- Google (`gemini-1.5-flash`)
-
-### Video-to-Video Models
-- Luma Dream Machine (`dummy`)
-
-Use highlighted word for `model` to make `LLMMaster` instance.
-
-The `model` parameter is optional. If you do not specify the model, the default model defined in `config.py` will be used.
-
-**Important:** You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
-
-2. **3D Models**
+### 3D Models
 
 From ver. 0.2.2, LLM Master supports 3D models thanks to Meshy API. Here are the list of supported functions defined as class:
 
@@ -115,6 +57,7 @@ From ver. 0.6.0, LLM Master also supports Tripo 3D modeling API. The following c
 - TripoTextTo3D: `tripo_tt3d`
 - TripoImageTo3D: `tripo_it3d`
 - TripoMultiviewTo3D: `tripo_mv3d`
+- TripoTextureModel: `tripo_texture`
 - TripoRefineModel: `tripo_refine`
 - TripoAnimationPreRigCheck: `tripo_aprc`
 - TripoAnimationRig: `tripo_arig`
@@ -122,7 +65,11 @@ From ver. 0.6.0, LLM Master also supports Tripo 3D modeling API. The following c
 - TripoStylization: `tripo_stylize`
 - TripoConversion: `tripo_conversion`
 
-3. **Panorama Models**
+From ver. 1.0.0, LLMMaster also supports Stable Diffusion 3D modeling API.
+
+- Stable Fast 3D (SF3D) and Stable Point Aware 3D (SPAR) : `stable_diffusion_it3d`
+
+### Panorama Models
 
 Are you not satisfied with just generating images and 3D models? From ver. 0.8.0, LLM Master supports Skybox API that generates 360-degree panoramic images and videos.
 
@@ -141,83 +88,98 @@ pip install llmmaster
 
 Relevant packages will also be installed.
 
-## Usage
+## Set API keys before use
 
-### Set API keys for your environment
+Most of the API services are paid, meaning LLM Master can be used by the subscribers of these providers. Prepare your own API keys in advance.
 
-Set up your API keys as environment variables. Note that you do not have to set all of the API keys as shown below. You can set only the ones that you need.
+LLM Master provides 2 way to set your API keys to access the services.
+
+### Set as environmental variables
+
+This is common to use the API if to run over your local computer. Use the commands below for your OS.
+
+Note that you do not have to set all of the API keys as shown below. You can set only the ones that you need.
 
 **Important**: changed `GEMINI_API_KEY` to `GOOGLE_API_KEY` since ver. 0.1.4.
 
 For Mac/Linux,
 
 ```
-export ANTHROPIC_API_KEY="your_anthropic_key"
-export CEREBRAS_API_KEY="your_cerebras_key"
-export DALLE_API_KEY="your_openai_key"
-export ELEVENLABS_API_KEY="your_elevenlabs_key"
-export FAL_KEY="your_fal_key"
-export GOOGLE_API_KEY="your_google_key"
-export GROQ_API_KEY="your_groq_key"
-export LUMAAI_API_KEY="your_lumaai_key"
-export MESHY_API_KEY="your_meshy_key"
-export MISTRAL_API_KEY="your_mistral_key"
-export OPENAI_API_KEY="your_openai_key"
-export PERPLEXITY_API_KEY="your_perplexity_key"
-export PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
-export RUNWAY_API_KEY="your_runway_key"
-export SKYBOX_API_KEY="your_skybox_key"
-export STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
-export TRIPO_API_KEY="your_tripo_key"
+export ANTHROPIC_API_KEY="your_API_key"
+export CEREBRAS_API_KEY="your_API_key"
+export DALLE_API_KEY="your_API_key"
+export DEEPSEEK_API_KEY="your_API_key"
+export ELEVENLABS_API_KEY="your_API_key"
+export FAL_KEY="your_API_key"
+export GOOGLE_API_KEY="your_API_key"
+export GROQ_API_KEY="your_API_key"
+export LUMAAI_API_KEY="your_API_key"
+export MESHY_API_KEY="your_API_key"
+export MISTRAL_API_KEY="your_API_key"
+export OPENAI_API_KEY="your_API_key"
+export PERPLEXITY_API_KEY="your_API_key"
+export PIKAPIKAPIKA_API_KEY="your_API_key"
+export RUNWAY_API_KEY="your_API_key"
+export SAMBANOVA_API_KEY="your_API_key"
+export SKYBOX_API_KEY="your_API_key"
+export STABLE_DIFFUSION_API_KEY="your_API_key"
+export TRIPO_API_KEY="your_API_key"
+export XAI_API_KEY="your_API_key"
 ```
 
 For Windows (cmd),
 
 ```
-SET ANTHROPIC_API_KEY=your_anthropic_key
-SET CEREBRAS_API_KEY=your_cerebras_key
-SET DALLE_API_KEY=your_openai_key
-SET ELEVENLABS_API_KEY=your_elevenlabs_key
-SET FAL_KEY=your_fal_key
-SET GOOGLE_API_KEY=your_google_key
-SET GROQ_API_KEY=your_groq_key
-SET LUMAAI_API_KEY=your_lumaai_key
-SET MESHY_API_KEY=your_meshy_key
-SET MISTRAL_API_KEY=your_mistral_key
-SET OPENAI_API_KEY=your_openai_key
-SET PERPLEXITY_API_KEY=your_perplexity_key
-SET PIKAPIKAPIKA_API_KEY=your_pikapikapika_key
-SET RUNWAY_API_KEY=your_runway_key
-SET SKYBOX_API_KEY=your_skybox_key
-SET STABLE_DIFFUSION_API_KEY=your_stable_diffusion_key
-SET TRIPO_API_KEY=your_tripo_key
+SET ANTHROPIC_API_KEY="your_API_key"
+SET CEREBRAS_API_KEY="your_API_key"
+SET DALLE_API_KEY="your_API_key"
+SET DEEPSEEK_API_KEY="your_API_key"
+SET ELEVENLABS_API_KEY="your_API_key"
+SET FAL_KEY="your_API_key"
+SET GOOGLE_API_KEY="your_API_key"
+SET GROQ_API_KEY="your_API_key"
+SET LUMAAI_API_KEY="your_API_key"
+SET MESHY_API_KEY="your_API_key"
+SET MISTRAL_API_KEY="your_API_key"
+SET OPENAI_API_KEY="your_API_key"
+SET PERPLEXITY_API_KEY="your_API_key"
+SET PIKAPIKAPIKA_API_KEY="your_API_key"
+SET RUNWAY_API_KEY="your_API_key"
+SET SAMBANOVA_API_KEY="your_API_key"
+SET SKYBOX_API_KEY="your_API_key"
+SET STABLE_DIFFUSION_API_KEY="your_API_key"
+SET TRIPO_API_KEY="your_API_key"
+SET XAI_API_KEY="your_API_key"
 ```
 
 For Windows (PowerShell)
 
 ```
-$env:ANTHROPIC_API_KEY="your_anthropic_key"
-$env:CEREBRAS_API_KEY="your_cerebras_key"
-$env:DALLE_API_KEY="your_openai_key"
-$env:ELEVENLABS_API_KEY="your_elevenlabs_key"
-$env:FAL_KEY="your_fal_key"
-$env:GOOGLE_API_KEY="your_google_key"
-$env:GROQ_API_KEY="your_groq_key"
-$env:LUMAAI_API_KEY="your_lumaai_key"
-$env:MESHY_API_KEY="your_meshy_key"
-$env:MISTRAL_API_KEY="your_mistral_key"
-$env:OPENAI_API_KEY="your_openai_key"
-$env:PERPLEXITY_API_KEY="your_perplexity_key"
-$env:PIKAPIKAPIKA_API_KEY="your_pikapikapika_key"
-$env:RUNWAY_API_KEY="your_runway_key"
-$env:SKYBOX_API_KEY="your_skybox_key"
-$env:STABLE_DIFFUSION_API_KEY="your_stable_diffusion_key"
-$env:TRIPO_API_KEY="your_tripo_key"
+$env:ANTHROPIC_API_KEY="your_API_key"
+$env:CEREBRAS_API_KEY="your_API_key"
+$env:DALLE_API_KEY="your_API_key"
+$env:DEEPSEEK_API_KEY="your_API_key"
+$env:ELEVENLABS_API_KEY="your_API_key"
+$env:FAL_KEY="your_API_key"
+$env:GOOGLE_API_KEY="your_API_key"
+$env:GROQ_API_KEY="your_API_key"
+$env:LUMAAI_API_KEY="your_API_key"
+$env:MESHY_API_KEY="your_API_key"
+$env:MISTRAL_API_KEY="your_API_key"
+$env:OPENAI_API_KEY="your_API_key"
+$env:PERPLEXITY_API_KEY="your_API_key"
+$env:PIKAPIKAPIKA_API_KEY="your_API_key"
+$env:RUNWAY_API_KEY="your_API_key"
+$env:SAMBANOVA_API_KEY="your_API_key"
+$env:SKYBOX_API_KEY="your_API_key"
+$env:STABLE_DIFFUSION_API_KEY="your_API_key"
+$env:TRIPO_API_KEY="your_API_key"
+$env:XAI_API_KEY="your_API_key"
 ```
 
-### Set API keys prepared in text file
+### Load API keys prepared in text file
 
-This is new since ver. 0.4.0. Your API keys are also set to LLMMaster from a saved text file, e.g. `api_key_pairs.txt`. The format shall be the following:
+This is new since ver. 0.4.0. Your API keys are also set to `LLMMaster` from a saved text file, e.g. `api_key_pairs.txt`. The format shall be the following:
 
 ```
 ANTHROPIC_API_KEY=your_anthropic_key
@@ -234,17 +196,15 @@ You do not have to set all the API keys but include ones you want to use.
 
 Read this text file in python script as string, then load through through `LLMMaster.set_api_keys()`. Explain details in use cases.
 
-This is useful for third-party application usage.
+## Use cases
 
-Note that `FAL_KEY` is only loaded from the OS environmental variable according to the official API reference.
+You can find and download all the use case codes in folder [usecases](https://github.com/Habatakurikei/llmmaster/tree/main/usecases). Most of the basic use cases generating texts, images, videos, audio and 3D models are covered.
 
-### Use cases
+In another folder [tests](https://github.com/Habatakurikei/llmmaster/tree/main/tests), you will also find much more detailed usage for each provider.
 
-You can find and download these use case codes in folder [usecases](https://github.com/Habatakurikei/llmmaster/tree/main/usecases).
+In this document, some typical cases are introduced.
 
-**Important:** How to handle or save generated contents? LLM Master basically returns raw output defined by each provider. Some models return REST API Response object from the requests library, while some other models return bytes object of media or specific class instance defined by provider. See [RESULTSTYPE.md](https://github.com/Habatakurikei/llmmaster/blob/main/RESULTSTYPE.md) for brief description of what type of object is returned.
-
-  1. Using **single Text-to-Text** LLM
+### Using single Text-to-Text LLM
 
 This is the most basic usage of LLM Master.
 
@@ -253,34 +213,46 @@ In the code below, `openai_instance` is actually a unique label to manage multip
 This case uses an API key of OpenAI from enriroment variable.
 
 ```python
+import json
+
 from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
 
 # Create an instance of LLMMaster
+key = "openai_instance"
 master = LLMMaster()
 
 # Configure LLM instance
-master.summon({
-    "openai_instance": master.pack_parameters(
-        provider="openai",
-        model="gpt-4o-mini",
-        prompt="Hello, how are you?",
-        max_tokens=100,
-        temperature=0.7
-    )
-})
+master.summon(
+    {
+        key: master.pack_parameters(
+            provider="openai",
+            model="gpt-4o-mini",
+            prompt="Hello, how are you?",
+            max_tokens=100,
+            temperature=0.7
+        )
+    }
+)
 
 # Run LLM
-print('Start running LLMMaster...')
+print("Start running LLMMaster...")
 master.run()
 
-# Get results
-results = master.results
-print(f'OpenAI responded: {results["openai_instance"]}')
+# Show results
+result_text = extract_llm_response(master.results[key])
+print(f"Response: {result_text}")
+
+# Save results to a JSON file
+save_as = "results.json"
+with open(save_as, "w", encoding="utf-8") as f:
+    json.dump(master.results[key], f, indent=4, ensure_ascii=False)
+print(f"Results saved to {save_as}")
 
 # Check elapsed time
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
-# Clear instances
+# Clear instance
 master.dismiss()
 ```
 
@@ -288,64 +260,82 @@ The following case is way of using API keys written in a text file instead of en
 
 ```python
 from pathlib import Path
+
 from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
 
 api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+key = "openai"
 
+print("Start generation...")
 master = LLMMaster()
 master.set_api_keys(api_key_pairs)
-print(f'API key pairs: {master.api_key_pairs}')
+print(f"API key pairs (print for debug purpose): {master.api_key_pairs}")
 
-parameters = master.pack_parameters(provider="openai",
-                                    prompt="Hello, how are you?")
-
-master.summon({"openai": parameters})
+master.summon(
+    {
+        key: master.pack_parameters(
+            provider=key,
+            prompt="Hello, how are you?"
+        )
+    }
+)
 master.run()
 
-results = master.results
-print(f'OpenAI responded: {results["openai"]}')
+print(f"Response: {extract_llm_response(master.results[key])}")
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
 
-  2. Using **multiple Text-to-Text** LLMs simultaneously
+**Important**: Since v1.0.0, output is `str`, `dict` or raw response of `requests`. See section "Handling generated contents" for details.
+
+LLM outputs also contain multiple items in JSON format. You can utilize an original response or extract the text part. A text response can be extracted by importing a utility function. Declare `from llmmaster.utils import extract_llm_response` and use `extract_llm_response()`.
+
+### Multiple Text-to-Text LLMs run simultaneously
+
+One of the advantages of using LLM Master is to run multiple models at once. This is another example that uses 10 different providers through a single call.
 
 ```python
 from pathlib import Path
+
 from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
 
 api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+prompt = "Who are you?"
+provider_list = [
+    "anthropic", "cerebras", "deepseek", "google", "groq", "mistral",
+    "openai", "perplexity", "sambanova", "xai"
+]
 
 # Create an instance of LLMMaster
 master = LLMMaster()
 master.set_api_keys(api_key_pairs)
-print(f'API key pairs: {master.api_key_pairs}')
 
 # Configure LLM instance
-master.summon({
-    "openai_instance": master.pack_parameters(
-        provider="openai",
-        prompt="Summarize the main ideas of quantum computing."
-    ),
-    "anthropic_instance": master.pack_parameters(
-        provider="anthropic",
-        prompt="Explain the concept of artificial general intelligence."
+for provider in provider_list:
+    master.summon(
+        {
+            provider: master.pack_parameters(
+                provider=provider,
+                prompt=prompt
+            )
+        }
     )
-})
 
 # You can check what parameters are set before run
-print('Parameters set before run.')
+print("Parameters (print for debug purpose).")
 for label, instance in master.instances.items():
-    print(f'{label} = {instance.parameters}')
+    print(f"{label} = {instance.parameters}")
 
 # Run LLM
-print('Start running LLMMaster...')
+print("Start running LLMMaster...")
 master.run()
 
 # Get results
 for instance, response in master.results.items():
-    print(f'{instance} responded: {response}')
+    print(f"{instance} responded: {extract_llm_response(response)}")
 
 # Check elapsed time
 print(f"Elapsed time: {master.elapsed_time} seconds")
@@ -354,685 +344,219 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-  3. Using **Text-to-Image** Models
+### Reasoning and Web Search Models
+
+Since API calls have become more and more versatile and complicated, LLM Master faced errors in some new functionality. The library needed to be re-developed from scratch.
+
+From v1.0.0, LLM Master can also handle the reasoning (thinking) models and web search capability. Here is an example.
 
 ```python
-import requests
+from pathlib import Path
+
 from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
 
-# Create an instance of LLMMaster
+api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+prompt = "What will happen in the technological singularity?"
+
+print("Start generation...")
 master = LLMMaster()
-
-# Configure instances
-master.summon({
-    "openai_image": master.pack_parameters(
-        provider="openai_tti",
-        model="dall-e-3",
-        prompt="A futuristic cityscape with flying cars in the clear sky",
-        size="1792x1024",
-        quality="hd"
-    ),
-    "stable_diffusion_image": master.pack_parameters(
-        provider="stable_diffusion_tti",
-        model="core",
-        prompt="A serene landscape with a mountain lake at sunset",
-        aspect_ratio="16:9",
-        style_preset="cinematic"
-    ),
-    "flux1_fal_image": master.pack_parameters(
-        provider="flux1_fal_tti",
-        model="fal-ai/flux/schnell",
-        prompt="A spaceship heading to Mars in the space",
-        image_size="landscape_16_9",
-        num_inference_steps=4
-    )
-})
-
-# You can check what parameters are set before run
-print('Parameters set before run.')
-for label, instance in master.instances.items():
-    print(f'{label} = {instance.parameters}')
-
-# Run master
-print('Start running LLMMaster...')
-master.run()
-
-# Get results
-response = master.results["openai_image"]
-if 'data' in response:
-    image_response = requests.get(response['data'][0]['url'])
-    if image_response.status_code == 200:
-        with open("openai_image.png", 'wb') as f:
-            f.write(image_response.content)
-        print("openai_image.png saved")
-
-response = master.results["stable_diffusion_image"]
-if hasattr(response, 'content'):
-    with open("stable_diffusion_image.png", 'wb') as f:
-        f.write(response.content)
-    print("stable_diffusion_image.png saved")
-
-response = master.results["flux1_fal_image"]
-if 'images' in response:
-    image_response = requests.get(response['images'][0]['url'])
-    if image_response.status_code == 200:
-        with open("flux1_fal_image.png", 'wb') as f:
-            f.write(image_response.content)
-    print("flux1_fal_image.png saved")
-
-# Check elapsed time
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-# Clear instances
-master.dismiss()
-```
-
-  4. Using **Text-to-Audio** (Speech/Sound) Models
-
-```python
-import elevenlabs
-from llmmaster import LLMMaster
-
-to_say = "Hello World!"
-
-master = LLMMaster()
-
-# Configure instances
-master.summon({
-    "openai": master.pack_parameters(
-        provider='openai_tts',
-        prompt=to_say,
-        voice='echo',
-        speed=0.5,
-        response_format='mp3'
-    ),
-    "elevenlabs_speech": master.pack_parameters(
-        provider='elevenlabs_tts',
-        prompt=to_say
-    ),
-    "elevenlabs_sound": master.pack_parameters(
-        provider='elevenlabs_ttse',
-        prompt='Drinking a glass of water.'
-    ),
-    "voicevox": master.pack_parameters(
-        provider='voicevox_tts',
-        prompt=to_say,
-        speaker=0
-    )
-})
-
-# You can check what parameters are set before run
-print('Parameters set before run.')
-for label, instance in master.instances.items():
-    print(f'{label} = {instance.parameters}')
-
-# Run master
-print('Start running LLMMaster...')
-master.run()
-
-# Get results
-print('Responses')
-
-response = master.results['openai']
-if response:
-    save_as = "openai.mp3"
-    with open(save_as, 'wb') as f:
-        for chunk in response.iter_bytes():
-            f.write(chunk)
-    print(f'Saved as {save_as}')
-
-if master.results['elevenlabs_speech']:
-    save_as = "elevenlabs_speech.mp3"
-    elevenlabs.save(master.results['elevenlabs_speech'], save_as)
-    print(f'Saved as {save_as}')
-
-if master.results['elevenlabs_sound']:
-    save_as = "elevenlabs_sound.mp3"
-    elevenlabs.save(master.results['elevenlabs_sound'], save_as)
-    print(f'Saved as {save_as}')
-
-response = master.results['voicevox']
-if response.content:
-    save_as = "voicevox.wav"
-    with open(save_as, 'wb') as f:
-        f.write(response.content)
-    print(f'Saved as {save_as}')
-
-# Check elapsed time
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  5. Using **Text-to-Video** Models
-
-```python
-import requests
-from llmmaster import LLMMaster
-
-master = LLMMaster()
-
-prompt = 'Japanese ladies in elegant kimono dancing in traditional tea room.'
-
-pika_parameters = {
-    "guidanceScale": 16,
-    "motion": 2,
-    "negativePrompt": "ugly"
-}
-
-# Configure instances
-master.summon({
-    "pikapikapika_ttv": master.pack_parameters(
-        provider='pikapikapika_ttv',
-        prompt=prompt,
-        style='Anime',
-        sfx=True,
-        frameRate=24,
-        aspectRatio='16:9',
-        camera={'zoom': 'out'},
-        parameters=pika_parameters
-    ),
-    "lumaai_ttv": master.pack_parameters(
-        provider='lumaai_ttv',
-        prompt=prompt,
-        aspect_ratio='16:9',
-        loop=True
-    )
-})
-
-print('Parameters set before run.')
-for label, instance in master.instances.items():
-    print(f'{label} = {instance.parameters}')
-
-print('Start running LLMMaster...')
-master.run()
-
-print('Responses')
-
-response = master.results['pikapikapika_ttv']
-if 'videos' in response:
-    res = requests.get(response['videos'][0]['resultUrl'])
-    if res.status_code == 200:
-        save_as = "pikapikapika_ttv.mp4"
-        with open(save_as, "wb") as f:
-            f.write(res.content)
-        print(f'Saved as {save_as}')
-
-response = master.results['lumaai_ttv']
-if 'assets' in response:
-    res = requests.get(response['assets']['video'])
-    if res.status_code == 200:
-        save_as = "lumaai_ttv.mp4"
-        with open(save_as, "wb") as f:
-            f.write(res.content)
-        print(f'Saved as {save_as}')
-
-# Check elapsed time
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  6. Using **Image-to-Text** Models
-
-```python
-from llmmaster import LLMMaster
-
-master = LLMMaster()
-
-# Online images are preferred for OpenAI.
-# Online images and local image paths are both supported for Google.
-# Change "image_url" for your case
-entries = [
+master.set_api_keys(api_key_pairs)
+master.summon(
     {
-        'name': 'openai_itt_case',
-        'params': {
-            'provider': 'openai_itt',
-            'model': 'gpt-4o',
-            'prompt': 'Describe each image.',
-            'image_url': ['https://example.com/image-1.jpg',
-                          'https://example.com/image-2.jpg']
-        }
-    },
-    {
-        'name': 'google_itt_case',
-        'params': {
-            'provider': 'google_itt',
-            'model': 'gemini-1.5-flash',
-            'prompt': 'What might be differences between these pictures?',
-            'image_url': ['https://example.com/image.png',
-                          '/home/user/my_image.png']
-        }
-    }
-]
-
-for entry in entries:
-    master.summon({entry['name']: master.pack_parameters(**entry['params'])})
-
-print('Start running LLMMaster...')
-master.run()
-
-for entry, result in master.results.items():
-    print(f'{entry} responded: {result}')
-
-print(f'Elapsed time: {master.elapsed_time} seconds')
-
-master.dismiss()
-```
-
-  7. Using **Image-to-Image** Models
-
-```python
-import requests
-from llmmaster import LLMMaster
-
-local_image = '/home/user/test_image.png'
-image_url = 'https://example.com/image-1.jpg'
-
-master = LLMMaster()
-master.summon({
-    "openai": master.pack_parameters(
-        provider="openai_iti",
-        mode='variations',
-        image=local_image,
-        n=1
-    ),
-    "stable_diffusion": master.pack_parameters(
-        provider='stable_diffusion_iti',
-        mode='remove_background',
-        image=local_image,
-    ),
-    "flux1_fal": master.pack_parameters(
-        provider="flux1_fal_iti",
-        strength=0.95,
-        image_url=image_url,
-        prompt='Make smiling',
-        image_size='landscape_16_9'
-    )
-})
-
-print('Start running LLMMaster...')
-master.run()
-
-print('Results')
-
-response = master.results["openai"]
-if 'data' in response:
-    image_response = requests.get(response['data'][0]['url'])
-    if image_response.status_code == 200:
-        with open("openai_iti.png", 'wb') as f:
-            f.write(image_response.content)
-
-response = master.results["stable_diffusion"]
-if hasattr(response, 'content'):
-    with open("stable_diffusion_iti.png", 'wb') as f:
-        f.write(response.content)
-
-response = master.results["flux1_fal"]
-if 'images' in response:
-    image_response = requests.get(response['images'][0]['url'])
-    if image_response.status_code == 200:
-        with open("flux1_fal_iti.png", 'wb') as f:
-            f.write(image_response.content)
-
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  8. Using **Image-to-Video** Model
-
-```python
-import requests
-from llmmaster import LLMMaster
-
-local_image = '/home/user/test_image.png'
-image_url = 'https://example.com/image-1.jpg'
-prompt = 'The girl makes smiling with her eyes closed.'
-
-master = LLMMaster()
-master.summon({
-    "stable_diffusion": master.pack_parameters(
-        provider='stable_diffusion_itv',
-        image=local_image
-    ),
-    "lumaai": master.pack_parameters(
-        provider='lumaai_itv',
-        prompt=prompt,
-        frame0=image_url
-    ),
-    "runway": master.pack_parameters(
-        provider='runway_itv',
-        prompt=prompt,
-        promptImage=image_url
-    )
-})
-
-print('Start running LLMMaster...')
-master.run()
-
-print('Results')
-
-response = master.results["stable_diffusion"]
-if hasattr(response, 'content'):
-    with open("stable_diffusion_itv.mp4", 'wb') as f:
-        f.write(response.content)
-
-response = master.results["lumaai"]
-if 'assets' in response:
-    res = requests.get(response['assets']['video'])
-    if res.status_code == 200:
-        with open("lumaai_itv.mp4", "wb") as f:
-            f.write(res.content)
-
-response = master.results["runway"]
-if 'output' in response:
-    res = requests.get(response['output'][0])
-    if res.status_code == 200:
-        with open("runway_itv.mp4", "wb") as f:
-            f.write(res.content)
-
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  9. Using **Audio-to-Text** (Speech-to-Text) Models
-
-```python
-from llmmaster import LLMMaster
-
-master = LLMMaster()
-
-speech_file = '/home/user/sample-speech.mp3'
-
-entries = [
-    {
-        'name': 'openai_stt_1',
-        'params': {
-            'provider': 'openai_stt',
-            'mode': 'translations',
-            'file': speech_file,
-            'response_format': 'json',
-            'temperature': 0.0
-        }
-    },
-    {
-        'name': 'openai_stt_2',
-        'params': {
-            'provider': 'openai_stt',
-            'mode': 'transcriptions',
-            'file': speech_file,
-            'response_format': 'text'
-        }
-    },
-    {
-        'name': 'openai_stt_3',
-        'params': {
-            'provider': 'openai_stt',
-            'mode': 'transcriptions',
-            'file': speech_file,
-            'response_format': 'verbose_json'
-        }
-    },
-    {
-        'name': 'google_stt',
-        'params': {
-            'provider': 'google_stt',
-            'prompt': 'What does the speaker imply?',
-            'audio_file': speech_file
-        }
-    }
-]
-
-for entry in entries:
-    master.summon({entry['name']: master.pack_parameters(**entry['params'])})
-
-print('Start running LLMMaster...')
-master.run()
-
-# Different type of response given by different
-# `response_format`, `transcriptions` or `translations` mode
-# Handle with care for output
-print('Results')
-for name, response in master.results.items():
-    print(f'{name}: {response}')
-
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  10. Using **Audio-to-Audio** Model
-
-```python
-# this function works to remove sound noise from source
-import elevenlabs
-from llmmaster import LLMMaster
-
-audio_file = '/home/user/test_audio.m4a'
-key = "elevenlabs_aiso"
-
-master = LLMMaster()
-master.summon({
-    key: master.pack_parameters(
-        provider=key,
-        audio=audio_file
-    )
-})
-
-print('Start running LLMMaster...')
-master.run()
-
-print('Result')
-if master.results[key]:
-    save_as = f"{key}.mp3"
-    elevenlabs.save(master.results[key], save_as)
-    print(f'Saved as {save_as}')
-
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  11. Using **Video-to-Text** Model
-
-```python
-from llmmaster import LLMMaster
-
-video_file = '/home/user/sample-video.mp4'
-key = 'google_vtt'
-
-master = LLMMaster()
-master.summon({
-    key: master.pack_parameters(
-        provider=key,
-        prompt='Describe attached video.',
-        video_file=video_file
-    )
-})
-
-print('Start running LLMMaster...')
-master.run()
-
-print(f'Response = {master.results[key]}')
-print(f"Elapsed time: {master.elapsed_time} seconds")
-
-master.dismiss()
-```
-
-  12. Using **Video-to-Video** Model
-
-```python
-import requests
-from llmmaster import LLMMaster
-
-task_id = 'uuid-generated-by-lumaai'
-
-master = LLMMaster()
-
-# Use generated video in Luma or public image in web.
-# This is a case to extend video with generated frame.
-key = 'lumaai_vtv'
-params = master.pack_parameters(
-    provider=key,
-    prompt='The boy exploring the space finds Mars.',
-    keyframes={
-        "frame0": {
-            "type": "generation",
-            "id": task_id
-        }
+        "openai_o1": master.pack_parameters(
+            provider="openai",
+            model="o1",
+            prompt=prompt,
+            reasoning_effort="high",
+        ),
+        "google_search": master.pack_parameters(
+            provider="google",
+            model="gemini-1.5-flash",
+            prompt=prompt,
+            dynamic_threshold=0.0
+        ),
+        "perplexity_reasoning": master.pack_parameters(
+            provider="perplexity",
+            model="sonar-reasoning",
+            prompt=prompt
+        ),
+        "deepseek_reasoner": master.pack_parameters(
+            provider="deepseek",
+            model="deepseek-reasoner",
+            prompt=prompt
+        )
     }
 )
-
-master.summon({key: params})
 master.run()
 
-response = master.results[key]
-if 'assets' in response:
-    res = requests.get(response['assets']['video'])
-    if res.status_code == 200:
-        with open(f"{key}.mp4", "wb") as f:
-            f.write(res.content)
-
+print("Responses.")
+for instance, response in master.results.items():
+    print(f"{instance} responded: {extract_llm_response(response)}")
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
 
-  13. Using **3D Models** (Meshy)
+### Audio input and output (OpenAI)
+
+OpenAI provides audio input and output. This is different from speech-to-text and text-to-speech. The users can communicate with AI using not text but voice.
+
+LLMMaster is not capable of real-time API but possible for file-based voice communication with the OpenAI models.
+
+The code below is a use case of audio input.
 
 ```python
-import requests
+from pathlib import Path
+
 from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
+from llmmaster.utils import openai_audio_prompt
 
-key = 'meshy_tt3d'
-negative_prompt = 'ugly, low resolution'
-prompt = 'A cute robot boy.'
+key = "openai"
+api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+audio_prompt = openai_audio_prompt(
+    prompt="What does he want to say?",
+    audio_path="./audio_input.wav"
+)
 
+print("Start generation...")
 master = LLMMaster()
-master.summon({
-    key: master.pack_parameters(
-        provider=key,
-        prompt=prompt,
-        negative_prompt=negative_prompt
-    )
-})
-
-print('Run master')
+master.set_api_keys(api_key_pairs)
+master.summon(
+    {
+        key: master.pack_parameters(
+            provider=key,
+            model="gpt-4o-audio-preview",
+            prompt=audio_prompt
+        )
+    }
+)
 master.run()
 
-print('Responses')
-response = master.results[key]
-
-# Meshy returns several different model formats
-for format, url in response['model_urls'].items():
-    if url:
-        res = requests.get(url)
-        if res.status_code == 200:
-            with open(f"{key}.{format}", 'wb') as f:
-                f.write(res.content)
-
-# Meshy also returns thumbnail png for preview
-if 'thumbnail_url' in response:
-    res = requests.get(response['thumbnail_url'])
-    if res.status_code == 200:
-        with open(f"{key}.png", 'wb') as f:
-            f.write(res.content)
-
+print(f"Response: {extract_llm_response(master.results[key])}")
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
 
-  14. Using **3D Models** (Tripo)
+Another example on audio output.
 
 ```python
-import requests
+from pathlib import Path
+
 from llmmaster import LLMMaster
+from llmmaster.utils import decode_base64
 
-key = 'tripo_tt3d'
-negative_prompt = 'ugly, low resolution'
-prompt = 'A cute robot boy.'
+key = "openai"
+api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
 
+print("Start generation...")
 master = LLMMaster()
-master.summon({
-    key: master.pack_parameters(
-        provider=key,
-        prompt=prompt,
-        negative_prompt=negative_prompt
-    )
-})
-
-print('Run master')
+master.set_api_keys(api_key_pairs)
+master.summon(
+    {
+        key: master.pack_parameters(
+            provider=key,
+            model="gpt-4o-audio-preview",
+            prompt="Hi, how are you?",
+            modalities=["text", "audio"],
+            audio={"voice": "alloy", "format": "wav"},
+        )
+    }
+)
 master.run()
 
-print('Responses')
-response = master.results[key]
-
-if 'data' in response:
-    # Download model
-    ext = response['data']['result']['model']['type']
-    res = requests.get(response['data']['result']['model']['url'])
-    if res.status_code == 200:
-        with open(f"{key}.{ext}", "wb") as f:
-            f.write(res.content)
-
-    # Download model
-    ext = response['data']['result']['rendered_image']['type']
-    res = requests.get(response['data']['result']['rendered_image']['url'])
-    if res.status_code == 200:
-        with open(f"{key}.{ext}", "wb") as f:
-            f.write(res.content)
+print("Save output audio.")
+decode_base64(
+    master.results[key]["choices"][0]["message"]["audio"]["data"],
+    save_as="./audio_output.wav",
+)
 
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
 
-  15. Using **Panorama Models** (Skybox)
+### Vision input for LLMs
+
+It is not well-known that many providers support image-to-text process, i.e. the vision input LLM. A concern is different providers define different input format of image and prompt.
+
+With support of utility functions in LLM Master, the vision input function is a good option to support your activity.
 
 ```python
-import requests
+from pathlib import Path
+
 from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
+from llmmaster.utils import anthropic_vision_prompt
+from llmmaster.utils import google_vision_prompt
+from llmmaster.utils import xai_vision_prompt
+from llmmaster.utils import groq_vision_prompt
+from llmmaster.utils import mistral_vision_prompt
+from llmmaster.utils import openai_vision_prompt
+from llmmaster.utils import sambanova_vision_prompt
 
-key = 'skybox_ttp'
-negative_prompt = 'ugly, dirty, low resolution'
-prompt = 'A Japanese temple, surrounded by mountains, with cherry blossoms.'
+api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+prompt = "What is this image about?"
+local_image = ["./test_image.png"]
+web_image = ["https://www.example.com/images/test.png"]
 
+print("Start generation...")
 master = LLMMaster()
-master.summon({
-    key: master.pack_parameters(
-        provider=key,
-        prompt=prompt,
-        skybox_style_id=138,
-        negative_text=negative_prompt
-    )
-})
-
-print('Run master')
+master.set_api_keys(api_key_pairs)
+master.summon(
+    {
+        "anthropic": master.pack_parameters(
+            provider="anthropic",
+            prompt=anthropic_vision_prompt(prompt, local_image),
+        ),
+        "google": master.pack_parameters(
+            provider="google",
+            prompt=google_vision_prompt(prompt, local_image),
+        ),
+        "xai": master.pack_parameters(
+            provider="xai",
+            prompt=xai_vision_prompt(prompt, local_image),
+            model="grok-2-vision-latest"
+        ),
+        "groq": master.pack_parameters(
+            provider="groq",
+            prompt=groq_vision_prompt(prompt, local_image),
+            model="llama-3.2-11b-vision-preview"
+        ),
+        "mistral": master.pack_parameters(
+            provider="mistral",
+            prompt=mistral_vision_prompt(prompt, local_image),
+            model="pixtral-12b-2409"
+        ),
+        "openai": master.pack_parameters(
+            provider="openai",
+            prompt=openai_vision_prompt(prompt, web_image)
+        ),
+        "sambanova": master.pack_parameters(
+            provider="sambanova",
+            prompt=sambanova_vision_prompt(prompt, local_image),
+            model="Llama-3.2-11B-Vision-Instruct"
+        )
+    }
+)
 master.run()
 
-print('Responses')
-response = master.results[key]
-
-# Download images generated
-if 'request' in response:
-    res = requests.get(response['request']['file_url'])
-    if res.status_code == 200:
-        with open(f"{key}_view.jpg", 'wb') as f:
-            f.write(res.content)
-
-    res = requests.get(response['request']['thumb_url'])
-    if res.status_code == 200:
-        with open(f"{key}_thumb.jpg", 'wb') as f:
-            f.write(res.content)
+print("Results")
+for instance, response in master.results.items():
+    print(f"{instance} responded: {extract_llm_response(response)}")
 
 print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
 
+## Handling generated contents
+
+How to handle or save generated contents? LLM Master basically returns raw output defined by each provider. Some models return REST API Response object from the requests library, while some other models return bytes object or base 64 encoded characters of media.
+
+See [RESULTSTYPE.md](https://github.com/Habatakurikei/llmmaster/blob/main/RESULTSTYPE.md) for brief description of what type of object is returned.
 
 ## Applications
 - [Zoltraak Klein](https://github.com/Habatakurikei/zoltraakklein): [Zoltraak](https://github.com/dai-motoki/zoltraak) is a framework of digital content plant, generating texts/codes, images, speeches and videos. LLMMaster is core interface for external AI services.
@@ -1048,8 +572,8 @@ master.dismiss()
 
 ### Initial arguments for LLMMaster
 
-- There is a limit to the number of LLM instances that can be created at once. This limit is adjustable by one of the new arguments, `summon_limit`, default is 100.
-- If you apply multiple model entries in a single LLMMaster instance, running simultaneously, each entry will start in a certain period of interval. This is a strict limitation of providers for security reason. The minimum interval should be 1 second but this value is adjustable with another argument `wait_for_starting`.
+- There is a limit to the number of LLM instances that can be created at once. This limit is adjustable by one of the new arguments, `summon_limit`, default is 150. This value must be a positive integer.
+- If you apply multiple model entries in a single `LLMMaster` instance, running simultaneously, each entry will start in a certain period of interval. This is a strict limitation of providers for security reason. The minimum interval should be 1 second but this value is adjustable with another argument `wait_for_starting`. This value shall be a positive float suitable for `time.sleep()`.
 
 Both arguments shall be set in the following manner:
 
@@ -1057,11 +581,6 @@ Both arguments shall be set in the following manner:
 from llmmaster import LLMMaster
 master = LLMMaster(summon_limit=150, wait_for_starting=2.5)
 ```
-
-## Customization
-
-- You can easily adjust default models by updating the dictionary in `config.py` and creating a new thread class for the provider.
-- You can also run an individual provider Model directly without using LLMMaster. See each class definition for details.
 
 ## Contributing
 
