@@ -20,6 +20,7 @@ MESHY_KEY_NAME = "MESHY_API_KEY"
 MISTRAL_KEY_NAME = "MISTRAL_API_KEY"
 OPENAI_KEY_NAME = "OPENAI_API_KEY"
 PERPLEXITY_KEY_NAME = "PERPLEXITY_API_KEY"
+REPLICA_KEY_NAME = "REPLICA_API_KEY"
 RUNWAY_KEY_NAME = "RUNWAY_API_KEY"
 SAMBANOVA_KEY_NAME = "SAMBANOVA_API_KEY"
 SKYBOX_KEY_NAME = "SKYBOX_API_KEY"
@@ -163,6 +164,27 @@ OPENAI_TTS_VOICE_DEFAULT = "alloy"
 
 # Perplexity
 PERPLEXITY_TTT_EP = "https://api.perplexity.ai/chat/completions"
+
+# Replica
+REPLICA_BASE_EP = "https://api.replicastudios.com"
+REPLICA_TTS_EP = "/v2/speech/tts"
+
+REPLICA_DEFAULT_SPEAKER = "211710e3-9ecb-437c-a6e1-893d78936b32"
+
+REPLICA_TTS_PARAMS = [
+    "extensions",
+    "sample_rate",
+    "bit_rate",
+    "global_pace",
+    "language_code",
+    "global_pitch",
+    "auto_pitch",
+    "global_volume",
+    "voice_preset_id",
+    "effects_preset_id",
+    "user_metadata",
+    "user_tags"
+]
 
 # Runway
 RUNWAY_BASE_EP = "https://api.dev.runwayml.com"

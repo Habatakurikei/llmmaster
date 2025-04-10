@@ -33,7 +33,7 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (audio output), `openai_tts`, `voicevox_tts` | `lumaai_ttv` |
+| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (audio output), `openai_tts`, `voicevox_tts`, `replica_tts` | `lumaai_ttv` |
 | Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `lumaai_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
 | Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv` |
@@ -119,6 +119,7 @@ export MISTRAL_API_KEY="your_API_key"
 export OPENAI_API_KEY="your_API_key"
 export PERPLEXITY_API_KEY="your_API_key"
 export PIKAPIKAPIKA_API_KEY="your_API_key"
+export REPLICA_API_KEY="your_replica_key"
 export RUNWAY_API_KEY="your_API_key"
 export SAMBANOVA_API_KEY="your_API_key"
 export SKYBOX_API_KEY="your_API_key"
@@ -130,26 +131,27 @@ export XAI_API_KEY="your_API_key"
 For Windows (cmd),
 
 ```
-SET ANTHROPIC_API_KEY="your_API_key"
-SET CEREBRAS_API_KEY="your_API_key"
-SET DALLE_API_KEY="your_API_key"
-SET DEEPSEEK_API_KEY="your_API_key"
-SET ELEVENLABS_API_KEY="your_API_key"
-SET FAL_KEY="your_API_key"
-SET GOOGLE_API_KEY="your_API_key"
-SET GROQ_API_KEY="your_API_key"
-SET LUMAAI_API_KEY="your_API_key"
-SET MESHY_API_KEY="your_API_key"
-SET MISTRAL_API_KEY="your_API_key"
-SET OPENAI_API_KEY="your_API_key"
-SET PERPLEXITY_API_KEY="your_API_key"
-SET PIKAPIKAPIKA_API_KEY="your_API_key"
-SET RUNWAY_API_KEY="your_API_key"
-SET SAMBANOVA_API_KEY="your_API_key"
-SET SKYBOX_API_KEY="your_API_key"
-SET STABLE_DIFFUSION_API_KEY="your_API_key"
-SET TRIPO_API_KEY="your_API_key"
-SET XAI_API_KEY="your_API_key"
+SET ANTHROPIC_API_KEY=your_API_key
+SET CEREBRAS_API_KEY=your_API_key
+SET DALLE_API_KEY=your_API_key
+SET DEEPSEEK_API_KEY=your_API_key
+SET ELEVENLABS_API_KEY=your_API_key
+SET FAL_KEY=your_API_key
+SET GOOGLE_API_KEY=your_API_key
+SET GROQ_API_KEY=your_API_key
+SET LUMAAI_API_KEY=your_API_key
+SET MESHY_API_KEY=your_API_key
+SET MISTRAL_API_KEY=your_API_key
+SET OPENAI_API_KEY=your_API_key
+SET PERPLEXITY_API_KEY=your_API_key
+SET PIKAPIKAPIKA_API_KEY=your_API_key
+SET REPLICA_API_KEY=your_replica_key
+SET RUNWAY_API_KEY=your_API_key
+SET SAMBANOVA_API_KEY=your_API_key
+SET SKYBOX_API_KEY=your_API_key
+SET STABLE_DIFFUSION_API_KEY=your_API_key
+SET TRIPO_API_KEY=your_API_key
+SET XAI_API_KEY=your_API_key
 ```
 
 For Windows (PowerShell)
@@ -169,6 +171,7 @@ $env:MISTRAL_API_KEY="your_API_key"
 $env:OPENAI_API_KEY="your_API_key"
 $env:PERPLEXITY_API_KEY="your_API_key"
 $env:PIKAPIKAPIKA_API_KEY="your_API_key"
+$env:REPLICA_API_KEY="your_replica_key"
 $env:RUNWAY_API_KEY="your_API_key"
 $env:SAMBANOVA_API_KEY="your_API_key"
 $env:SKYBOX_API_KEY="your_API_key"

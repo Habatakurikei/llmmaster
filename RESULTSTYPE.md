@@ -91,6 +91,9 @@ Brief summary of what type to be stored in LLMMaster.results for each model.
 ### Pika
 - ~~PikaPikaPikaGeneration: dict = requests.models.Response with text content~~ DEPRECATED from v1.0.0
 
+### Replica
+- ReplicaTextToSpeech: requests.models.Response with URL of generated speech
+
 ### Runway
 - RunwayImageToVideo: requests.models.Response with URL of generated video
 

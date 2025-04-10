@@ -19,6 +19,7 @@ from .config import MISTRAL_KEY_NAME
 from .config import OPENAI_KEY_NAME
 from .config import PERPLEXITY_KEY_NAME
 from .config import PROVIDERS_NEED_DUMMY_PROMPT
+from .config import REPLICA_KEY_NAME
 from .config import RUNWAY_KEY_NAME
 from .config import SAMBANOVA_KEY_NAME
 from .config import SKYBOX_KEY_NAME
@@ -62,6 +63,7 @@ from .openai_models import OpenAISpeechToText
 from .openai_models import OpenAITextToImage
 from .openai_models import OpenAITextToSpeech
 from .perplexity_models import PerplexityLLM
+from .replica_models import ReplicaTextToSpeech
 from .runway_models import RunwayImageToVideo
 from .sambanova_models import SambaNovaLLM
 from .skybox_models import SkyboxPanoramaToImageVideo
@@ -259,6 +261,11 @@ ACTIVE_MODELS = {
         CLASS: PerplexityLLM,
         KEY_NAME: PERPLEXITY_KEY_NAME,
         DEFAULT_MODEL: "sonar"
+    },
+    "replica_tts": {
+        CLASS: ReplicaTextToSpeech,
+        KEY_NAME: REPLICA_KEY_NAME,
+        DEFAULT_MODEL: "latest"
     },
     "runway_itv": {
         CLASS: RunwayImageToVideo,

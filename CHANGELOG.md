@@ -23,6 +23,10 @@
   - Hailuo
   - Niji Voice
 
+## [1.1.0] - 2025-04-12
+### Added
+- `ReplicaTextToSpeech`
+
 ## [1.0.0] - 2025-03-08
 ### Changed
 - Reviewed all the models to use native REST API

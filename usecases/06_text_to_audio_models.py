@@ -30,7 +30,7 @@ master.summon(
         "elevenlabs_voicedesign": master.pack_parameters(
             provider="elevenlabs_voicedesign",
             output_format="mp3_44100_32",
-            text=speech_text,
+            text=speech_text, # min 100 words required
             voice_description="A female voice with a soft and friendly tone.",
             auto_generate_text=False
         ),
@@ -38,6 +38,10 @@ master.summon(
             provider="voicevox_tts",
             prompt=to_say,
             speaker=0
+        ),
+        "replica": master.pack_parameters(
+            provider="replica_tts",
+            prompt=to_say,
         )
     }
 )
