@@ -1,18 +1,23 @@
+from requests.models import Response
+
+from .config import XAI_BASE_EP
 from .config import XAI_TTT_EP
+from .config import XAI_I2T_EP
+from .config import XAI_LLM_PARAMS
+from .config import XAI_I2T_PARAMS
 from .llmbase import LLMBase
+from .root_model import RootModel
 
 
 class XAILLM(LLMBase):
     """
     XAI provides a powerful LLM model inluding vision model.
-      - grok-2(-latest)
-      - grok-2-vision(-latest)
-      - grok-beta
-      - grok-vision-beta
+      - grok-2 and 3 with reasoning
+      - vision
     """
 
     def run(self) -> None:
-        self.response = self._call_llm(url=XAI_TTT_EP)
+        self.response = self._call_llm(url=f"{XAI_BASE_EP}{XAI_TTT_EP}")
 
     def _body(self) -> dict:
         """
@@ -35,40 +40,41 @@ class XAILLM(LLMBase):
         """
         body = super()._body()
 
-        if "deferred" in self.parameters:
-            body["deferred"] = self.parameters["deferred"]
+        for param in XAI_LLM_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
-        if "frequency_penalty" in self.parameters:
-            body["frequency_penalty"] = self.parameters["frequency_penalty"]
+        return body
 
-        if "logit_bias" in self.parameters:
-            body["logit_bias"] = self.parameters["logit_bias"]
 
-        if "logprobs" in self.parameters:
-            body["logprobs"] = self.parameters["logprobs"]
+class XAITextToImage(RootModel):
+    """
+    Text-to-Image by Grok. Same as DALL-E.
+    """
+    def run(self) -> None:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        response = self._call_rest_api(url=f"{XAI_BASE_EP}{XAI_I2T_EP}")
+        self.response = (
+            response.json() if isinstance(response, Response) else response
+        )
 
-        if "presence_penalty" in self.parameters:
-            body["presence_penalty"] = self.parameters["presence_penalty"]
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - n: int, 1 to 10
+          - quality: str (not supported)
+          - size: str (not supported)
+          - response_format: str, url or b64_json
+          - style: str (not supported)
+          - user: str
+        """
+        body = {
+            "prompt": self.parameters["prompt"],
+            "model": self.parameters["model"]
+        }
 
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "seed" in self.parameters:
-            body["seed"] = self.parameters["seed"]
-
-        if "stop" in self.parameters:
-            body["stop"] = self.parameters["stop"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
-
-        if "tool_choices" in self.parameters:
-            body["tool_choices"] = self.parameters["tool_choices"]
-
-        if "top_logprobs" in self.parameters:
-            body["top_logprobs"] = self.parameters["top_logprobs"]
-
-        if "user" in self.parameters:
-            body["user"] = self.parameters["user"]
+        for param in XAI_I2T_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body

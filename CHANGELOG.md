@@ -23,7 +23,12 @@
   - Hailuo
   - Niji Voice
 
-## [1.1.0] - 2025-04-12
+## [1.2.0] - 2025-04-11
+### Added
+- `XAITextToImage`
+- Reasoning model for `XAILLM`
+
+## [1.1.0] - 2025-04-10
 ### Added
 - `ReplicaTextToSpeech`
 

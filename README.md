@@ -33,7 +33,7 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (audio output), `openai_tts`, `voicevox_tts`, `replica_tts` | `lumaai_ttv` |
+| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, `xai_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (voice output), `openai_tts`, `voicevox_tts`, `replica_tts` | `lumaai_ttv` |
 | Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `lumaai_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
 | Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv` |
@@ -401,13 +401,13 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-### Audio input and output (OpenAI)
+### Voice input and output (OpenAI)
 
-OpenAI provides audio input and output. This is different from speech-to-text and text-to-speech. The users can communicate with AI using not text but voice.
+OpenAI provides voice (audio) input and output. This is different from speech-to-text and text-to-speech. The users can communicate with AI using not text but voice.
 
 LLMMaster is not capable of real-time API but possible for file-based voice communication with the OpenAI models.
 
-The code below is a use case of audio input.
+The code below is a use case of voice input.
 
 ```python
 from pathlib import Path
@@ -443,7 +443,7 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-Another example on audio output.
+Another example on voice output.
 
 ```python
 from pathlib import Path

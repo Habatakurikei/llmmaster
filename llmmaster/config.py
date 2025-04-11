@@ -248,7 +248,34 @@ VOICEVOX_QUERY_EP = "/audio_query"
 VOICEVOX_SYNTHESIS_EP = "/synthesis"
 
 # XAI
-XAI_TTT_EP = "https://api.x.ai/v1/chat/completions"
+XAI_BASE_EP = "https://api.x.ai"
+XAI_TTT_EP = "/v1/chat/completions"
+XAI_I2T_EP = "/v1/images/generations"
+
+XAI_LLM_PARAMS = [
+    "deferred",
+    "frequency_penalty",
+    "logit_bias",
+    "logprobs",
+    "presence_penalty",
+    "reasoning_effort",
+    "response_format",
+    "seed",
+    "stop",
+    "tools",
+    "tool_choices",
+    "top_logprobs",
+    "user"
+]
+
+XAI_I2T_PARAMS = [
+    "n",
+    "quality",
+    "response_format",
+    "size",
+    "style",
+    "user"
+]
 
 # Models that prompt is not required
 PROVIDERS_NEED_DUMMY_PROMPT = [

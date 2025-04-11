@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from conftest import load_api_keys
@@ -7,10 +9,13 @@ from llmmaster import LLMMaster
 from llmmaster.utils import extract_llm_response
 from llmmaster.utils import xai_vision_prompt
 from llmmaster.xai_models import XAILLM
+from llmmaster.xai_models import XAITextToImage
 
 
 PROVIDER = "xai"
 PROMPT = "What is the future implementation of Grok 2 from XAI?"
+CHARACTER_PROMPT = "./test-inputs/character_prompt_short.txt"
+
 IMAGE_PATH = [
     "./test-inputs/dragon_girl_1.png",
     "./test-inputs/elf_girl_1.png",
@@ -104,6 +109,40 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
+def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test model with more parameters
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "xai_reasoning"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    # not testing deferred parameter due to 500 error
+    entry = master.pack_parameters(
+        provider=PROVIDER,
+        prompt="What will happen after the second Trump presidency?",
+        model="grok-3-mini-beta",
+        reasoning_effort="high",
+        temperature=0.3
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], XAILLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
 def test_i2t(run_api: bool, load_api_file: bool) -> None:
     """
     Test image to text
@@ -128,6 +167,39 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
     master.summon({key: entry})
 
     judgment = verify_instance(master.instances[key], XAILLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
+def test_tti(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test text to image generation
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "xai_tti"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider=key,
+        model="grok-2-image-latest",
+        prompt=Path(CHARACTER_PROMPT).read_text(encoding="utf-8"),
+        n=1,
+        response_format="url",
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], XAITextToImage)
     if judgment is False:
         pytest.fail(f"{key} is not an expected instance.")
 

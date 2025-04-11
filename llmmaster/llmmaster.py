@@ -84,6 +84,7 @@ from .tripo_models import TripoTextTo3D
 from .tripo_models import TripoTextureModel
 from .voicevox_models import VoicevoxTextToSpeech
 from .xai_models import XAILLM
+from .xai_models import XAITextToImage
 
 
 ACTIVE_MODELS = {
@@ -366,6 +367,11 @@ ACTIVE_MODELS = {
         CLASS: XAILLM,
         KEY_NAME: XAI_KEY_NAME,
         DEFAULT_MODEL: "grok-2-latest"
+    },
+    "xai_tti": {
+        CLASS: XAITextToImage,
+        KEY_NAME: XAI_KEY_NAME,
+        DEFAULT_MODEL: "grok-2-image-latest"
     },
 }
 

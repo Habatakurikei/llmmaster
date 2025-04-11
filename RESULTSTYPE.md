@@ -129,3 +129,4 @@ Brief summary of what type to be stored in LLMMaster.results for each model.
 ### XAI
 - XAILLM (text-to-text): requests.models.Response with text content.
 - XAILLM (vision input): requests.models.Response with text content.
+- XAITextToImage: requests.models.Response with base64 encoded image

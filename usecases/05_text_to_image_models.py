@@ -37,6 +37,10 @@ master.summon(
             provider="lumaai_tti",
             prompt=prompt,
             aspect_ratio="16:9"
+        ),
+        "xai": master.pack_parameters(
+            provider="xai_tti",
+            prompt=prompt
         )
     }
 )
