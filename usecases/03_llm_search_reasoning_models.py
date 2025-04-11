@@ -32,6 +32,12 @@ master.summon(
             provider="deepseek",
             model="deepseek-reasoner",
             prompt=prompt
+        ),
+        "xai": master.pack_parameters(
+            provider="xai",
+            model="grok-3-mini-beta",
+            prompt=prompt,
+            reasoning_effort="high"
         )
     }
 )
