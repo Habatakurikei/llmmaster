@@ -110,6 +110,39 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
+def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test reasoning model
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "google_reasoning"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider="google",
+        model="gemini-2.5-pro-exp-03-25",
+        prompt="Is the basic income a good idea?",
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], GoogleLLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+            response = extract_llm_response(master.results[key])
+            print(f"Extracted response: {response}")
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
 def test_llm_search(run_api: bool, load_api_file: bool) -> None:
     """
     Test web search model
