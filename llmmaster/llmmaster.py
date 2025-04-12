@@ -12,6 +12,7 @@ from .config import ELEVENLABS_KEY_NAME
 from .config import FAL_KEY_NAME
 from .config import GOOGLE_KEY_NAME
 from .config import GROQ_KEY_NAME
+from .config import INCEPTIONLABS_KEY_NAME
 from .config import KEY_NAME
 from .config import LUMAAI_KEY_NAME
 from .config import MESHY_KEY_NAME
@@ -44,6 +45,8 @@ from .google_models import GoogleLLM
 from .google_models import GoogleSpeechVideoToText
 from .groq_models import GroqLLM
 from .groq_models import GroqSpeechToText
+from .inceptionlabs_models import InceptionLabsFIM
+from .inceptionlabs_models import InceptionLabsLLM
 from .lumaai_models import LumaAIImageToImage
 from .lumaai_models import LumaAIImageToVideo
 from .lumaai_models import LumaAITextToImage
@@ -167,6 +170,16 @@ ACTIVE_MODELS = {
         CLASS: GroqSpeechToText,
         KEY_NAME: GROQ_KEY_NAME,
         DEFAULT_MODEL: "whisper-large-v3"
+    },
+    "inceptionlabs": {
+        CLASS: InceptionLabsLLM,
+        KEY_NAME: INCEPTIONLABS_KEY_NAME,
+        DEFAULT_MODEL: "mercury-coder-small"
+    },
+    "inceptionlabs_fim": {
+        CLASS: InceptionLabsFIM,
+        KEY_NAME: INCEPTIONLABS_KEY_NAME,
+        DEFAULT_MODEL: "mercury-coder-small"
     },
     "lumaai_iti": {
         CLASS: LumaAIImageToImage,

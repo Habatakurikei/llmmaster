@@ -2,6 +2,7 @@
 
 ## [Unsupported]
 - Realtime API services
+- Streaming output by LLM
 - Multiple turns in LLM chat thread
 - Anthropic Claude prompt cache
 

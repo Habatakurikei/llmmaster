@@ -1,6 +1,7 @@
 from requests.models import Response
 
 from .config import DEFAULT_TOKENS
+from .config import LLM_PARAMS
 from .config import TEMPERATURE
 from .config import TOP_K
 from .config import TOP_P
@@ -59,17 +60,9 @@ class LLMBase(RootModel):
             }
         )
 
-        if "max_tokens" in self.parameters:
-            body["max_tokens"] = self.parameters["max_tokens"]
-
-        if "temperature" in self.parameters:
-            body["temperature"] = self.parameters["temperature"]
-
-        if "top_p" in self.parameters:
-            body["top_p"] = self.parameters["top_p"]
-
-        if "top_k" in self.parameters:
-            body["top_k"] = self.parameters["top_k"]
+        for param in LLM_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 

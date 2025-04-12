@@ -15,6 +15,7 @@ ELEVENLABS_KEY_NAME = "ELEVENLABS_API_KEY"
 FAL_KEY_NAME = "FAL_KEY"
 GOOGLE_KEY_NAME = "GOOGLE_API_KEY"
 GROQ_KEY_NAME = "GROQ_API_KEY"
+INCEPTIONLABS_KEY_NAME = "INCEPTIONLABS_API_KEY"
 LUMAAI_KEY_NAME = "LUMAAI_API_KEY"
 MESHY_KEY_NAME = "MESHY_API_KEY"
 MISTRAL_KEY_NAME = "MISTRAL_API_KEY"
@@ -51,6 +52,13 @@ DEFAULT_TOKENS = 4096
 TEMPERATURE = 0.7
 TOP_P = 0.9
 TOP_K = 30
+
+LLM_PARAMS = [
+    "max_tokens",
+    "temperature",
+    "top_p",
+    "top_k"
+]
 
 # Adobe Firefly
 ADOBE_FIREFLY_TOKEN_PRE_EP = "https://ims-na1.adobelogin.com/ims/token/v3?"
@@ -118,6 +126,19 @@ GROQ_BASE_EP = 'https://api.groq.com/openai'
 GROQ_TTT_EP = "/v1/chat/completions"
 GROQ_TRANSCRIPTION_EP = "/v1/audio/transcriptions"
 GROQ_TRANSLATION_EP = "/v1/audio/translations"
+
+# Inception Labs (Mercury)
+INCEPTIONLABS_BASE_EP = "https://api.inceptionlabs.ai"
+INCEPTIONLABS_TTT_EP = "/v1/chat/completions"
+INCEPTIONLABS_FIM_EP = "/v1/fim/completions"
+
+INCEPTIONLABS_TTT_PARAMS = [
+    "frequency_penalty",
+    "presence_penalty",
+    "stop",
+    "diffusing",
+    "tools"
+]
 
 # Luma Dream Machine
 LUMAAI_BASE_EP = "https://api.lumalabs.ai/dream-machine"
