@@ -484,4 +484,42 @@ def test_iti_variations(run_api: bool, load_api_file: bool) -> None:
 
     assert judgment
 
+
+def test_tti_gpt(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test text to image generation with gpt-4o
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "openai_tti"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider="openai_tti",
+        model="gpt-image-1",
+        prompt=Path(CHARACTER_PROMPT).read_text(encoding="utf-8"),
+        background="transparent",
+        moderation="auto",
+        n=1,
+        output_compression=100,
+        output_format="png",
+        quality="high",
+        size="1024x1024",
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], OpenAITextToImage)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
 # TODO: tools and more tests

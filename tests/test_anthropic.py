@@ -160,4 +160,43 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
-# TODO: add tool calling
+# tool calling
+
+def test_websearch(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test web search
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "anthropic_websearch"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider=PROVIDER,
+        model="claude-3-7-sonnet-latest",
+        prompt="Who is the new pope elected?",
+        tools=[
+            {
+                "type": "web_search_20250305",
+                "name": "web_search",
+                "max_uses": 5
+            }
+        ]
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], AnthropicLLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+            response = extract_llm_response(master.results[key])
+            print(f"Extracted response: {response}")
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment

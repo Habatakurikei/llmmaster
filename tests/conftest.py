@@ -54,8 +54,7 @@ def write_json(save_as: str = '', output: dict = {}) -> None:
     Only text contents are available.
     Error occurs if output includes any binary data.
     """
-    if not os.path.isdir(TEST_OUTPUT_PATH):
-        os.makedirs(TEST_OUTPUT_PATH)
+    os.makedirs(TEST_OUTPUT_PATH, exist_ok=True)
 
     filepath = os.path.join(TEST_OUTPUT_PATH, save_as)
 

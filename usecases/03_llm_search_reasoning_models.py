@@ -38,6 +38,18 @@ master.summon(
             model="grok-3-mini-beta",
             prompt=prompt,
             reasoning_effort="high"
+        ),
+        "anthropic_websearch": master.pack_parameters(
+            provider="anthropic",
+            model="claude-3-7-sonnet-latest",
+            prompt=prompt,
+            tools=[
+                {
+                    "type": "web_search_20250305",
+                    "name": "web_search",
+                    "max_uses": 5
+                }
+            ]
         )
     }
 )
