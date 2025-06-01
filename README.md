@@ -34,9 +34,9 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
 | Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, `xai_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (voice output), `openai_tts`, `voicevox_tts`, `replica_tts` | `lumaai_ttv` |
-| Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `lumaai_iti`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
+| Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `lumaai_iti`, `lumaai_rfi`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
 | Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
-| Video | `google_vtt` | NA | NA | `lumaai_vtv` |
+| Video | `google_vtt` | NA | NA | `lumaai_vtv`, `lumaai_rfv` |
 
 **Important:**
   - You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
