@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="llmmaster",
-    version="1.2.0",
+    version="1.3.0",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A unified interface for interacting with multiple LLMs and generative AIs.",
