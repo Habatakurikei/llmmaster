@@ -143,6 +143,40 @@ def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
+def test_llm_livesearch(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test model with more parameters
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "xai_livesearch"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider=PROVIDER,
+        prompt="Provide news about Trump administration in the last 24 hours.",
+        model="grok-3-latest",
+        search_parameters={
+            "mode": "auto"
+        }
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], XAILLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
 def test_i2t(run_api: bool, load_api_file: bool) -> None:
     """
     Test image to text

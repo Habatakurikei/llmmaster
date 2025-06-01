@@ -33,11 +33,17 @@ master.summon(
             model="deepseek-reasoner",
             prompt=prompt
         ),
-        "xai": master.pack_parameters(
+        "xai_reasoning": master.pack_parameters(
             provider="xai",
             model="grok-3-mini-beta",
             prompt=prompt,
             reasoning_effort="high"
+        ),
+        "xai_livesearch": master.pack_parameters(
+            provider="xai",
+            model="grok-3-latest",
+            prompt=prompt,
+            search_parameters={"mode": "auto"}
         ),
         "anthropic_websearch": master.pack_parameters(
             provider="anthropic",

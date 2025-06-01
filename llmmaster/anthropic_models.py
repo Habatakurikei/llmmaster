@@ -1,3 +1,4 @@
+from .config import ANTHROPIC_LLM_PARAMS
 from .config import ANTHROPIC_TTT_EP
 from .config import ANTHROPIC_VERSION_HEADER
 from .config import DEFAULT_TOKENS
@@ -41,23 +42,9 @@ class AnthropicLLM(LLMBase):
             if message["role"] == "system":
                 message["role"] = "assistant"
 
-        if "metadata" in self.parameters:
-            body["metadata"] = self.parameters["metadata"]
-
-        if "stop_sequences" in self.parameters:
-            body["stop_sequences"] = self.parameters["stop_sequences"]
-
-        if "system" in self.parameters:
-            body["system"] = self.parameters["system"]
-
-        if "tool_choice" in self.parameters:
-            body["tool_choice"] = self.parameters["tool_choice"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
-
-        if "thinking" in self.parameters:
-            body["thinking"] = self.parameters["thinking"]
+        for param in ANTHROPIC_LLM_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 

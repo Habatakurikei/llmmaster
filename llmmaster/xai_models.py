@@ -34,9 +34,11 @@ class XAILLM(LLMBase):
           - tool_choices: list
           - top_logprobs: int
           - user: str
+          - search_parameters: dict
         Notes:
           - top_k parameter does not exist.
           - include keyword 'json' in prompt for json_object output.
+          - 2025-06-01: search_parameters is added.
         """
         body = super()._body()
 

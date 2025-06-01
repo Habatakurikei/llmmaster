@@ -2,12 +2,21 @@ from requests.models import Response
 
 from .config import LUMAAI_BASE_EP
 from .config import LUMAAI_ITI_EP
+from .config import LUMAAI_ITI_PARAMS
 from .config import LUMAAI_ITV_EP
+from .config import LUMAAI_ITV_PARAMS
 from .config import LUMAAI_RESULT_EP
+from .config import LUMAAI_RFI_EP
+from .config import LUMAAI_RFI_PARAMS
+from .config import LUMAAI_RFV_EP
+from .config import LUMAAI_RFV_PARAMS
 from .config import LUMAAI_STATUS_IN_PROGRESS
 from .config import LUMAAI_TTI_EP
+from .config import LUMAAI_TTI_PARAMS
 from .config import LUMAAI_TTV_EP
+from .config import LUMAAI_TTV_PARAMS
 from .config import LUMAAI_VTV_EP
+from .config import LUMAAI_VTV_PARAMS
 from .config import WAIT_FOR_LUMAI_RESULT
 from .root_model import RootModel
 
@@ -48,10 +57,12 @@ class LumaAIBase(RootModel):
         self.extra_headers = {"Accept": "application/json"}
 
     def _body(self) -> dict:
-        return {
-            "prompt": self.parameters["prompt"],
-            "model": self.parameters["model"]
-        }
+        body = {"model": self.parameters["model"]}
+
+        if "prompt" in self.parameters:
+            body["prompt"] = self.parameters["prompt"]
+
+        return body
 
     def _is_task_ongoing(self, response: Response) -> bool:
         return response.json().get("state") in LUMAAI_STATUS_IN_PROGRESS
@@ -72,8 +83,9 @@ class LumaAITextToImage(LumaAIBase):
         """
         body = super()._body()
 
-        if "aspect_ratio" in self.parameters:
-            body["aspect_ratio"] = self.parameters["aspect_ratio"]
+        for param in LUMAAI_TTI_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -96,17 +108,9 @@ class LumaAIImageToImage(LumaAIBase):
         """
         body = super()._body()
 
-        if "image_ref" in self.parameters:
-            body["image_ref"] = self.parameters["image_ref"]
-
-        if "style_ref" in self.parameters:
-            body["style_ref"] = self.parameters["style_ref"]
-
-        if "character_ref" in self.parameters:
-            body["character_ref"] = self.parameters["character_ref"]
-
-        if "modify_image_ref" in self.parameters:
-            body["modify_image_ref"] = self.parameters["modify_image_ref"]
+        for param in LUMAAI_ITI_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -129,17 +133,9 @@ class LumaAITextToVideo(LumaAIBase):
         """
         body = super()._body()
 
-        if "aspect_ratio" in self.parameters:
-            body["aspect_ratio"] = self.parameters["aspect_ratio"]
-
-        if "loop" in self.parameters:
-            body["loop"] = self.parameters["loop"]
-
-        if "resolution" in self.parameters:
-            body["resolution"] = self.parameters["resolution"]
-
-        if "duration" in self.parameters:
-            body["duration"] = self.parameters["duration"]
+        for param in LUMAAI_TTV_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -161,14 +157,9 @@ class LumaAIImageToVideo(LumaAIBase):
         """
         body = super()._body()
 
-        if "aspect_ratio" in self.parameters:
-            body["aspect_ratio"] = self.parameters["aspect_ratio"]
-
-        if "loop" in self.parameters:
-            body["loop"] = self.parameters["loop"]
-
-        if "keyframes" in self.parameters:
-            body["keyframes"] = self.parameters["keyframes"]
+        for param in LUMAAI_ITV_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -193,19 +184,109 @@ class LumaAIVideoToVideo(LumaAIBase):
         """
         body = super()._body()
 
-        if "aspect_ratio" in self.parameters:
-            body["aspect_ratio"] = self.parameters["aspect_ratio"]
-
-        if "loop" in self.parameters:
-            body["loop"] = self.parameters["loop"]
-
-        if "resolution" in self.parameters:
-            body["resolution"] = self.parameters["resolution"]
-
-        if "duration" in self.parameters:
-            body["duration"] = self.parameters["duration"]
-
-        if "keyframes" in self.parameters:
-            body["keyframes"] = self.parameters["keyframes"]
+        for param in LUMAAI_VTV_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
+
+
+class LumaAIReframeImage(LumaAIBase):
+    """
+    Reframe Image
+    """
+
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_RFI_EP)
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - media: str
+          - aspect_ratio: str
+          - grid_position_x: int
+          - grid_position_y: int
+          - x_start: int
+          - x_end: int
+          - y_start: int
+          - y_end: int
+          - format: str
+          - callback_url: str
+        """
+        body = super()._body()
+
+        body["generation_type"] = "reframe_image"
+
+        for param in LUMAAI_RFI_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - media
+          - aspect_ratio
+        """
+        parameters = kwargs
+
+        if "media" not in kwargs:
+            msg = "parameter `media` is required"
+            raise ValueError(msg)
+
+        if "aspect_ratio" not in kwargs:
+            msg = "parameter `aspect_ratio` is required"
+            raise ValueError(msg)
+
+        return parameters
+
+class LumaAIReframeVideo(LumaAIBase):
+    """
+    Reframe Video
+    """
+
+    def run(self) -> any:
+        self.response = self._call_llm(LUMAAI_RFV_EP)
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - media: str
+          - first_frame: str
+          - aspect_ratio: str
+          - grid_position_x: int
+          - grid_position_y: int
+          - x_start: int
+          - x_end: int
+          - y_start: int
+          - y_end: int
+          - callback_url: str
+        """
+        body = super()._body()
+
+        body["generation_type"] = "reframe_video"
+
+        for param in LUMAAI_RFV_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - media
+          - aspect_ratio
+        """
+        parameters = kwargs
+
+        if "media" not in kwargs:
+            msg = "parameter `media` is required"
+            raise ValueError(msg)
+
+        if "aspect_ratio" not in kwargs:
+            msg = "parameter `aspect_ratio` is required"
+            raise ValueError(msg)
+
+        return parameters

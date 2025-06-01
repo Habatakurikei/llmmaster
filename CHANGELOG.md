@@ -24,6 +24,12 @@
   - Hailuo
   - Niji Voice
 
+## [1.3.0] - 2025-06-01
+### Added
+- `LumaAIReframeImage`
+- `LumaAIReframeVideo`
+- Live search option for `XAILLM`
+
 ## [1.2.0] - 2025-04-11
 ### Added
 - `XAITextToImage`

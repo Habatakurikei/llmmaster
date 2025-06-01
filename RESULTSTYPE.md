@@ -56,6 +56,8 @@ Brief summary of what type to be stored in LLMMaster.results for each model.
 - LumaAITextToVideo: requests.models.Response with URL of generation
 - LumaAIImageToVideo: requests.models.Response with URL of generation
 - LumaAIVideoToVideo: requests.models.Response with URL of generation
+- LumaAIReframeImage: requests.models.Response with URL of generation
+- LumaAIReframeVideo: requests.models.Response with URL of generation
 
 ### Meshy
 - MeshyTextTo3D: requests.models.Response with URL of 3D model

@@ -83,6 +83,14 @@ ADOBE_FIREFLY_MAX_N = 4
 # Anthropic
 ANTHROPIC_TTT_EP = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION_HEADER = "2023-06-01"
+ANTHROPIC_LLM_PARAMS = [
+    "metadata",
+    "stop_sequences",
+    "system",
+    "tool_choice",
+    "tools",
+    "thinking"
+]
 
 # Cerebras
 CEREBRAS_TTT_EP = "https://api.cerebras.ai/v1/chat/completions"
@@ -148,9 +156,69 @@ LUMAAI_ITI_EP = "/v1/generations/image"
 LUMAAI_TTV_EP = "/v1/generations"
 LUMAAI_ITV_EP = "/v1/generations"
 LUMAAI_VTV_EP = "/v1/generations"
+LUMAAI_RFI_EP = "/v1/generations/image/reframe"
+LUMAAI_RFV_EP = "/v1/generations/video/reframe"
 
 LUMAAI_STATUS_IN_PROGRESS = ["queued", "dreaming"]
 WAIT_FOR_LUMAI_RESULT = 5.0
+
+LUMAAI_TTI_PARAMS = [
+    "aspect_ratio"
+]
+
+LUMAAI_ITI_PARAMS = [
+    "image_ref",
+    "style_ref",
+    "character_ref",
+    "modify_image_ref"
+]
+
+LUMAAI_TTV_PARAMS = [
+    "aspect_ratio",
+    "loop",
+    "resolution",
+    "duration"
+]
+
+LUMAAI_ITV_PARAMS = [
+    "aspect_ratio",
+    "loop",
+    "keyframes"
+]
+
+LUMAAI_VTV_PARAMS = [
+    "aspect_ratio",
+    "loop",
+    "resolution",
+    "duration",
+    "keyframes"
+]
+
+LUMAAI_RFI_PARAMS = [
+    "media",
+    "aspect_ratio",
+    "grid_position_x",
+    "grid_position_y",
+    "x_start",
+    "x_end",
+    "y_start",
+    "y_end",
+    "format",
+    "callback_url"
+]
+
+LUMAAI_RFV_PARAMS = [
+    "media",
+    "first_frame",
+    "aspect_ratio",
+    "grid_position_x",
+    "grid_position_y",
+    "x_start",
+    "x_end",
+    "y_start",
+    "y_end",
+    "callback_url"
+]
 
 # Meshy
 MESHY_BASE_EP = "https://api.meshy.ai/openapi"
@@ -286,7 +354,8 @@ XAI_LLM_PARAMS = [
     "tools",
     "tool_choices",
     "top_logprobs",
-    "user"
+    "user",
+    "search_parameters"
 ]
 
 XAI_I2T_PARAMS = [
@@ -308,6 +377,8 @@ PROVIDERS_NEED_DUMMY_PROMPT = [
     "groq_stt",
     "openai_iti",
     "openai_stt",
+    "lumaai_rfi",
+    "lumaai_rfv",
     "meshy_it3d",
     "meshy_remesh",
     "meshy_tt3d_refine",

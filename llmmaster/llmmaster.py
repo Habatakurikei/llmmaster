@@ -49,6 +49,8 @@ from .inceptionlabs_models import InceptionLabsFIM
 from .inceptionlabs_models import InceptionLabsLLM
 from .lumaai_models import LumaAIImageToImage
 from .lumaai_models import LumaAIImageToVideo
+from .lumaai_models import LumaAIReframeImage
+from .lumaai_models import LumaAIReframeVideo
 from .lumaai_models import LumaAITextToImage
 from .lumaai_models import LumaAITextToVideo
 from .lumaai_models import LumaAIVideoToVideo
@@ -190,6 +192,16 @@ ACTIVE_MODELS = {
         CLASS: LumaAIImageToVideo,
         KEY_NAME: LUMAAI_KEY_NAME,
         DEFAULT_MODEL: "ray-1-6"
+    },
+    "lumaai_rfi": {
+        CLASS: LumaAIReframeImage,
+        KEY_NAME: LUMAAI_KEY_NAME,
+        DEFAULT_MODEL: "photon-1"
+    },
+    "lumaai_rfv": {
+        CLASS: LumaAIReframeVideo,
+        KEY_NAME: LUMAAI_KEY_NAME,
+        DEFAULT_MODEL: "ray-2"
     },
     "lumaai_tti": {
         CLASS: LumaAITextToImage,

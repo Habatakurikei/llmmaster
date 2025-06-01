@@ -11,6 +11,8 @@ from llmmaster.lumaai_models import LumaAIImageToVideo
 from llmmaster.lumaai_models import LumaAITextToImage
 from llmmaster.lumaai_models import LumaAITextToVideo
 from llmmaster.lumaai_models import LumaAIVideoToVideo
+from llmmaster.lumaai_models import LumaAIReframeImage
+from llmmaster.lumaai_models import LumaAIReframeVideo
 
 
 CHARACTER_PROMPT = "./test-inputs/character_prompt_short.txt"
@@ -247,6 +249,83 @@ def test_vtv(run_api: bool, load_api_file: bool) -> None:
     master.summon({key: entry})
 
     judgment = verify_instance(master.instances[key], LumaAIVideoToVideo)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
+def test_rfi(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test reframe image generation
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "lumaai_rfi"
+
+    media_url = "https://storage.cdn-luma.com/dream_machine"
+    media_url += "/8f638692-91ec-4f43-96f6-792328f3c1ad"
+    media_url += "/848ad8da-c7f6-42ca-83b7-b9a920ba17f5_result8d4dfb4123e1c2c5.jpg"
+    media_input = {"url": media_url}
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider=key,
+        media=media_input,
+        aspect_ratio="3:4",
+        grid_position_x=100,
+        grid_position_y=100,
+        format="png"
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], LumaAIReframeImage)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
+def test_rfv(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test reframe video generation
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "lumaai_rfv"
+
+    media_url = "https://storage.cdn-luma.com/dream_machine"
+    media_url += "/c3660737-c4d5-4a1f-b4b0-12695bce1f21"
+    media_url += "/9d5a9731-b3d9-45a0-af94-0b770d99d6da_resultd5dcad2d8e7936ad.mp4"
+    media_input = {"url": media_url}
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider=key,
+        media=media_input,
+        aspect_ratio="3:4",
+        grid_position_x=0,
+        grid_position_y=0
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], LumaAIReframeVideo)
     if judgment is False:
         pytest.fail(f"{key} is not an expected instance.")
 
