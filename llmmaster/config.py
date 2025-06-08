@@ -129,6 +129,28 @@ GOOGLE_GEMINI_DELETE_EP = "/v1beta"
 GOOGLE_GEMINI_FILE_LIST_EP = "/v1beta/files"
 WAIT_FOR_GOOGLE_VTT_RESULT = 5.0
 
+GOOGLE_LLM_PARAMS = [
+    "stopSequences",
+    "responseMimeType",
+    "responseSchema",
+    "responseModalities",
+    "candidateCount",
+    "maxOutputTokens",
+    "temperature",
+    "topP",
+    "topK",
+    "seed",
+    "presencePenalty",
+    "frequencyPenalty",
+    "responseLogprobs",
+    "logprobs",
+    "enableEnhancedCivicAnswers",
+    "speechConfig",
+    "max_tokens",
+    "top_p",
+    "top_k"
+]
+
 # Groq
 GROQ_BASE_EP = 'https://api.groq.com/openai'
 GROQ_TTT_EP = "/v1/chat/completions"

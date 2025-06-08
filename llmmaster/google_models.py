@@ -9,6 +9,7 @@ from .config import GOOGLE_GEMINI_DELETE_EP
 from .config import GOOGLE_GEMINI_FILE_LIST_EP
 from .config import GOOGLE_GEMINI_TTT_EP
 from .config import GOOGLE_GEMINI_UPLOAD_EP
+from .config import GOOGLE_LLM_PARAMS
 from .config import POSITIVE_RESPONSE_CODES
 from .config import WAIT_FOR_GOOGLE_VTT_RESULT
 from .root_model import RootModel
@@ -206,88 +207,9 @@ class GoogleLLM(GoogleGeminiBase):
         """
         generation_config = {}
 
-        if "stopSequences" in self.parameters:
-            generation_config["stopSequences"] = self.parameters[
-                "stopSequences"
-            ]
-
-        if "responseMimeType" in self.parameters:
-            generation_config["responseMimeType"] = self.parameters[
-                "responseMimeType"
-            ]
-
-        if "responseSchema" in self.parameters:
-            generation_config["responseSchema"] = self.parameters[
-                "responseSchema"
-            ]
-
-        if "responseModalities" in self.parameters:
-            generation_config["responseModalities"] = self.parameters[
-                "responseModalities"
-            ]
-
-        if "candidateCount" in self.parameters:
-            generation_config["candidateCount"] = self.parameters[
-                "candidateCount"
-            ]
-
-        if "maxOutputTokens" in self.parameters:
-            generation_config["maxOutputTokens"] = self.parameters[
-                "maxOutputTokens"
-            ]
-
-        if "max_tokens" in self.parameters:
-            generation_config["maxOutputTokens"] = self.parameters[
-                "max_tokens"
-            ]
-
-        if "temperature" in self.parameters:
-            generation_config["temperature"] = self.parameters[
-                "temperature"
-            ]
-
-        if "topP" in self.parameters:
-            generation_config["topP"] = self.parameters["topP"]
-
-        if "top_p" in self.parameters:
-            generation_config["topP"] = self.parameters["top_p"]
-
-        if "topK" in self.parameters:
-            generation_config["topK"] = self.parameters["topK"]
-
-        if "top_k" in self.parameters:
-            generation_config["topK"] = self.parameters["top_k"]
-
-        if "seed" in self.parameters:
-            generation_config["seed"] = self.parameters["seed"]
-
-        if "presencePenalty" in self.parameters:
-            generation_config["presencePenalty"] = self.parameters[
-                "presencePenalty"
-            ]
-
-        if "frequencyPenalty" in self.parameters:
-            generation_config["frequencyPenalty"] = self.parameters[
-                "frequencyPenalty"
-            ]
-
-        if "responseLogprobs" in self.parameters:
-            generation_config["responseLogprobs"] = self.parameters[
-                "responseLogprobs"
-            ]
-
-        if "logprobs" in self.parameters:
-            generation_config["logprobs"] = self.parameters["logprobs"]
-
-        if "enableEnhancedCivicAnswers" in self.parameters:
-            generation_config["enableEnhancedCivicAnswers"] = self.parameters[
-                "enableEnhancedCivicAnswers"
-            ]
-
-        if "speechConfig" in self.parameters:
-            generation_config["speechConfig"] = self.parameters[
-                "speechConfig"
-            ]
+        for param in GOOGLE_LLM_PARAMS:
+            if param in self.parameters:
+                generation_config[param] = self.parameters[param]
 
         return generation_config
 

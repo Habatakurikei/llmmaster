@@ -123,7 +123,7 @@ def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider="google",
-        model="gemini-2.5-pro-exp-03-25",
+        model="gemini-2.5-pro-preview-05-06",
         prompt="Is the basic income a good idea?",
     )
     master.summon({key: entry})

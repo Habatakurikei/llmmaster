@@ -241,6 +241,7 @@ class LumaAIReframeImage(LumaAIBase):
 
         return parameters
 
+
 class LumaAIReframeVideo(LumaAIBase):
     """
     Reframe Video
