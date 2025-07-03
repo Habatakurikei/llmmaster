@@ -25,6 +25,10 @@
   - Niji Voice
 
 ## [1.3.1] - 2025-07-03
+### Changed
+- Replaced `setup.py` with `pyproject.toml`
+
+## [1.3.1] - 2025-07-03
 ### Added
 - `anthropic_pdf_prompt()` in `utils.py` for `AnthropicLLM`
 

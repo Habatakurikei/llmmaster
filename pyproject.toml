@@ -1,7 +1,37 @@
 [project]
 name = "llmmaster"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.3.2"
+description = "A unified interface for interacting with multiple LLMs and generative AIs."
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
+authors = [{ name = "Daisuke Yamaguchi", email = "daicom0204@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.32.3",
+    "requests-toolbelt>=1.0.0"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.4",
+    "flake8>=7.1.1",
+    "build>=1.2.2.post1",
+    "twine>=6.1.0"
+]
+
+[project.urls]
+Homepage = "https://habatakurikei.com/"
+GitHub = "https://github.com/Habatakurikei/llmmaster"
+PyPI = "https://pypi.org/project/llmmaster/"
+
+[tool.setuptools.packages.find]
+include = ["llmmaster", "llmmaster.*"]
