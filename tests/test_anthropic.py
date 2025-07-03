@@ -6,6 +6,7 @@ from conftest import verify_instance
 from llmmaster import LLMMaster
 from llmmaster.anthropic_models import AnthropicLLM
 from llmmaster.utils import anthropic_vision_prompt
+from llmmaster.utils import anthropic_pdf_prompt
 from llmmaster.utils import extract_llm_response
 
 
@@ -13,6 +14,7 @@ PROVIDER = "anthropic"
 PROMPT = "Hello, how are you?"
 IMAGE_PATH = ["./test-inputs/dragon_girl_1.png",
               "./test-inputs/elf_girl_1.png"]
+PDF_PATH = "./test-inputs/Manus-api-presentation-EN.pdf"
 
 
 @pytest.fixture
@@ -145,6 +147,42 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
     )
 
     entry = master.pack_parameters(provider=PROVIDER, prompt=image_prompt)
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], AnthropicLLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
+def test_pdf(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test pdf to text
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "anthropic_pdf"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    pdf_prompt = anthropic_pdf_prompt(
+        prompt="Summarize information in 150 words.",
+        pdf_path=PDF_PATH
+    )
+
+    entry = master.pack_parameters(
+        provider=PROVIDER,
+        prompt=pdf_prompt,
+        model="claude-3-5-sonnet-20241022"
+    )
     master.summon({key: entry})
 
     judgment = verify_instance(master.instances[key], AnthropicLLM)

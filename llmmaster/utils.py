@@ -275,8 +275,30 @@ def openai_audio_prompt(prompt: str = '', audio_path: str = '') -> list[dict]:
         }
     ]
 
+# PDF input to LLM
+
+
+def anthropic_pdf_prompt(
+    prompt: str = '',
+    pdf_path: str = ''
+) -> list[dict]:
+    """
+    Create a prompt for Anthropic LLM PDF input.
+    Set return object to prompt of LLMMaster (content in messages).
+    """
+    contents = [{"type": "text", "text": prompt}]
+    contents.append({
+        "type": "document",
+        "source": {
+            "type": "base64",
+            "media_type": "application/pdf",
+            "data": _encode_base64(pdf_path),
+        }
+    })
+    return contents
 
 # Output processing
+
 
 def extract_llm_response(response: dict = {}) -> str:
     """

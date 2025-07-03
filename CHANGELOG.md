@@ -24,6 +24,10 @@
   - Hailuo
   - Niji Voice
 
+## [1.3.1] - 2025-07-03
+### Added
+- `anthropic_pdf_prompt()` in `utils.py` for `AnthropicLLM`
+
 ## [1.3.0] - 2025-06-01
 ### Added
 - `LumaAIReframeImage`

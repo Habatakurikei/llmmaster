@@ -561,6 +561,8 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
+From v1.3.1, `AnthropicLLM` supports PDF input using `anthropic_pdf_prompt()`, implementing similar to the example shown avobe.
+
 ## Handling generated contents
 
 How to handle or save generated contents? LLM Master basically returns raw output defined by each provider. Some models return REST API Response object from the requests library, while some other models return bytes object or base 64 encoded characters of media.
