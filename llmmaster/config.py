@@ -119,7 +119,20 @@ WAIT_FOR_FAL_RESULT = 5.0
 # Flux1 Fal
 FLUX1_FAL_TTI_EP = "/fal-ai/flux"
 FLUX1_FAL_ITI_EP = "/fal-ai/flux"
+FLUX1_FAL_KONTEXT_EP = "/fal-ai/flux-kontext"
 WAIT_FOR_FLUX1_FAL_RESULT = 3.0
+
+FLUX1_FAL_KONTEXT_PARAMS = [
+    "num_inference_steps",
+    "seed",
+    "guidance_scale",
+    "sync_mode",
+    "num_images",
+    "enable_safety_checker",
+    "output_format",
+    "acceleration",
+    "resolution_mode"
+]
 
 # Google
 GOOGLE_GEMINI_BASE_EP = "https://generativelanguage.googleapis.com"

@@ -40,6 +40,7 @@ from .elevenlabs_models import ElevenLabsTextToSpeech
 from .elevenlabs_models import ElevenLabsVoiceChanger
 from .elevenlabs_models import ElevenLabsVoiceDesign
 from .flux1_fal_models import Flux1FalImageToImage
+from .flux1_fal_models import Flux1FalKontext
 from .flux1_fal_models import Flux1FalTextToImage
 from .google_models import GoogleLLM
 from .google_models import GoogleSpeechVideoToText
@@ -142,6 +143,11 @@ ACTIVE_MODELS = {
         CLASS: Flux1FalImageToImage,
         KEY_NAME: FAL_KEY_NAME,
         DEFAULT_MODEL: "dev/image-to-image"
+    },
+    "flux1_fal_kontext": {
+        CLASS: Flux1FalKontext,
+        KEY_NAME: FAL_KEY_NAME,
+        DEFAULT_MODEL: "dev"
     },
     "flux1_fal_tti": {
         CLASS: Flux1FalTextToImage,

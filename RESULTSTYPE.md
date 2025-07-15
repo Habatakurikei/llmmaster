@@ -36,6 +36,7 @@ Brief summary of what type to be stored in LLMMaster.results for each model.
 ### Flux.1 via Fal
 - Flux1FalTextToImage: requests.models.Response with base64 content.
 - Flux1FalImageToImage: requests.models.Response with base64 content.
+- Flux1FalKontext: requests.models.Response with base64 content.
 
 ### Google
 - GoogleLLM (text-to-text): requests.models.Response with text content.

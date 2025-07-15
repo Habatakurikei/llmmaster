@@ -7,6 +7,7 @@ from conftest import run_llmmaster
 from conftest import verify_instance
 from llmmaster import LLMMaster
 from llmmaster.flux1_fal_models import Flux1FalImageToImage
+from llmmaster.flux1_fal_models import Flux1FalKontext
 from llmmaster.flux1_fal_models import Flux1FalTextToImage
 from llmmaster.utils import flux1_fal_image_input
 from llmmaster.utils import flux1_fal_image_save
@@ -129,6 +130,55 @@ def test_iti(run_api: bool, load_api_file: bool) -> None:
                     result=master.results[key],
                     save_as=f"./test-outputs/{key}"
                 )
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
+def test_kontext(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test kontext generation
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "flux1_fal_kontext"
+
+    prompt = "Let the her mouth make v-shape. Keep her eyes closed."
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    master.summon(
+        {
+            key: master.pack_parameters(
+                provider=key,
+                model="dev",
+                prompt=prompt,
+                image_url=flux1_fal_image_input(ITI_SOURCE_IMAGE),
+                num_inference_steps=28,
+                seed=42,
+                guidance_scale=5.0,
+                num_images=2,
+                enable_safety_checker=True,
+                output_format="png",
+                acceleration="regular",
+                resolution_mode="match_input"
+            )
+        }
+    )
+
+    judgment = verify_instance(master.instances[key], Flux1FalKontext)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+            flux1_fal_image_save(
+                result=master.results[key],
+                save_as=f"./test-outputs/{key}"
+            )
         except Exception as e:
             pytest.fail(f"Test failed with error: {str(e)}")
 

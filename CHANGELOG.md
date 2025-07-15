@@ -24,6 +24,10 @@
   - Hailuo
   - Niji Voice
 
+## [1.4.0] - 2025-07-15
+### Added
+- `Flux1FalKontext`
+
 ## [1.3.1] - 2025-07-03
 ### Changed
 - Replaced `setup.py` with `pyproject.toml`

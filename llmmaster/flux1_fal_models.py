@@ -4,6 +4,8 @@ from requests.models import Response
 from .config import FAL_BASE_EP
 from .config import FAL_STATUS_IN_PROGRESS
 from .config import FLUX1_FAL_ITI_EP
+from .config import FLUX1_FAL_KONTEXT_EP
+from .config import FLUX1_FAL_KONTEXT_PARAMS
 from .config import FLUX1_FAL_TTI_EP
 from .config import WAIT_FOR_FLUX1_FAL_RESULT
 from .root_model import RootModel
@@ -162,5 +164,48 @@ class Flux1FalImageToImage(Flux1FalBase):
             body["enable_safety_checker"] = self.parameters[
                 "enable_safety_checker"
             ]
+
+        return body
+
+
+class Flux1FalKontext(Flux1FalBase):
+    """
+    Kontext
+      - dev
+    """
+
+    def run(self) -> None:
+        self.response = self._call_llm(
+            url=(
+                f"{FAL_BASE_EP}{FLUX1_FAL_KONTEXT_EP}/"
+                f"{self.parameters['model']}"
+            )
+        )
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - image_url (required): str of URL or base64 encoded image
+          - num_inference_steps: int
+          - seed: int
+          - guidance_scale: float
+          - sync_mode: bool
+          - num_images: int
+          - enable_safety_checker: bool
+          - output_format: str
+          - acceleration: str
+          - resolution_mode: str
+        Note:
+          - sync_mode is fixed True
+        """
+        body = {
+            "prompt": self.parameters["prompt"],
+            "image_url": self.parameters["image_url"],
+            "sync_mode": True
+        }
+
+        for param in FLUX1_FAL_KONTEXT_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
