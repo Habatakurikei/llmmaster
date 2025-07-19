@@ -23,6 +23,11 @@
   - Rodin 3D
   - Hailuo
   - Niji Voice
+  - GPT-Image-1 Edit
+
+## [1.4.1] - 2025-07-19
+### Added
+- `gpt-image-1` can be used in `OpenAITextToImage`
 
 ## [1.4.0] - 2025-07-15
 ### Added

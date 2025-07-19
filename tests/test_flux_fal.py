@@ -144,7 +144,7 @@ def test_kontext(run_api: bool, load_api_file: bool) -> None:
     master = LLMMaster()
     key = "flux1_fal_kontext"
 
-    prompt = "Let the her mouth make v-shape. Keep her eyes closed."
+    prompt = "Upside down her mouth. Keep her eyes closed."
 
     if load_api_file:
         master.set_api_keys(load_api_keys())

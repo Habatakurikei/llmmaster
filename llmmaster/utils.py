@@ -354,6 +354,22 @@ def flux1_fal_image_save(
         decode_base64(b64, save_as=f"{save_as}_{i:02d}.{ext}")
 
 
+def openai_image_save(
+    result: dict = {},
+    save_as: str = "openai_image_output"
+) -> None:
+    """
+    Save the image data from OpenAI response.
+    This function can be used in gpt-image-1 only but not for Dall-E.
+    """
+    ext = result["output_format"]
+    for i, item in enumerate(result["data"]):
+        decode_base64(
+            item["b64_json"],
+            save_as=f"{save_as}_{i:02d}.{ext}"
+        )
+
+
 # Supporting functions
 
 def _encode_base64(file_path: str = '') -> str:

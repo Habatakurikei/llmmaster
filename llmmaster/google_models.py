@@ -8,8 +8,8 @@ from .config import GOOGLE_GEMINI_BASE_EP
 from .config import GOOGLE_GEMINI_DELETE_EP
 from .config import GOOGLE_GEMINI_FILE_LIST_EP
 from .config import GOOGLE_GEMINI_TTT_EP
+from .config import GOOGLE_GEMINI_TTT_PARAMS
 from .config import GOOGLE_GEMINI_UPLOAD_EP
-from .config import GOOGLE_LLM_PARAMS
 from .config import POSITIVE_RESPONSE_CODES
 from .config import WAIT_FOR_GOOGLE_VTT_RESULT
 from .root_model import RootModel
@@ -207,7 +207,7 @@ class GoogleLLM(GoogleGeminiBase):
         """
         generation_config = {}
 
-        for param in GOOGLE_LLM_PARAMS:
+        for param in GOOGLE_GEMINI_TTT_PARAMS:
             if param in self.parameters:
                 generation_config[param] = self.parameters[param]
 

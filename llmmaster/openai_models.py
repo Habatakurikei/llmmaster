@@ -5,12 +5,17 @@ from requests.models import Response
 from .config import OPENAI_BASE_EP
 from .config import OPENAI_IMAGE_EDIT_EP
 from .config import OPENAI_IMAGE_VARIATIONS_EP
+from .config import OPENAI_ITI_PARAMS
+from .config import OPENAI_STT_PARAMS
 from .config import OPENAI_TRANSCRIPTION_EP
 from .config import OPENAI_TRANSLATION_EP
 from .config import OPENAI_TTI_EP
+from .config import OPENAI_TTI_PARAMS
 from .config import OPENAI_TTS_EP
+from .config import OPENAI_TTS_PARAMS
 from .config import OPENAI_TTS_VOICE_DEFAULT
 from .config import OPENAI_TTT_EP
+from .config import OPENAI_TTT_PARAMS
 from .llmbase import LLMBase
 from .multipart_formdata_model import MultipartFormdataModel
 from .multipart_formdata_model import SpeechToTextBase
@@ -71,70 +76,9 @@ class OpenAILLM(LLMBase):
         if "max_tokens" in body:
             del body["max_tokens"]
 
-        # Parameters defined by OpenAI
-        if "max_completion_tokens" in self.parameters:
-            body["max_completion_tokens"] = self.parameters[
-                "max_completion_tokens"
-            ]
-
-        if "store" in self.parameters:
-            body["store"] = self.parameters["store"]
-
-        if "reasoning_effort" in self.parameters:
-            body["reasoning_effort"] = self.parameters["reasoning_effort"]
-
-        if "metadata" in self.parameters:
-            body["metadata"] = self.parameters["metadata"]
-
-        if "frequency_penalty" in self.parameters:
-            body["frequency_penalty"] = self.parameters["frequency_penalty"]
-
-        if "logit_bias" in self.parameters:
-            body["logit_bias"] = self.parameters["logit_bias"]
-
-        if "logprobs" in self.parameters:
-            body["logprobs"] = self.parameters["logprobs"]
-
-        if "top_logprobs" in self.parameters:
-            body["top_logprobs"] = self.parameters["top_logprobs"]
-
-        if "modalities" in self.parameters:
-            body["modalities"] = self.parameters["modalities"]
-
-        if "prediction" in self.parameters:
-            body["prediction"] = self.parameters["prediction"]
-
-        if "audio" in self.parameters:
-            body["audio"] = self.parameters["audio"]
-
-        if "presence_penalty" in self.parameters:
-            body["presence_penalty"] = self.parameters["presence_penalty"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "seed" in self.parameters:
-            body["seed"] = self.parameters["seed"]
-
-        if "service_tier" in self.parameters:
-            body["service_tier"] = self.parameters["service_tier"]
-
-        if "stop" in self.parameters:
-            body["stop"] = self.parameters["stop"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
-
-        if "tool_choice" in self.parameters:
-            body["tool_choice"] = self.parameters["tool_choice"]
-
-        if "parallel_tool_calls" in self.parameters:
-            body["parallel_tool_calls"] = self.parameters[
-                "parallel_tool_calls"
-            ]
-
-        if "user" in self.parameters:
-            body["user"] = self.parameters["user"]
+        for param in OPENAI_TTT_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -163,11 +107,9 @@ class OpenAITextToSpeech(RootModel):
             "voice": self.parameters["voice"]
         }
 
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "speed" in self.parameters:
-            body["speed"] = self.parameters["speed"]
+        for param in OPENAI_TTS_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -232,30 +174,19 @@ class OpenAISpeechToText(SpeechToTextBase):
         """
         body = super()._body()
 
-        if "prompt" in self.parameters:
-            body["prompt"] = self.parameters["prompt"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "temperature" in self.parameters:
-            body["temperature"] = str(self.parameters["temperature"])
-
-        if "language" in self.parameters:
-            body["language"] = self.parameters["language"]
-
-        if "timestamp_granularities" in self.parameters:
-            body["timestamp_granularities"] = self.parameters[
-                "timestamp_granularities"
-            ]
+        for param in OPENAI_STT_PARAMS:
+            if param in self.parameters:
+                body[param] = str(self.parameters[param])
 
         return body
 
 
 class OpenAITextToImage(RootModel):
     """
-    Text-to-Image
-    Popular as DALL-E
+    Text-to-Image as of 2025-07-19
+      - dall-e-2
+      - dall-e-3
+      - gpt-image-1
     """
     def run(self) -> None:
         self.payload = {"headers": self._headers(), "json": self._body()}
@@ -267,43 +198,40 @@ class OpenAITextToImage(RootModel):
     def _body(self) -> dict:
         """
         Specific parameters:
-          - n: int
-          - quality: str, standard or hd
-          - size: str, 256x256, 512x512, or 1024x1024
-          - response_format: str, url or b64_json
-          - style: str, natural or comic
-          - user: str
+          For Dall-E:
+            - n: int
+            - quality: str, standard or hd
+            - size: str, 256x256, 512x512, or 1024x1024
+            - response_format: str, url or b64_json
+            - style: str, natural or comic
+            - user: str
+          For GPT-Image-1:
+            - background: transparent, opaque, auto
+            - moderation: str or None
+            - n: int
+            - output_compression: int
+            - output_format: png, jpeg or webp
+            - quality: high, medium or low
+            - size: 1024x1024, 1536x1024, 1024x1536
+            - user: str
         """
         body = {
             "prompt": self.parameters["prompt"],
             "model": self.parameters["model"]
         }
 
-        if "n" in self.parameters:
-            body["n"] = self.parameters["n"]
-
-        if "quality" in self.parameters:
-            body["quality"] = self.parameters["quality"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "size" in self.parameters:
-            body["size"] = self.parameters["size"]
-
-        if "style" in self.parameters:
-            body["style"] = self.parameters["style"]
-
-        if "user" in self.parameters:
-            body["user"] = self.parameters["user"]
+        for param in OPENAI_TTI_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
 
 class OpenAIImageToImage(MultipartFormdataModel):
     """
-    List of available models as of 2024-07-12:
+    List of available models as of 2025-07-19:
       - dall-e-2
+      - gpt-image-1
     Covered edit modes for this class:
       - variations
       - edits
@@ -348,9 +276,6 @@ class OpenAIImageToImage(MultipartFormdataModel):
             )
         }
 
-        if "prompt" in self.parameters:
-            body["prompt"] = self.parameters["prompt"]
-
         if "mask" in self.parameters:
             body["mask"] = (
                 os.path.split(self.parameters["mask"])[1],
@@ -358,17 +283,9 @@ class OpenAIImageToImage(MultipartFormdataModel):
                 "image/png"
             )
 
-        if "n" in self.parameters:
-            body["n"] = str(self.parameters["n"])
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "size" in self.parameters:
-            body["size"] = self.parameters["size"]
-
-        if "user" in self.parameters:
-            body["user"] = self.parameters["user"]
+        for param in OPENAI_ITI_PARAMS:
+            if param in self.parameters:
+                body[param] = str(self.parameters[param])
 
         return body
 

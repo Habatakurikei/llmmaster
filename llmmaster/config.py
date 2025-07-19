@@ -122,6 +122,27 @@ FLUX1_FAL_ITI_EP = "/fal-ai/flux"
 FLUX1_FAL_KONTEXT_EP = "/fal-ai/flux-kontext"
 WAIT_FOR_FLUX1_FAL_RESULT = 3.0
 
+FLUX1_FAL_ITI_PARAMS = [
+    "prompt",
+    "image_url",
+    "strength",
+    "image_size",
+    "num_inference_steps",
+    "seed",
+    "guidance_scale",
+    "num_images",
+    "enable_safety_checker"
+]
+
+FLUX1_FAL_TTI_PARAMS = [
+    "image_size",
+    "num_inference_steps",
+    "seed",
+    "guidance_scale",
+    "num_images",
+    "enable_safety_checker"
+]
+
 FLUX1_FAL_KONTEXT_PARAMS = [
     "num_inference_steps",
     "seed",
@@ -142,7 +163,7 @@ GOOGLE_GEMINI_DELETE_EP = "/v1beta"
 GOOGLE_GEMINI_FILE_LIST_EP = "/v1beta/files"
 WAIT_FOR_GOOGLE_VTT_RESULT = 5.0
 
-GOOGLE_LLM_PARAMS = [
+GOOGLE_GEMINI_TTT_PARAMS = [
     "stopSequences",
     "responseMimeType",
     "responseSchema",
@@ -285,6 +306,63 @@ OPENAI_IMAGE_EDIT_EP = "/v1/images/edits"
 OPENAI_IMAGE_VARIATIONS_EP = "/v1/images/variations"
 
 OPENAI_TTS_VOICE_DEFAULT = "alloy"
+
+OPENAI_TTT_PARAMS = [
+    "max_completion_tokens",
+    "store",
+    "reasoning_effort",
+    "metadata",
+    "frequency_penalty",
+    "logit_bias",
+    "logprobs",
+    "top_logprobs",
+    "modalities",
+    "prediction",
+    "audio",
+    "presence_penalty",
+    "response_format",
+    "seed",
+    "service_tier",
+    "stop",
+    "tools",
+    "tool_choice",
+    "parallel_tool_calls",
+    "user"
+]
+
+OPENAI_TTS_PARAMS = [
+    "response_format",
+    "speed"
+]
+
+OPENAI_STT_PARAMS = [
+    "prompt",
+    "response_format",
+    "temperature",
+    "language",
+    "timestamp_granularities"
+]
+
+OPENAI_TTI_PARAMS = [
+    "background",
+    "moderation",
+    "n",
+    "output_compression",
+    "output_format",
+    "quality",
+    "response_format",
+    "size",
+    "style",
+    "user"
+]
+
+OPENAI_ITI_PARAMS = [
+    "prompt",
+    "n",
+    "response_format",
+    "size",
+    "user"
+]
 
 # Perplexity
 PERPLEXITY_TTT_EP = "https://api.perplexity.ai/chat/completions"

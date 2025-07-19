@@ -15,6 +15,7 @@ from llmmaster.openai_models import OpenAITextToSpeech
 from llmmaster.utils import decode_base64
 from llmmaster.utils import extract_llm_response
 from llmmaster.utils import openai_audio_prompt
+from llmmaster.utils import openai_image_save
 from llmmaster.utils import openai_vision_prompt
 
 
@@ -383,7 +384,7 @@ def test_tti(run_api: bool, load_api_file: bool) -> None:
     """
     judgment = True
     master = LLMMaster()
-    key = "openai_tti"
+    key = "openai_tti_dalle"
 
     if load_api_file:
         master.set_api_keys(load_api_keys())
@@ -487,11 +488,11 @@ def test_iti_variations(run_api: bool, load_api_file: bool) -> None:
 
 def test_tti_gpt(run_api: bool, load_api_file: bool) -> None:
     """
-    Test text to image generation with gpt-4o
+    Test text to image generation with gpt
     """
     judgment = True
     master = LLMMaster()
-    key = "openai_tti"
+    key = "openai_tti_gpt"
 
     if load_api_file:
         master.set_api_keys(load_api_keys())
@@ -502,11 +503,11 @@ def test_tti_gpt(run_api: bool, load_api_file: bool) -> None:
         prompt=Path(CHARACTER_PROMPT).read_text(encoding="utf-8"),
         background="transparent",
         moderation="auto",
-        n=1,
+        n=2,
         output_compression=100,
         output_format="png",
         quality="high",
-        size="1024x1024",
+        size="1024x1536",
     )
     master.summon({key: entry})
 
@@ -517,6 +518,10 @@ def test_tti_gpt(run_api: bool, load_api_file: bool) -> None:
     if run_api:
         try:
             run_llmmaster(master)
+            openai_image_save(
+                result=master.results[key],
+                save_as=f"./test-outputs/{key}"
+            )
         except Exception as e:
             pytest.fail(f"Test failed with error: {str(e)}")
 

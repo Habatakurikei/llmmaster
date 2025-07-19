@@ -41,6 +41,7 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 **Important:**
   - You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
   - `pikapikapika_ttv` was deprecated and removed at v1.0.0.
+  - `gpt-image-1` model can be used at v1.4.1 for provider `openai_tti`.
 
 ### 3D Models
 

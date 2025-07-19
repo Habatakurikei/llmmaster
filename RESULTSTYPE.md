@@ -80,6 +80,7 @@ Brief summary of what type to be stored in LLMMaster.results for each model.
 - OpenAITextToImage:
     - requests.models.Response with URL of generated image if `response_format` is `url`
     - requests.models.Response with base64 content if `response_format` is `b64_json`
+    - Only `b64_json` in `gpt-image-1`
 - OpenAITextToSpeech: ~~bytes = openai._legacy_response.HttpxBinaryResponseContent~~ requests.models.Response with binary content
 - OpenAIImageToImage:
     - requests.models.Response with URL of generated image if `response_format` is `url`

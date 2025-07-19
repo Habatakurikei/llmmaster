@@ -4,9 +4,11 @@ from requests.models import Response
 from .config import FAL_BASE_EP
 from .config import FAL_STATUS_IN_PROGRESS
 from .config import FLUX1_FAL_ITI_EP
+from .config import FLUX1_FAL_ITI_PARAMS
 from .config import FLUX1_FAL_KONTEXT_EP
 from .config import FLUX1_FAL_KONTEXT_PARAMS
 from .config import FLUX1_FAL_TTI_EP
+from .config import FLUX1_FAL_TTI_PARAMS
 from .config import WAIT_FOR_FLUX1_FAL_RESULT
 from .root_model import RootModel
 
@@ -77,27 +79,9 @@ class Flux1FalTextToImage(Flux1FalBase):
         """
         body = {"prompt": self.parameters["prompt"], "sync_mode": True}
 
-        if "image_size" in self.parameters:
-            body["image_size"] = self.parameters["image_size"]
-
-        if "num_inference_steps" in self.parameters:
-            body["num_inference_steps"] = self.parameters[
-                "num_inference_steps"
-            ]
-
-        if "seed" in self.parameters:
-            body["seed"] = self.parameters["seed"]
-
-        if "guidance_scale" in self.parameters:
-            body["guidance_scale"] = self.parameters["guidance_scale"]
-
-        if "num_images" in self.parameters:
-            body["num_images"] = self.parameters["num_images"]
-
-        if "enable_safety_checker" in self.parameters:
-            body["enable_safety_checker"] = self.parameters[
-                "enable_safety_checker"
-            ]
+        for param in FLUX1_FAL_TTI_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
@@ -134,36 +118,9 @@ class Flux1FalImageToImage(Flux1FalBase):
         """
         body = {"sync_mode": True}
 
-        if "prompt" in self.parameters:
-            body["prompt"] = self.parameters["prompt"]
-
-        if "image_url" in self.parameters:
-            body["image_url"] = self.parameters["image_url"]
-
-        if "strength" in self.parameters:
-            body["strength"] = self.parameters["strength"]
-
-        if "image_size" in self.parameters:
-            body["image_size"] = self.parameters["image_size"]
-
-        if "num_inference_steps" in self.parameters:
-            body["num_inference_steps"] = self.parameters[
-                "num_inference_steps"
-            ]
-
-        if "seed" in self.parameters:
-            body["seed"] = self.parameters["seed"]
-
-        if "guidance_scale" in self.parameters:
-            body["guidance_scale"] = self.parameters["guidance_scale"]
-
-        if "num_images" in self.parameters:
-            body["num_images"] = self.parameters["num_images"]
-
-        if "enable_safety_checker" in self.parameters:
-            body["enable_safety_checker"] = self.parameters[
-                "enable_safety_checker"
-            ]
+        for param in FLUX1_FAL_ITI_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
