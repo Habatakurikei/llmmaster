@@ -25,6 +25,10 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.2] - 2025-07-24
+### Changed
+- Updated `PerplexityLLM`
+
 ## [1.4.1] - 2025-07-19
 ### Added
 - `gpt-image-1` can be used in `OpenAITextToImage`

@@ -366,6 +366,22 @@ OPENAI_ITI_PARAMS = [
 
 # Perplexity
 PERPLEXITY_TTT_EP = "https://api.perplexity.ai/chat/completions"
+PERPLEXITY_TTT_PARAMS = [
+    "search_mode",
+    "reasoning_effort",
+    "search_domain_filter",
+    "return_images",
+    "return_related_questions",
+    "search_recency_filter",
+    "search_after_date_filter",
+    "search_before_date_filter",
+    "last_updated_after_filter",
+    "last_updated_before_filter",
+    "presence_penalty",
+    "frequency_penalty",
+    "response_format",
+    "web_search_options"
+]
 
 # Replica
 REPLICA_BASE_EP = "https://api.replicastudios.com"

@@ -68,13 +68,14 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         prompt=PROMPT,
         system_prompt="Return in a news narration style to read aloud.",
         model="sonar-pro",
-        max_tokens=4096,
+        max_tokens=8192,
         presence_penalty=-0.2,
         search_recency_filter="month",
         temperature=0.3,
         top_p=0.6,
-        top_k=75
+        top_k=75,
     )
+    entry["web_search_options"] = {"search_context_size": "high"}
     master.summon({key: entry})
 
     judgment = verify_instance(master.instances[key], PerplexityLLM)
