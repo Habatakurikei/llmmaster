@@ -80,7 +80,7 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="grok-2-latest",
+        model="grok-3",
         system_prompt=system_prompt,
         frequency_penalty=0.2,
         presence_penalty=0.2,

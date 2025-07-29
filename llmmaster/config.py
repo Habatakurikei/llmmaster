@@ -472,6 +472,7 @@ XAI_TTT_EP = "/v1/chat/completions"
 XAI_I2T_EP = "/v1/images/generations"
 
 XAI_LLM_PARAMS = [
+    "max_completion_tokens",
     "deferred",
     "frequency_penalty",
     "logit_bias",

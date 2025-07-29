@@ -39,8 +39,16 @@ class XAILLM(LLMBase):
           - top_k parameter does not exist.
           - include keyword 'json' in prompt for json_object output.
           - 2025-06-01: search_parameters is added.
+          - 2025-07-29: deprecated max_tokens.
         """
         body = super()._body()
+
+        # xAI does not support max_tokens any more
+        # Remove max_tokens from body if it exists
+        if "max_tokens" in self.parameters:
+            body["max_completion_tokens"] = self.parameters["max_tokens"]
+        if "max_tokens" in body:
+            del body["max_tokens"]
 
         for param in XAI_LLM_PARAMS:
             if param in self.parameters:
