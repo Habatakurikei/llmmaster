@@ -25,6 +25,10 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.3] - 2025-07-29
+### Added
+- `web_search_options` can be used in `OpenAILLM`
+
 ## [1.4.2] - 2025-07-24
 ### Changed
 - Updated `PerplexityLLM`

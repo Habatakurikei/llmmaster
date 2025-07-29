@@ -155,6 +155,40 @@ def test_o1(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
+def test_websearch(run_api: bool, load_api_file: bool) -> None:
+    """
+    Test the web search tool
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "openai"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    entry = master.pack_parameters(
+        provider=PROVIDER,
+        model="gpt-4o-search-preview",
+        prompt="What were the news yesterday?",
+        web_search_options={},
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], OpenAILLM)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            run_llmmaster(master)
+            response = extract_llm_response(master.results[key])
+            print(f"Extracted response: {response}")
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
+
+
 def test_i2t(run_api: bool, load_api_file: bool) -> None:
     """
     Test OpenAI image to text

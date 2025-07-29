@@ -327,7 +327,8 @@ OPENAI_TTT_PARAMS = [
     "tools",
     "tool_choice",
     "parallel_tool_calls",
-    "user"
+    "user",
+    "web_search_options"
 ]
 
 OPENAI_TTS_PARAMS = [
