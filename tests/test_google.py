@@ -156,9 +156,12 @@ def test_llm_search(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         prompt="What was happening in the world last week?",
-        dynamic_threshold=0.1
+        max_tokens=8192,
+        tools=[{
+            "googleSearch": {}
+        }],
     )
     master.summon({key: entry})
 

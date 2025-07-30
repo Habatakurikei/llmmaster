@@ -38,10 +38,13 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 | Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv`, `lumaai_rfv` |
 
-**Important:**
-  - You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
+You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
+
+**Important Updates:**
   - `pikapikapika_ttv` was deprecated and removed at v1.0.0.
+  - From v1.3.1, `AnthropicLLM` supports PDF input using `anthropic_pdf_prompt()`, implementing similar to the example shown avobe.
   - `gpt-image-1` model can be used at v1.4.1 for provider `openai_tti`.
+  - Since v1.4.4, Google Search can be used with `gemini-2.0` series and later. `gemini-1.5` series are no lonnger supported.
 
 ### 3D Models
 
@@ -348,11 +351,11 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 master.dismiss()
 ```
 
-### Reasoning and Web Search Models
+### Reasoning Models
 
 Since API calls have become more and more versatile and complicated, LLM Master faced errors in some new functionality. The library needed to be re-developed from scratch.
 
-From v1.0.0, LLM Master can also handle the reasoning (thinking) models and web search capability. Here is an example.
+From v1.0.0, LLM Master can also handle the reasoning (thinking) models. Here is an example.
 
 ```python
 from pathlib import Path
@@ -368,17 +371,11 @@ master = LLMMaster()
 master.set_api_keys(api_key_pairs)
 master.summon(
     {
-        "openai_o1": master.pack_parameters(
+        "openai_o3": master.pack_parameters(
             provider="openai",
-            model="o1",
+            model="o3",
             prompt=prompt,
             reasoning_effort="high",
-        ),
-        "google_search": master.pack_parameters(
-            provider="google",
-            model="gemini-1.5-flash",
-            prompt=prompt,
-            dynamic_threshold=0.0
         ),
         "perplexity_reasoning": master.pack_parameters(
             provider="perplexity",
@@ -396,6 +393,81 @@ master.summon(
             prompt=prompt,
             reasoning_effort="high"
         )
+    }
+)
+master.run()
+
+print("Responses.")
+for instance, response in master.results.items():
+    print(f"{instance} responded: {extract_llm_response(response)}")
+print(f"Elapsed time: {master.elapsed_time} seconds")
+
+master.dismiss()
+```
+
+### Web Search
+
+LLM Master is also capable on web search. Here is an example.
+
+```python
+from pathlib import Path
+
+from llmmaster import LLMMaster
+from llmmaster.utils import extract_llm_response
+
+api_key_pairs = Path("api_key_pairs.txt").read_text(encoding="utf-8")
+prompt = "What are most popular pokemon characters in 2025? Look for rankings."
+
+print("Start generation...")
+master = LLMMaster()
+master.set_api_keys(api_key_pairs)
+master.summon(
+    {
+        "anthropic": {
+            "provider": "anthropic",
+            "model": "claude-sonnet-4-20250514",
+            "prompt": prompt,
+            "tools": [
+                {
+                    "type": "web_search_20250305",
+                    "name": "web_search",
+                    "max_uses": 3
+                }
+            ],
+        },
+        "google": {
+            "provider": "google",
+            "model": "gemini-2.5-flash",
+            "prompt": prompt,
+            "tools": [{
+                "googleSearch": {}
+            }]
+        },
+        "openai": {
+            "provider": "openai",
+            "model": "gpt-4o-search-preview",
+            "prompt": prompt,
+            "web_search_options": {
+                "search_context_size": "low"
+            },
+        },
+        "perplexity": {
+            "provider": "perplexity",
+            "model": "sonar",
+            "prompt": prompt,
+            "web_search_options": {
+                "search_context_size": "low"
+            },
+        },
+        "xai": {
+            "provider": "xai",
+            "model": "grok-3",
+            "prompt": prompt,
+            "search_parameters": {
+                "mode": "on",
+                "return_citations": True
+            },
+        }
     }
 )
 master.run()
@@ -561,8 +633,6 @@ print(f"Elapsed time: {master.elapsed_time} seconds")
 
 master.dismiss()
 ```
-
-From v1.3.1, `AnthropicLLM` supports PDF input using `anthropic_pdf_prompt()`, implementing similar to the example shown avobe.
 
 ## Handling generated contents
 

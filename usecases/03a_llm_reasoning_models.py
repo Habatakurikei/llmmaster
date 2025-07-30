@@ -11,17 +11,11 @@ master = LLMMaster()
 master.set_api_keys(api_key_pairs)
 master.summon(
     {
-        "openai_o1": master.pack_parameters(
+        "openai_o3": master.pack_parameters(
             provider="openai",
-            model="o1",
+            model="o3",
             prompt=prompt,
-            reasoning_effort="high",
-        ),
-        "google_search": master.pack_parameters(
-            provider="google",
-            model="gemini-1.5-flash",
-            prompt=prompt,
-            dynamic_threshold=0.0
+            reasoning_effort="low",
         ),
         "perplexity_reasoning": master.pack_parameters(
             provider="perplexity",
@@ -33,29 +27,11 @@ master.summon(
             model="deepseek-reasoner",
             prompt=prompt
         ),
-        "xai_reasoning": master.pack_parameters(
+        "xai": master.pack_parameters(
             provider="xai",
             model="grok-3-mini-beta",
             prompt=prompt,
-            reasoning_effort="high"
-        ),
-        "xai_livesearch": master.pack_parameters(
-            provider="xai",
-            model="grok-3-latest",
-            prompt=prompt,
-            search_parameters={"mode": "auto"}
-        ),
-        "anthropic_websearch": master.pack_parameters(
-            provider="anthropic",
-            model="claude-3-7-sonnet-latest",
-            prompt=prompt,
-            tools=[
-                {
-                    "type": "web_search_20250305",
-                    "name": "web_search",
-                    "max_uses": 5
-                }
-            ]
+            reasoning_effort="low"
         )
     }
 )

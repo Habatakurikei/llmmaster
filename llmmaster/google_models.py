@@ -152,27 +152,21 @@ class GoogleLLM(GoogleGeminiBase):
                     "text": self.parameters["prompt"]
                 })
 
+        # Google does not support max_tokens
+        # Remove max_tokens from body if it exists
+        if "max_tokens" in self.parameters:
+            self.parameters["maxOutputTokens"] = self.parameters["max_tokens"]
+            del self.parameters["max_tokens"]
+
         if "system_prompt" in self.parameters:
             body["system_instruction"] = {
                 "parts": {
-                    "text": self.parameters['system_prompt']
+                    "text": self.parameters["system_prompt"]
                 }
             }
 
-        if "dynamic_threshold" in self.parameters:
-            # web search
-            body["tools"] = [
-                {
-                    "googleSearchRetrieval": {
-                        "dynamicRetrievalConfig": {
-                            "mode": "MODE_DYNAMIC",
-                            "dynamicThreshold": self.parameters[
-                                "dynamic_threshold"
-                            ]
-                        }
-                    }
-                }
-            ]
+        if "tools" in self.parameters:
+            body["tools"] = self.parameters["tools"]
 
         generation_config = self._generation_config()
         if generation_config:

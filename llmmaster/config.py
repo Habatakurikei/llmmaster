@@ -180,7 +180,6 @@ GOOGLE_GEMINI_TTT_PARAMS = [
     "logprobs",
     "enableEnhancedCivicAnswers",
     "speechConfig",
-    "max_tokens",
     "top_p",
     "top_k"
 ]

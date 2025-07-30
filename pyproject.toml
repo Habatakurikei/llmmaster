@@ -1,6 +1,6 @@
 [project]
 name = "llmmaster"
-version = "1.4.3"
+version = "1.4.4"
 description = "A unified interface for interacting with multiple LLMs and generative AIs."
 readme = "README.md"
 authors = [{ name = "Daisuke Yamaguchi", email = "daicom0204@gmail.com" }]

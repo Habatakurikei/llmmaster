@@ -25,6 +25,10 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.4] - 2025-07-30
+### Changed
+- Updated web search in `GoogleLLM`, in which the old Gemini models are no longer supported
+
 ## [1.4.3] - 2025-07-29
 ### Added
 - `web_search_options` can be used in `OpenAILLM`
