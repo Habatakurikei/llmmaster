@@ -27,7 +27,7 @@ class GoogleGeminiBase(RootModel):
         try:
             super().__init__(**kwargs)
         except Exception as e:
-            msg = "Exception received in GoogleGeminiBase"
+            msg = f"Exception received in GoogleGeminiBase: {e}"
             raise Exception(msg) from e
 
     def _endpoint(self) -> str:

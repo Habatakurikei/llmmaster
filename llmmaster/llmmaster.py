@@ -634,7 +634,7 @@ class InstanceCreator:
             instance = to_create(api_key=self.api_key, **self.parameters)
 
         except Exception as e:
-            raise Exception("Failed creating LLM instance.") from e
+            raise Exception(f"Failed creating LLM instance: {e}") from e
 
         self.verified_OK = False
 

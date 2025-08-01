@@ -25,6 +25,10 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.5] - 2025-08-01
+### Added
+- More error messages for debug.
+
 ## [1.4.4] - 2025-07-30
 ### Changed
 - Updated web search in `GoogleLLM`, in which the old Gemini models are no longer supported

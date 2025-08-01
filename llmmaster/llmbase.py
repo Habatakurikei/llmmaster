@@ -17,7 +17,7 @@ class LLMBase(RootModel):
         try:
             super().__init__(**kwargs)
         except Exception as e:
-            msg = "Exception received in LLMBase"
+            msg = f"Exception received in LLMBase: {e}"
             raise Exception(msg) from e
 
     def _call_llm(self, url: str = '') -> any:
@@ -81,30 +81,30 @@ class LLMBase(RootModel):
         parameters = kwargs
 
         if "max_tokens" in kwargs:
-            buff = kwargs["max_tokens"]
+            buff = int(kwargs["max_tokens"])
             if 0 < buff:
-                parameters["max_tokens"] = int(buff)
+                parameters["max_tokens"] = buff
             else:
                 parameters["max_tokens"] = DEFAULT_TOKENS
 
         if "temperature" in kwargs:
-            buff = kwargs["temperature"]
+            buff = float(kwargs["temperature"])
             if 0 <= buff:
-                parameters["temperature"] = float(buff)
+                parameters["temperature"] = buff
             else:
                 parameters["temperature"] = TEMPERATURE
 
         if "top_p" in kwargs:
-            buff = kwargs["top_p"]
+            buff = float(kwargs["top_p"])
             if 0 <= buff:
-                parameters["top_p"] = float(buff)
+                parameters["top_p"] = buff
             else:
                 parameters["top_p"] = TOP_P
 
         if "top_k" in kwargs:
-            buff = kwargs["top_k"]
+            buff = int(kwargs["top_k"])
             if 0 <= buff:
-                parameters["top_k"] = int(buff)
+                parameters["top_k"] = buff
             else:
                 parameters["top_k"] = TOP_K
 
