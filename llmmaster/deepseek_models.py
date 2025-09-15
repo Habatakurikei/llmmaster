@@ -1,3 +1,4 @@
+from .config import DEEPSEEK_LLM_PARAMS
 from .config import DEEPSEEK_TTT_EP
 from .llmbase import LLMBase
 
@@ -27,28 +28,8 @@ class DeepSeekLLM(LLMBase):
         """
         body = super()._body()
 
-        if "frequency_penalty" in self.parameters:
-            body["frequency_penalty"] = self.parameters["frequency_penalty"]
-
-        if "presence_penalty" in self.parameters:
-            body["presence_penalty"] = self.parameters["presence_penalty"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "stop" in self.parameters:
-            body["stop"] = self.parameters["stop"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
-
-        if "tool_choice" in self.parameters:
-            body["tool_choice"] = self.parameters["tool_choice"]
-
-        if "logprobs" in self.parameters:
-            body["logprobs"] = self.parameters["logprobs"]
-
-        if "top_logprobs" in self.parameters:
-            body["top_logprobs"] = self.parameters["top_logprobs"]
+        for param in DEEPSEEK_LLM_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body

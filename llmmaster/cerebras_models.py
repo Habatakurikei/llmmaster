@@ -1,3 +1,4 @@
+from .config import CEREBRAS_LLM_PARAMS
 from .config import CEREBRAS_TTT_EP
 from .llmbase import LLMBase
 
@@ -40,22 +41,8 @@ class CerebrasLLM(LLMBase):
                 "max_completion_tokens"
             ]
 
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "seed" in self.parameters:
-            body["seed"] = self.parameters["seed"]
-
-        if "stop" in self.parameters:
-            body["stop"] = self.parameters["stop"]
-
-        if "user" in self.parameters:
-            body["user"] = self.parameters["user"]
-
-        if "tool_choice" in self.parameters:
-            body["tool_choice"] = self.parameters["tool_choice"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
+        for param in CEREBRAS_LLM_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body

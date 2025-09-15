@@ -25,6 +25,10 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.6] - 2025-09-15
+### Changed
+- Adjusted parameter input for `DeepSeekLLM` and `CerebrasLLM`.
+
 ## [1.4.5] - 2025-08-01
 ### Added
 - More error messages for debug.

@@ -94,9 +94,27 @@ ANTHROPIC_LLM_PARAMS = [
 
 # Cerebras
 CEREBRAS_TTT_EP = "https://api.cerebras.ai/v1/chat/completions"
+CEREBRAS_LLM_PARAMS = [
+    "response_format",
+    "seed",
+    "stop",
+    "user",
+    "tool_choice",
+    "tools"
+]
 
 # DeepSeek
 DEEPSEEK_TTT_EP = "https://api.deepseek.com/chat/completions"
+DEEPSEEK_LLM_PARAMS = [
+    "frequency_penalty",
+    "presence_penalty",
+    "response_format",
+    "stop",
+    "tools",
+    "tool_choice",
+    "logprobs",
+    "top_logprobs"
+]
 
 # ElevenLabs
 ELEVENLABS_BASE_EP = "https://api.elevenlabs.io"
