@@ -107,7 +107,7 @@ ACTIVE_MODELS = {
     "deepseek": {
         CLASS: DeepSeekLLM,
         KEY_NAME: DEEPSEEK_KEY_NAME,
-        DEFAULT_MODEL: "deepseek-chat"
+        DEFAULT_MODEL: "deepseek-v4-flash"
     },
     "elevenlabs_aiso": {
         CLASS: ElevenLabsAudioIsolation,
@@ -397,7 +397,7 @@ ACTIVE_MODELS = {
     "xai": {
         CLASS: XAILLM,
         KEY_NAME: XAI_KEY_NAME,
-        DEFAULT_MODEL: "grok-2-latest"
+        DEFAULT_MODEL: "grok-3-mini"
     },
     "xai_tti": {
         CLASS: XAITextToImage,

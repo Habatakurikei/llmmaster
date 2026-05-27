@@ -14,17 +14,19 @@ class DeepSeekLLM(LLMBase):
     def _body(self) -> dict:
         """
         Specific parameters:
-          - frequency_penalty: float
-          - presence_penalty: float
+          - thinking: enabled, disabled
+          - reasoning_effort: high, max
           - response_format: text or json_object in dict
           - stop: object or None
           - tools: list of dict
           - tool_choice: dict
           - logprobs: bool or None
           - top_logprobs: int or None
+          - user_id: str
         Notes:
           - top_k parameter does not exist.
           - include keyword 'json' in prompt for json_object output.
+          - 2026-05-27: `thinking` parameter added.
         """
         body = super()._body()
 

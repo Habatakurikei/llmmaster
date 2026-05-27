@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [{ name = "Daisuke Yamaguchi", email = "daicom0204@gmail.com" }]
 requires-python = ">=3.10"
 dependencies = [
-    "requests>=2.32.3",
+    "requests>=2.34.2",
     "requests-toolbelt>=1.0.0"
 ]
 classifiers = [
@@ -22,10 +22,10 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.3.4",
-    "flake8>=7.1.1",
-    "build>=1.2.2.post1",
-    "twine>=6.1.0"
+    "pytest>=9.0.3",
+    "flake8>=7.3.0",
+    "build>=1.5.0",
+    "twine>=6.2.0"
 ]
 
 [project.urls]

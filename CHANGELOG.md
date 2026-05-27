@@ -25,6 +25,10 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.7] - 2026-05-27 (no pip release)
+### Changed
+- Updated `DeepSeekLLM` to adapt the new API and v4.
+
 ## [1.4.6] - 2025-09-15
 ### Changed
 - Adjusted parameter input for `DeepSeekLLM` and `CerebrasLLM`.

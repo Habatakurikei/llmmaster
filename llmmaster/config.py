@@ -104,17 +104,20 @@ CEREBRAS_LLM_PARAMS = [
 ]
 
 # DeepSeek
+# frequency_penalty, presence_penalty are deprecated
 DEEPSEEK_TTT_EP = "https://api.deepseek.com/chat/completions"
 DEEPSEEK_LLM_PARAMS = [
-    "frequency_penalty",
-    "presence_penalty",
+    "thinking",
+    "reasoning_effort",
     "response_format",
     "stop",
     "tools",
     "tool_choice",
     "logprobs",
-    "top_logprobs"
+    "top_logprobs",
+    "user_id"
 ]
+
 
 # ElevenLabs
 ELEVENLABS_BASE_EP = "https://api.elevenlabs.io"

@@ -24,7 +24,9 @@ master.summon(
         ),
         "deepseek_reasoner": master.pack_parameters(
             provider="deepseek",
-            model="deepseek-reasoner",
+            model="deepseek-v4-flash",
+            thinking={"type": "enabled"},
+            reasoning_effort="high",
             prompt=prompt
         ),
         "xai": master.pack_parameters(

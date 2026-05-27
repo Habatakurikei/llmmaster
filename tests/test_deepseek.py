@@ -69,11 +69,10 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="deepseek-chat",
+        model="deepseek-v4-flash",
+        thinking={"type": "disabled"},
         system_prompt=system_prompt,
         response_format={"type": "json_object"},
-        presence_penalty=0.2,
-        frequency_penalty=0.2,
         max_tokens=4096,
         temperature=0.3,
         top_p=0.6,
@@ -98,6 +97,7 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
 def test_reasoner(run_api: bool, load_api_file: bool) -> None:
     """
     Test reasoner model
+    2026-05-27: deprecated
     """
     judgment = True
     master = LLMMaster()
@@ -109,7 +109,9 @@ def test_reasoner(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="Where does today come before yesterday?",
-        model="deepseek-reasoner"
+        model="deepseek-v4-pro",
+        thinking={"type": "enabled"},
+        reasoning_effort="high"
     )
     master.summon({key: entry})
 
