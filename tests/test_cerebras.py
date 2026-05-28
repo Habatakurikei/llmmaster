@@ -33,7 +33,10 @@ def test_llm_least(run_api: bool, load_api_file: bool) -> None:
     if load_api_file:
         master.set_api_keys(load_api_keys())
 
-    entry = master.pack_parameters(provider=PROVIDER, prompt=PROMPT)
+    entry = master.pack_parameters(
+        provider=PROVIDER,
+        prompt=PROMPT,
+    )
     master.summon({key: entry})
 
     judgment = verify_instance(master.instances[key], CerebrasLLM)
@@ -69,7 +72,7 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="llama3.3-70b",
+        model="gpt-oss-120b",
         system_prompt=system_prompt,
         max_completion_tokens=4096,
         response_format={"type": "json_object"},
@@ -78,6 +81,17 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         top_p=0.6,
         stop=["QED"],
         user=None,
+        clear_thinking=None,
+        frequency_penalty=0.2,
+        presence_penalty=0.0,
+        parallel_tool_calls=None,
+        prompt_cache_key=None,
+        prediction=None,
+        service_tier=None,
+        reasoning_effort="low",
+        logit_bias=None,
+        logprobs=True,
+        top_logprobs=10
     )
     master.summon({key: entry})
 

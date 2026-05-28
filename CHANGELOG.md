@@ -25,6 +25,14 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.8] - 2026-05-28 (no pip release)
+### Added
+- `GroqTextToSpeech`
+### Changed
+- Updated `CerebrasLLM` to adapt the latest API.
+- Updated `GroqLLM` to adapt the latest API.
+- Deprecated `ReplicaTextToSpeech` but model remains.
+
 ## [1.4.7] - 2026-05-27 (no pip release)
 ### Changed
 - Updated `DeepSeekLLM` to adapt the new API and v4.

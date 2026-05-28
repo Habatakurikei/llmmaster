@@ -95,6 +95,17 @@ ANTHROPIC_LLM_PARAMS = [
 # Cerebras
 CEREBRAS_TTT_EP = "https://api.cerebras.ai/v1/chat/completions"
 CEREBRAS_LLM_PARAMS = [
+    "clear_thinking",
+    "frequency_penalty",
+    "logit_bias",
+    "logprobs",
+    "parallel_tool_calls",
+    "prediction",
+    "presence_penalty",
+    "prompt_cache_key",
+    "reasoning_effort",
+    "service_tier",
+    "top_logprobs",
     "response_format",
     "seed",
     "stop",
@@ -206,10 +217,50 @@ GOOGLE_GEMINI_TTT_PARAMS = [
 ]
 
 # Groq
+# 2026-05-28: added parameters list
 GROQ_BASE_EP = 'https://api.groq.com/openai'
 GROQ_TTT_EP = "/v1/chat/completions"
 GROQ_TRANSCRIPTION_EP = "/v1/audio/transcriptions"
 GROQ_TRANSLATION_EP = "/v1/audio/translations"
+GROQ_TTS_EP = "/v1/audio/speech"
+
+GROQ_TTT_PARAMS = [
+    "frequency_penalty",
+    "parallel_tool_calls",
+    "presence_penalty",
+    "response_format",
+    "seed",
+    "service_tier",
+    "stop",
+    "tool_choice",
+    "tools",
+    "top_logprobs",
+    "user",
+    "citation_options",
+    "compound_custom",
+    "disable_tool_validation",
+    "documents",
+    "include_reasoning",
+    "reasoning_effort",
+    "reasoning_format",
+    "search_settings"
+]
+
+GROQ_STT_PARAMS = [
+    "prompt",
+    "response_format",
+    "language",
+    "timestamp_granularities"
+]
+
+GROQ_TTS_PARAMS = [
+    "response_format",
+    "sample_rate",
+    "speed",
+    "voice"
+]
+
+GROQ_TTS_VOICE_DEFAULT = "troy"
 
 # Inception Labs (Mercury)
 INCEPTIONLABS_BASE_EP = "https://api.inceptionlabs.ai"

@@ -1,11 +1,17 @@
 from requests.models import Response
 
 from .config import GROQ_BASE_EP
+from .config import GROQ_STT_PARAMS
 from .config import GROQ_TRANSCRIPTION_EP
 from .config import GROQ_TRANSLATION_EP
+from .config import GROQ_TTS_EP
+from .config import GROQ_TTS_PARAMS
+from .config import GROQ_TTS_VOICE_DEFAULT
 from .config import GROQ_TTT_EP
+from .config import GROQ_TTT_PARAMS
 from .llmbase import LLMBase
 from .multipart_formdata_model import SpeechToTextBase
+from .root_model import RootModel
 
 
 class GroqLLM(LLMBase):
@@ -36,6 +42,15 @@ class GroqLLM(LLMBase):
           - tools: list of dict or None
           - top_logprobs: int or None
           - user: str or None
+        2026-05-28: new parameters
+          - citation_options: enabled/disabled
+          - compound_custom: dict or None
+          - disable_tool_validation: bool
+          - documents: list or None
+          - include_reasoning: bool or None
+          - reasoning_effort: default/low/medium/high or None
+          - reasoning_format: hidden/raw/parsed or None
+          - search_settings: dict or None
         Notes:
           - top_k is not supported
           - do not use max_tokens but max_completion_tokens instead
@@ -56,50 +71,15 @@ class GroqLLM(LLMBase):
                 "max_completion_tokens"
             ]
 
-        if "frequency_penalty" in self.parameters:
-            body["frequency_penalty"] = self.parameters["frequency_penalty"]
-
-        if "parallel_tool_calls" in self.parameters:
-            body["parallel_tool_calls"] = self.parameters[
-                "parallel_tool_calls"
-            ]
-
-        if "presence_penalty" in self.parameters:
-            body["presence_penalty"] = self.parameters["presence_penalty"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "seed" in self.parameters:
-            body["seed"] = self.parameters["seed"]
-
-        if "service_tier" in self.parameters:
-            body["service_tier"] = self.parameters["service_tier"]
-
-        if "stop" in self.parameters:
-            body["stop"] = self.parameters["stop"]
-
-        if "tool_choice" in self.parameters:
-            body["tool_choice"] = self.parameters["tool_choice"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
-
-        if "top_logprobs" in self.parameters:
-            body["top_logprobs"] = self.parameters["top_logprobs"]
-
-        if "user" in self.parameters:
-            body["user"] = self.parameters["user"]
+        for param in GROQ_TTT_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 
 
 class GroqSpeechToText(SpeechToTextBase):
     """
-    List of available models as of 2025-01-15:
-      - whisper-large-v3-turbo
-      - whisper-large-v3
-      - distil-whisper-large-v3-en
     Covered modes for this class:
       - transcriptions
       - translations
@@ -135,21 +115,60 @@ class GroqSpeechToText(SpeechToTextBase):
           - temperature: float
         Parameters for transcriptions:
           - language: str
+          - timestamp_granularities: list or None
         Special parameters for LLMMaster:
           - mode (required): 'transcriptions' or 'translations'
         """
         body = super()._body()
 
-        if "prompt" in self.parameters:
-            body["prompt"] = self.parameters["prompt"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
         if "temperature" in self.parameters:
             body["temperature"] = str(self.parameters["temperature"])
 
-        if "language" in self.parameters:
-            body["language"] = self.parameters["language"]
+        for param in GROQ_STT_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
+
+
+class GroqTextToSpeech(RootModel):
+    """
+    2026-05-28 added: TTS for read-aloud
+    """
+
+    def run(self) -> None:
+        self.payload = {"headers": self._headers(), "json": self._body()}
+        self.response = self._call_rest_api(url=GROQ_BASE_EP + GROQ_TTS_EP)
+
+    def _body(self) -> dict:
+        """
+        Specific parameters:
+          - model (required): str
+          - input (required): text to speak up as prompt
+          - voice (required): whose voice in str
+          - response_format: flac, mp3, mulaw, ogg, wav in str
+          - sample_rate: int
+          - speed: float between 0.5 and 5.0
+        """
+        body = {
+            "model": self.parameters["model"],
+            "input": self.parameters["prompt"],
+        }
+
+        for param in GROQ_TTS_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
+
+        return body
+
+    def _verify_arguments(self, **kwargs) -> dict:
+        """
+        Check required parameters:
+          - voice
+        """
+        parameters = kwargs
+
+        if "voice" not in kwargs:
+            parameters["voice"] = GROQ_TTS_VOICE_DEFAULT
+
+        return parameters

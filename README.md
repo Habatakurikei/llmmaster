@@ -33,7 +33,7 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, `xai_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `openai` (voice output), `openai_tts`, `voicevox_tts`, `replica_tts` | `lumaai_ttv` |
+| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, `xai_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `groq_tts`, `openai` (voice output), `openai_tts`, `voicevox_tts`, `replica_tts` (deprecated) | `lumaai_ttv` |
 | Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `flux1_fal_kontext`, `lumaai_iti`, `lumaai_rfi`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
 | Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv`, `lumaai_rfv` |
@@ -41,6 +41,7 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 You need to install Voicevox engine separately for `voicevox_tts`. See [Voicevox](https://voicevox.hiroshiba.jp/) for details.
 
 **Important Updates:**
+  - `replica_tts` was deprecated due to service stop by the provider.
   - `pikapikapika_ttv` was deprecated and removed at v1.0.0.
   - From v1.3.1, `AnthropicLLM` supports PDF input using `anthropic_pdf_prompt()`, implementing similar to the example shown avobe.
   - `gpt-image-1` model can be used at v1.4.1 for provider `openai_tti`.

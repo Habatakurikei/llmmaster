@@ -2,10 +2,12 @@ import pytest
 
 from conftest import load_api_keys
 from conftest import run_llmmaster
+from conftest import save_response
 from conftest import verify_instance
 from llmmaster import LLMMaster
 from llmmaster.groq_models import GroqLLM
 from llmmaster.groq_models import GroqSpeechToText
+from llmmaster.groq_models import GroqTextToSpeech
 from llmmaster.utils import extract_llm_response
 from llmmaster.utils import groq_vision_prompt
 
@@ -73,7 +75,7 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
         system_prompt=system_prompt,
         frequency_penalty=0.2,
         presence_penalty=-0.2,
@@ -84,7 +86,13 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         temperature=0.3,
         top_p=0.6,
         stop=["QED"],
-        user=None
+        user=None,
+        citation_options="disabled",
+        compound_custom=None,
+        disable_tool_validation=False,
+        documents=None,
+        reasoning_effort="low",
+        search_settings=None
     )
     master.summon({key: entry})
 
@@ -119,7 +127,7 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="llama-3.2-11b-vision-preview",
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
         prompt=image_prompt
     )
     master.summon({key: entry})
@@ -206,5 +214,41 @@ def test_translation(run_api: bool, load_api_file: bool) -> None:
 
     assert judgment
 
+
+def test_tts(run_api: bool, load_api_file: bool) -> None:
+    """
+    2025-05-28 added: Test text-to-speech output
+    """
+    judgment = True
+    master = LLMMaster()
+    key = "groq_tts"
+
+    if load_api_file:
+        master.set_api_keys(load_api_keys())
+
+    # not including model and voice to check default values
+    entry = master.pack_parameters(
+        provider=key,
+        prompt="Hello, this is a test for text-to-speech.",
+        response_format="wav",
+        sample_rate=44100,
+        speed=1.5,
+    )
+    master.summon({key: entry})
+
+    judgment = verify_instance(master.instances[key], GroqTextToSpeech)
+    if judgment is False:
+        pytest.fail(f"{key} is not an expected instance.")
+
+    if run_api:
+        try:
+            master.run()
+            if isinstance(master.results[key], str):
+                pytest.fail(f"Test failed with error: {master.results[key]}")
+            save_response(master.results[key], key, "wav")
+        except Exception as e:
+            pytest.fail(f"Test failed with error: {str(e)}")
+
+    assert judgment
 
 # TODO: Add test for tool calling

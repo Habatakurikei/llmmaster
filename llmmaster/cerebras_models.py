@@ -22,6 +22,18 @@ class CerebrasLLM(LLMBase):
           - user: str or None
           - tool_choice: str or dict
           - tools: list of dict or None
+        2026-05-28: new parametrs
+          - clear_thinking: bool or None
+          - frequency_penalty: float
+          - logit_bias: map or None
+          - logprobs: bool
+          - parallel_tool_calls: bool or None
+          - prediction: dict or None
+          - presence_penalty: float
+          - prompt_cache_key: str or None
+          - reasoning_effort: dict or None
+          - service_tier: str or None
+          - top_logprobs: int or None
         Note:
           - top_k is not supported
           - handle both max_tokens and max_completion_tokens

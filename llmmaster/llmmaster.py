@@ -46,6 +46,7 @@ from .google_models import GoogleLLM
 from .google_models import GoogleSpeechVideoToText
 from .groq_models import GroqLLM
 from .groq_models import GroqSpeechToText
+from .groq_models import GroqTextToSpeech
 from .inceptionlabs_models import InceptionLabsFIM
 from .inceptionlabs_models import InceptionLabsLLM
 from .lumaai_models import LumaAIImageToImage
@@ -102,7 +103,7 @@ ACTIVE_MODELS = {
     "cerebras": {
         CLASS: CerebrasLLM,
         KEY_NAME: CEREBRAS_KEY_NAME,
-        DEFAULT_MODEL: "llama3.1-8b"
+        DEFAULT_MODEL: "gpt-oss-120b"
     },
     "deepseek": {
         CLASS: DeepSeekLLM,
@@ -178,6 +179,11 @@ ACTIVE_MODELS = {
         CLASS: GroqSpeechToText,
         KEY_NAME: GROQ_KEY_NAME,
         DEFAULT_MODEL: "whisper-large-v3"
+    },
+    "groq_tts": {
+        CLASS: GroqTextToSpeech,
+        KEY_NAME: GROQ_KEY_NAME,
+        DEFAULT_MODEL: "canopylabs/orpheus-v1-english"
     },
     "inceptionlabs": {
         CLASS: InceptionLabsLLM,
