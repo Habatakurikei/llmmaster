@@ -25,6 +25,14 @@
   - Niji Voice
   - GPT-Image-1 Edit
 
+## [1.4.9] - 2026-05-29 (no pip release)
+### Added
+- `InceptionLabsLLM`, `InceptionLabsFIM` and `InceptionLabsEdit`
+### Changed
+- Updated `SambaNovaLLM` to adapt the latest API.
+- Updated `PerplexityLLM` to adapt the latest API.
+- Updated `MistralLLM`, `MistralFIM` to adapt the latest API.
+
 ## [1.4.8] - 2026-05-28 (no pip release)
 ### Added
 - `GroqTextToSpeech`

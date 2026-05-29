@@ -47,6 +47,7 @@ from .google_models import GoogleSpeechVideoToText
 from .groq_models import GroqLLM
 from .groq_models import GroqSpeechToText
 from .groq_models import GroqTextToSpeech
+from .inceptionlabs_models import InceptionLabsEdit
 from .inceptionlabs_models import InceptionLabsFIM
 from .inceptionlabs_models import InceptionLabsLLM
 from .lumaai_models import LumaAIImageToImage
@@ -188,12 +189,17 @@ ACTIVE_MODELS = {
     "inceptionlabs": {
         CLASS: InceptionLabsLLM,
         KEY_NAME: INCEPTIONLABS_KEY_NAME,
-        DEFAULT_MODEL: "mercury-coder-small"
+        DEFAULT_MODEL: "mercury-2"
     },
     "inceptionlabs_fim": {
         CLASS: InceptionLabsFIM,
         KEY_NAME: INCEPTIONLABS_KEY_NAME,
-        DEFAULT_MODEL: "mercury-coder-small"
+        DEFAULT_MODEL: "mercury-2"
+    },
+    "inceptionlabs_edit": {
+        CLASS: InceptionLabsEdit,
+        KEY_NAME: INCEPTIONLABS_KEY_NAME,
+        DEFAULT_MODEL: "mercury-2"
     },
     "lumaai_iti": {
         CLASS: LumaAIImageToImage,
@@ -268,7 +274,7 @@ ACTIVE_MODELS = {
     "mistral_fim": {
         CLASS: MistralFIM,
         KEY_NAME: MISTRAL_KEY_NAME,
-        DEFAULT_MODEL: "codestral-latest"
+        DEFAULT_MODEL: "codestral-2508"
     },
     "openai": {
         CLASS: OpenAILLM,
@@ -313,7 +319,7 @@ ACTIVE_MODELS = {
     "sambanova": {
         CLASS: SambaNovaLLM,
         KEY_NAME: SAMBANOVA_KEY_NAME,
-        DEFAULT_MODEL: "Meta-Llama-3.1-8B-Instruct"
+        DEFAULT_MODEL: "Meta-Llama-3.3-70B-Instruct"
     },
     "skybox_ptiv": {
         CLASS: SkyboxPanoramaToImageVideo,

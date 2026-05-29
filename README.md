@@ -33,7 +33,7 @@ Use highlighted word for parameter `provider` to make `LLMMaster` instance.
 
 | From \ To | Text | Image | Audio | Video |
 |-----------|------|-------|-------|-------|
-| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, `xai_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `groq_tts`, `openai` (voice output), `openai_tts`, `voicevox_tts`, `replica_tts` (deprecated) | `lumaai_ttv` |
+| Text | `anthropic`, `cerebras`, `deepseek`, `google`, `groq`, `inceptionlabs`, `inceptionlabs_fim`, `inceptionlabs_edit`, `mistral`, `mistral_fim`, `openai`, `perplexity`, `sambanova`, `xai` | `flux1_fal_tti`, `lumaai_tti`, `openai_tti`, `stable_diffusion_tti`, `xai_tti`, adobe_firefly_tti (pending) | `elevenlabs_tts`, `elevenlabs_ttse`, `elevenlabs_voicedesign`, `groq_tts`, `openai` (voice output), `openai_tts`, `voicevox_tts`, `replica_tts` (deprecated) | `lumaai_ttv` |
 | Image | `anthropic`, `google`, `groq`, `mistral`, `openai`, `sambanova`, `xai` | `flux1_fal_iti`, `flux1_fal_kontext`, `lumaai_iti`, `lumaai_rfi`, `openai_iti`, `stable_diffusion_iti` | NA | `lumaai_itv`, `runway_itv`, `stable_diffusion_itv` |
 | Audio | `google_stt`, `groq_stt`, `openai` (audio input), `openai_stt` | NA | `elevenlabs_aiso`, `elevenlabs_voicechange`, | NA |
 | Video | `google_vtt` | NA | NA | `lumaai_vtv`, `lumaai_rfv` |
@@ -118,6 +118,7 @@ export ELEVENLABS_API_KEY="your_API_key"
 export FAL_KEY="your_API_key"
 export GOOGLE_API_KEY="your_API_key"
 export GROQ_API_KEY="your_API_key"
+export INCEPTIONLABS_API_KEY="your_API_key"
 export LUMAAI_API_KEY="your_API_key"
 export MESHY_API_KEY="your_API_key"
 export MISTRAL_API_KEY="your_API_key"
@@ -144,6 +145,7 @@ SET ELEVENLABS_API_KEY=your_API_key
 SET FAL_KEY=your_API_key
 SET GOOGLE_API_KEY=your_API_key
 SET GROQ_API_KEY=your_API_key
+SET INCEPTIONLABS_API_KEY="your_API_key"
 SET LUMAAI_API_KEY=your_API_key
 SET MESHY_API_KEY=your_API_key
 SET MISTRAL_API_KEY=your_API_key
@@ -170,6 +172,7 @@ $env:ELEVENLABS_API_KEY="your_API_key"
 $env:FAL_KEY="your_API_key"
 $env:GOOGLE_API_KEY="your_API_key"
 $env:GROQ_API_KEY="your_API_key"
+$env:INCEPTIONLABS_API_KEY="your_API_key"
 $env:LUMAAI_API_KEY="your_API_key"
 $env:MESHY_API_KEY="your_API_key"
 $env:MISTRAL_API_KEY="your_API_key"

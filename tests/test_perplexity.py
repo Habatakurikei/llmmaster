@@ -69,13 +69,28 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         system_prompt="Return in a news narration style to read aloud.",
         model="sonar-pro",
         max_tokens=8192,
-        presence_penalty=-0.2,
-        search_recency_filter="month",
         temperature=0.3,
         top_p=0.6,
         top_k=75,
+        response_format={"type": "text"},
+        disable_search=False,
+        enable_search_classifier=False,
+        search_mode="web",
+        web_search_options={
+            "search_context_size": "low",
+            "search_type": "auto",
+            "user_location": {"country": "US"}
+        },
+        return_images=True,
+        return_related_questions=True,
+        search_domain_filter=None,
+        search_language_filter=None,
+        search_recency_filter="month",
+        image_format_filter=["png","jpg"],
+        image_domain_filter=None,
+        reasoning_effort="low",
+        language_preference=None
     )
-    entry["web_search_options"] = {"search_context_size": "high"}
     master.summon({key: entry})
 
     judgment = verify_instance(master.instances[key], PerplexityLLM)
@@ -91,9 +106,10 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
-def test_reasoning(run_api: bool, load_api_file: bool) -> None:
+def reasoning(run_api: bool, load_api_file: bool) -> None:
     """
     Test reasoning
+    2026-05-29: deprecated due to merge to test_llm_more.
     """
     judgment = True
     master = LLMMaster()

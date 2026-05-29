@@ -1,3 +1,4 @@
+from .config import PERPLEXITY_BASE_EP
 from .config import PERPLEXITY_TTT_EP
 from .config import PERPLEXITY_TTT_PARAMS
 from .llmbase import LLMBase
@@ -9,7 +10,9 @@ class PerplexityLLM(LLMBase):
     """
 
     def run(self) -> None:
-        self.response = self._call_llm(url=PERPLEXITY_TTT_EP)
+        self.response = self._call_llm(
+            url=f"{PERPLEXITY_BASE_EP}{PERPLEXITY_TTT_EP}"
+        )
 
     def _body(self) -> dict:
         """
@@ -28,6 +31,7 @@ class PerplexityLLM(LLMBase):
           - frequency_penalty: float
           - response_format: dict
           - web_search_options: dict
+        2026-05-29: added more parameters.
         Note:
           - Either frequency_penalty or presence_penalty can be set.
           - Example of "web_search_options": {"search_context_size": "high"}

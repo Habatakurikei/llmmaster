@@ -129,7 +129,6 @@ DEEPSEEK_LLM_PARAMS = [
     "user_id"
 ]
 
-
 # ElevenLabs
 ELEVENLABS_BASE_EP = "https://api.elevenlabs.io"
 ELEVENLABS_TTS_EP = "/v1/text-to-speech"
@@ -266,13 +265,22 @@ GROQ_TTS_VOICE_DEFAULT = "troy"
 INCEPTIONLABS_BASE_EP = "https://api.inceptionlabs.ai"
 INCEPTIONLABS_TTT_EP = "/v1/chat/completions"
 INCEPTIONLABS_FIM_EP = "/v1/fim/completions"
+INCEPTIONLABS_EDIT_EP = "/v1/edit/completions"
 
 INCEPTIONLABS_TTT_PARAMS = [
+    "stop",
+    "tools",
+    "diffusing",
+    "extra_body",
+    "realtime",
+    "response_format",
+    "reasoning_summary",
+    "reasoning_summary_wait",
+    "reasoning_effort",
+    "suffix",
     "frequency_penalty",
     "presence_penalty",
-    "stop",
-    "diffusing",
-    "tools"
+    "repetition_penalty"
 ]
 
 # Luma Dream Machine
@@ -366,6 +374,27 @@ MISTRAL_TTT_EP = "/v1/chat/completions"
 MISTRAL_FIM_EP = "/v1/fim/completions"
 MISTRAL_AGENT_EP = "/v1/agents/completions"
 
+MISTRAL_TTT_PARAMS = [
+    "frequency_penalty",
+    "guardrails",
+    "metadata",
+    "parallel_tool_calls",
+    "prediction",
+    "presence_penalty",
+    "prompt_cache_key",
+    "prompt_mode",
+    "random_seed",
+    "reasoning_effort",
+    "response_format",
+    "safe_prompt",
+    "stop",
+    "tool_choice",
+    "tools",
+    "suffix",
+    "min_tokens",
+    "name"
+]
+
 # OpenAI
 OPENAI_BASE_EP = "https://api.openai.com"
 OPENAI_TTT_EP = "/v1/chat/completions"
@@ -437,22 +466,31 @@ OPENAI_ITI_PARAMS = [
 ]
 
 # Perplexity
-PERPLEXITY_TTT_EP = "https://api.perplexity.ai/chat/completions"
+PERPLEXITY_BASE_EP = "https://api.perplexity.ai"
+PERPLEXITY_AGENT_EP = "/v1/agent"
+PERPLEXITY_SEARCH_EP = "/search"
+PERPLEXITY_TTT_EP = "/v1/sonar"
+
 PERPLEXITY_TTT_PARAMS = [
+    "stop",
+    "response_format",
+    "web_search_options",
     "search_mode",
-    "reasoning_effort",
-    "search_domain_filter",
     "return_images",
     "return_related_questions",
+    "​enable_search_classifier",
+    "disable_search",
+    "search_domain_filter",
+    "search_language_filter",
     "search_recency_filter",
     "search_after_date_filter",
     "search_before_date_filter",
     "last_updated_after_filter",
     "last_updated_before_filter",
-    "presence_penalty",
-    "frequency_penalty",
-    "response_format",
-    "web_search_options"
+    "image_format_filter",
+    "image_domain_filter",
+    "reasoning_effort",
+    "language_preference"
 ]
 
 # Replica
@@ -487,6 +525,23 @@ WAIT_FOR_RUNWAY_RESULT = 5.0
 
 # Sambanova
 SAMBANOVA_TTT_EP = "https://api.sambanova.ai/v1/chat/completions"
+
+SAMBANOVA_TTT_PARAMS = [
+    "presence_penalty",
+    "frequency_penalty",
+    "do_sample",
+    "stop",
+    "response_format",
+    "reasoning_effort",
+    "tool_choice",
+    "tools",
+    "parallel_tool_calls",
+    "chat_template_kwargs",
+    "logprobs",
+    "top_logprobs",
+    "logit_bias",
+    "seed"
+]
 
 # Skybox
 SKYBOX_BASE_EP = "https://backend.blockadelabs.com/api/v1"

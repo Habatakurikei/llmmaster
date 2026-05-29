@@ -85,7 +85,7 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         safe_prompt=True,
         max_tokens=4096,
         temperature=0.3,
-        top_p=0.6,
+        top_p=0.6
     )
     master.summon({key: entry})
 
@@ -120,7 +120,7 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="pixtral-12b-2409",
+        model="mistral-large-2512",
         prompt=image_prompt,
     )
     master.summon({key: entry})
@@ -153,13 +153,12 @@ def test_fim(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider="mistral_fim",
-        model="codestral-2405",
+        model="codestral-2508",
         temperature=1.5,
         stop="string",
         random_seed=0,
         prompt="def",
         suffix="return a+b",
-        min_tokens=0,
     )
     master.summon({key: entry})
 

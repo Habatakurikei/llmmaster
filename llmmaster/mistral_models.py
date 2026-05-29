@@ -2,6 +2,7 @@ from .config import MISTRAL_AGENT_EP
 from .config import MISTRAL_BASE_EP
 from .config import MISTRAL_FIM_EP
 from .config import MISTRAL_TTT_EP
+from .config import MISTRAL_TTT_PARAMS
 from .llmbase import LLMBase
 
 
@@ -39,41 +40,13 @@ class MistralBase(LLMBase):
         Note:
           - top_k parameter does not exist.
           - include keyword 'json' in prompt for json_object output.
+        2026-05-29: added more parameters.
         """
         body = super()._body()
 
-        if "stop" in self.parameters:
-            body["stop"] = self.parameters["stop"]
-
-        if "random_seed" in self.parameters:
-            body["random_seed"] = self.parameters["random_seed"]
-
-        if "response_format" in self.parameters:
-            body["response_format"] = self.parameters["response_format"]
-
-        if "tools" in self.parameters:
-            body["tools"] = self.parameters["tools"]
-
-        if "tool_choice" in self.parameters:
-            body["tool_choice"] = self.parameters["tool_choice"]
-
-        if "presence_penalty" in self.parameters:
-            body["presence_penalty"] = self.parameters["presence_penalty"]
-
-        if "frequency_penalty" in self.parameters:
-            body["frequency_penalty"] = self.parameters["frequency_penalty"]
-
-        if "safe_prompt" in self.parameters:
-            body["safe_prompt"] = self.parameters["safe_prompt"]
-
-        if "suffix" in self.parameters:
-            body["suffix"] = self.parameters["suffix"]
-
-        if "min_tokens" in self.parameters:
-            body["min_tokens"] = self.parameters["min_tokens"]
-
-        if "agent_id" in self.parameters:
-            body["agent_id"] = self.parameters["agent_id"]
+        for param in MISTRAL_TTT_PARAMS:
+            if param in self.parameters:
+                body[param] = self.parameters[param]
 
         return body
 

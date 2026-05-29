@@ -71,13 +71,22 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="Meta-Llama-3.1-405B-Instruct",
+        model="gpt-oss-120b",
         system_prompt=system_prompt,
+        presence_penalty=-0.2,
+        frequency_penalty=0.2,
         max_tokens=4096,
         temperature=0.3,
         top_p=0.6,
         top_k=50,
+        do_sample=False,
         stop=["QED"],
+        response_format={"type": "json_object"},
+        reasoning_effort="low",
+        logit_bias=None,
+        logprobs=True,
+        top_logprobs=10,
+        seed=1234567890
     )
     master.summon({key: entry})
 
@@ -112,7 +121,7 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="Llama-3.2-11B-Vision-Instruct",
+        model="Llama-4-Maverick-17B-128E-Instruct",
         prompt=image_prompt,
     )
     master.summon({key: entry})
