@@ -78,7 +78,7 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         system_prompt=system_prompt,
         stopSequences=["QED"],
         responseMimeType="application/json",
@@ -89,8 +89,6 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         topP=0.95,
         topK=40,
         seed=1,
-        presencePenalty=0.2,
-        frequencyPenalty=0.2,
         enableEnhancedCivicAnswers=True
     )
     master.summon({key: entry})
@@ -123,8 +121,9 @@ def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider="google",
-        model="gemini-2.5-pro-preview-05-06",
+        model="gemini-3.1-pro-preview",
         prompt="Is the basic income a good idea?",
+        thinkingConfig={"includeThoughts": True}
     )
     master.summon({key: entry})
 
@@ -198,7 +197,7 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         prompt=image_prompt
     )
     master.summon({key: entry})
@@ -231,7 +230,7 @@ def test_stt(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=key,
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         prompt="What is the attached audio about?",
         file=SPEECH_PATH
     )
@@ -265,7 +264,7 @@ def test_vtt(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=key,
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         prompt="What is the attached video about?",
         file=VIDEO_PATH
     )

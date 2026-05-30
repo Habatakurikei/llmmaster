@@ -99,7 +99,7 @@ ACTIVE_MODELS = {
     "anthropic": {
         CLASS: AnthropicLLM,
         KEY_NAME: ANTHROPIC_KEY_NAME,
-        DEFAULT_MODEL: "claude-3-haiku-20240307"
+        DEFAULT_MODEL: "claude-haiku-4-5-20251001"
     },
     "cerebras": {
         CLASS: CerebrasLLM,
@@ -159,17 +159,17 @@ ACTIVE_MODELS = {
     "google": {
         CLASS: GoogleLLM,
         KEY_NAME: GOOGLE_KEY_NAME,
-        DEFAULT_MODEL: "gemini-1.5-flash"
+        DEFAULT_MODEL: "gemini-2.5-flash"
     },
     "google_stt": {
         CLASS: GoogleSpeechVideoToText,
         KEY_NAME: GOOGLE_KEY_NAME,
-        DEFAULT_MODEL: "gemini-1.5-flash"
+        DEFAULT_MODEL: "gemini-2.5-flash"
     },
     "google_vtt": {
         CLASS: GoogleSpeechVideoToText,
         KEY_NAME: GOOGLE_KEY_NAME,
-        DEFAULT_MODEL: "gemini-1.5-flash"
+        DEFAULT_MODEL: "gemini-2.5-flash"
     },
     "groq": {
         CLASS: GroqLLM,
@@ -194,12 +194,12 @@ ACTIVE_MODELS = {
     "inceptionlabs_fim": {
         CLASS: InceptionLabsFIM,
         KEY_NAME: INCEPTIONLABS_KEY_NAME,
-        DEFAULT_MODEL: "mercury-2"
+        DEFAULT_MODEL: "mercury-coder"
     },
     "inceptionlabs_edit": {
         CLASS: InceptionLabsEdit,
         KEY_NAME: INCEPTIONLABS_KEY_NAME,
-        DEFAULT_MODEL: "mercury-2"
+        DEFAULT_MODEL: "mercury-edit-2"
     },
     "lumaai_iti": {
         CLASS: LumaAIImageToImage,
@@ -279,7 +279,7 @@ ACTIVE_MODELS = {
     "openai": {
         CLASS: OpenAILLM,
         KEY_NAME: OPENAI_KEY_NAME,
-        DEFAULT_MODEL: "gpt-4o-mini"
+        DEFAULT_MODEL: "gpt-4.1-mini"
     },
     "openai_iti": {
         CLASS: OpenAIImageToImage,
@@ -409,12 +409,12 @@ ACTIVE_MODELS = {
     "xai": {
         CLASS: XAILLM,
         KEY_NAME: XAI_KEY_NAME,
-        DEFAULT_MODEL: "grok-3-mini"
+        DEFAULT_MODEL: "grok-4.3"
     },
     "xai_tti": {
         CLASS: XAITextToImage,
         KEY_NAME: XAI_KEY_NAME,
-        DEFAULT_MODEL: "grok-2-image-latest"
+        DEFAULT_MODEL: "grok-imagine-image-quality"
     },
 }
 

@@ -13,7 +13,7 @@ from llmmaster.xai_models import XAITextToImage
 
 
 PROVIDER = "xai"
-PROMPT = "What is the future implementation of Grok 2 from XAI?"
+PROMPT = "What is the strategy of xAI Grok implementation for industries?"
 CHARACTER_PROMPT = "./test-inputs/character_prompt_short.txt"
 
 IMAGE_PATH = [
@@ -80,16 +80,13 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What are the capital cities of the G20 countries?",
-        model="grok-4-fast-non-reasoning",
+        model="grok-4.3",
         system_prompt=system_prompt,
         temperature=0.3,
         response_format={"type": "json_object"},
-        frequency_penalty=0.2,
-        presence_penalty=0.2,
         max_tokens=4096,
         seed=1234567890,
         top_p=0.6,
-        stop=["QED"],
         logprobs=True,
         top_logprobs=6,
         logit_bias=None,
@@ -120,11 +117,10 @@ def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
     if load_api_file:
         master.set_api_keys(load_api_keys())
 
-    # not testing deferred parameter due to 500 error
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="What will happen after the second Trump presidency?",
-        model="grok-3-mini-beta",
+        model="grok-4.3",
         reasoning_effort="high",
         temperature=0.3
     )
@@ -146,6 +142,7 @@ def test_llm_reasoning(run_api: bool, load_api_file: bool) -> None:
 def test_llm_livesearch(run_api: bool, load_api_file: bool) -> None:
     """
     Test model with more parameters
+    2026-05-30: deprecated. Use the agent tools API.
     """
     judgment = True
     master = LLMMaster()
@@ -157,7 +154,7 @@ def test_llm_livesearch(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="Provide news about Trump administration in the last 24 hours.",
-        model="grok-3-latest",
+        model="grok-4.3",
         search_parameters={
             "mode": "auto"
         }
@@ -195,7 +192,7 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="grok-2-vision-latest",
+        model="grok-4.3",
         prompt=image_prompt,
     )
     master.summon({key: entry})
@@ -226,9 +223,10 @@ def test_tti(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=key,
-        model="grok-2-image-latest",
         prompt=Path(CHARACTER_PROMPT).read_text(encoding="utf-8"),
+        aspect_ratio="1:1",
         n=1,
+        resolution="2k",
         response_format="url",
     )
     master.summon({key: entry})

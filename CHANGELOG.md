@@ -18,12 +18,16 @@
   - Suno for rather enterprise use
 - Other providers/models to be added
   - Tool calling for LLMs
+  - Google image, voice, audio and video generation
   - Agent in MistralAI
-  - Google VertexAI
   - Rodin 3D
   - Hailuo
   - Niji Voice
   - GPT-Image-1 Edit
+
+## [1.5.0] - 2026-05-30
+### Changed
+- Reviewed and corrected Anthropic, Google, OpenAI and xAI models to adapt the latest API.
 
 ## [1.4.9] - 2026-05-29 (no pip release)
 ### Added

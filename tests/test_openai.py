@@ -94,16 +94,14 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
         frequency_penalty=0.2,
         logprobs=True,
         logit_bias={},
-        top_logprobs=3,
         max_tokens=8192,
         modalities=["text"],
         presence_penalty=0.2,
         response_format={"type": "json_object"},
-        seed=1234567890,
         service_tier="auto",
         stop=["QED"],
-        temperature=0.3,
-        top_p=0.6,
+        top_logprobs=3,
+        top_p=0.6
     )
     master.summon({key: entry})
 
@@ -120,23 +118,24 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     assert judgment
 
 
-def test_o1(run_api: bool, load_api_file: bool) -> None:
+def test_reasoning(run_api: bool, load_api_file: bool) -> None:
     """
     Test the reasoning model
+    2026-05-30: renamed
     """
     judgment = True
     master = LLMMaster()
-    key = "openai_o1"
+    key = "openai_reasoning"
 
     if load_api_file:
         master.set_api_keys(load_api_keys())
 
-    # test reasoning_effort='high' later with o1
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="o1",
+        model="gpt-5.4",
         prompt="What will happen in the technological singularity?",
-        reasoning_effort="high",
+        reasoning_effort="low",
+        verbosity="high"
     )
     master.summon({key: entry})
 
@@ -168,7 +167,7 @@ def test_websearch(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="gpt-4o-search-preview",
+        model="gpt-5-search-api",
         prompt="What were the news yesterday?",
         web_search_options={},
     )
@@ -207,7 +206,7 @@ def test_i2t(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="gpt-4o",
+        model="gpt-5.4",
         prompt=image_prompt
     )
     master.summon({key: entry})

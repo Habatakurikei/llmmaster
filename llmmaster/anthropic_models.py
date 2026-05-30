@@ -33,6 +33,7 @@ class AnthropicLLM(LLMBase):
           - system: str
           - tool_choice: dict
           - tools: list of objects
+        2026-05-30: reviewed parameters.
         Note:
           - unable to set system role but assistant is used instead.
         """

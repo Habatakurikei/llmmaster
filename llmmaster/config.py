@@ -84,12 +84,22 @@ ADOBE_FIREFLY_MAX_N = 4
 ANTHROPIC_TTT_EP = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION_HEADER = "2023-06-01"
 ANTHROPIC_LLM_PARAMS = [
+    "cache_control",
+    "container",
+    "context_management",
+    "diagnostics",
+    "inference_geo",
+    "mcp_servers",
     "metadata",
+    "output_config",
+    "service_tier",
+    "speed",
     "stop_sequences",
     "system",
+    "thinking",
     "tool_choice",
     "tools",
-    "thinking"
+    "user_profile_id"
 ]
 
 # Cerebras
@@ -198,6 +208,7 @@ GOOGLE_GEMINI_TTT_PARAMS = [
     "stopSequences",
     "responseMimeType",
     "responseSchema",
+    "responseJsonSchema",
     "responseModalities",
     "candidateCount",
     "maxOutputTokens",
@@ -211,6 +222,10 @@ GOOGLE_GEMINI_TTT_PARAMS = [
     "logprobs",
     "enableEnhancedCivicAnswers",
     "speechConfig",
+    "thinkingConfig",
+    "imageConfig",
+    "mediaResolution",
+    "responseFormat",
     "top_p",
     "top_k"
 ]
@@ -396,7 +411,9 @@ MISTRAL_TTT_PARAMS = [
 ]
 
 # OpenAI
+# 2026-05-30: need to implement Response API
 OPENAI_BASE_EP = "https://api.openai.com"
+OPENAI_RESPONSE_EP = "/v1/responses"
 OPENAI_TTT_EP = "/v1/chat/completions"
 OPENAI_TTS_EP = "/v1/audio/speech"
 OPENAI_TRANSLATION_EP = "/v1/audio/translations"
@@ -408,26 +425,28 @@ OPENAI_IMAGE_VARIATIONS_EP = "/v1/images/variations"
 OPENAI_TTS_VOICE_DEFAULT = "alloy"
 
 OPENAI_TTT_PARAMS = [
-    "max_completion_tokens",
-    "store",
-    "reasoning_effort",
-    "metadata",
+    "audio",
     "frequency_penalty",
     "logit_bias",
     "logprobs",
-    "top_logprobs",
+    "max_completion_tokens",
+    "metadata",
     "modalities",
+    "parallel_tool_calls",
     "prediction",
-    "audio",
     "presence_penalty",
+    "prompt_cache_key",
+    "prompt_cache_retention",
+    "reasoning_effort",
     "response_format",
-    "seed",
+    "safety_identifier",
     "service_tier",
     "stop",
-    "tools",
+    "store",
     "tool_choice",
-    "parallel_tool_calls",
-    "user",
+    "tools",
+    "top_logprobs",
+    "verbosity",
     "web_search_options"
 ]
 
@@ -603,24 +622,25 @@ XAI_LLM_PARAMS = [
     "frequency_penalty",
     "logit_bias",
     "logprobs",
+    "parallel_tool_calls",
     "presence_penalty",
     "reasoning_effort",
     "response_format",
+    "search_parameters",
     "seed",
     "stop",
-    "tools",
     "tool_choices",
+    "tools",
     "top_logprobs",
     "user",
-    "search_parameters"
+    "web_search_options"
 ]
 
 XAI_I2T_PARAMS = [
+    "aspect_ratio",
     "n",
-    "quality",
+    "resolution",
     "response_format",
-    "size",
-    "style",
     "user"
 ]
 

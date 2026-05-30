@@ -70,13 +70,11 @@ def test_llm_more(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt="Could you tell me the story of Hamlet?",
-        model="claude-3-5-sonnet-20240620",
+        model="claude-sonnet-4-6",
         system_prompt="You are a good storyteller.",
         max_tokens=8192,
-        temperature=0.3,
-        top_p=0.6,
-        top_k=75,
         metadata=None,
+        service_tier="auto",
         stop_sequences=["QED"],
         system="Output in 150 words.",
     )
@@ -110,7 +108,7 @@ def test_thinking(run_api: bool, load_api_file: bool) -> None:
         provider=PROVIDER,
         prompt="What are the most 3 serious problems in the world?",
         thinking={"type": "enabled", "budget_tokens": 10000},
-        model="claude-3-7-sonnet-20250219",
+        model="claude-sonnet-4-6",
         max_tokens=128000
     )
     master.summon({key: entry})
@@ -181,7 +179,7 @@ def test_pdf(run_api: bool, load_api_file: bool) -> None:
     entry = master.pack_parameters(
         provider=PROVIDER,
         prompt=pdf_prompt,
-        model="claude-3-5-sonnet-20241022"
+        model="claude-sonnet-4-6"
     )
     master.summon({key: entry})
 
@@ -213,8 +211,8 @@ def test_websearch(run_api: bool, load_api_file: bool) -> None:
 
     entry = master.pack_parameters(
         provider=PROVIDER,
-        model="claude-3-7-sonnet-latest",
-        prompt="Who is the new pope elected?",
+        model="claude-sonnet-4-6",
+        prompt="Latest trends in Japanese stock prices.",
         tools=[
             {
                 "type": "web_search_20250305",

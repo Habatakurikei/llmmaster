@@ -10,6 +10,8 @@ LLM Master, L2M2 in short, is a powerful engine to boost your creativity by work
 
 This is a Python library that provides a unified interface for interacting with multiple Large Language Models (LLMs) and multimedia generative AI models from different providers.
 
+**Important:** With the release of v1.5.0, LLMMaster will be deprecated. Since the first release, generative AI models have grown widely: text, image, voice, audio, video, MCP, skills, and agents. The library will be maintained as best as the developer can, though keeping all public models up to date is quite a challenge. Thank you for your interest in LLMMaster.
+
 ## Features
 
 - Support for various models from each provider
